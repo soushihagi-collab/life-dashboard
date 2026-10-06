@@ -2,252 +2,253 @@
 <html lang="ja">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Schedule | LIFE DASHBOARD</title>
 
-    <link
-        rel="stylesheet"
-        href="./style.css"
-    >
-
     <style>
 
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: #f5f7fa;
+            color: #1f2933;
+        }
+
         /* =========================
-           SCHEDULE PAGE
+           Header
         ========================= */
 
-        .schedule-page {
+        header {
+            padding: 28px 30px 20px;
+            border-bottom: 1px solid #e1e6eb;
+            background: #ffffff;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .header-subtitle {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #8a94a3;
+            letter-spacing: 1px;
+        }
+
+        #auth-status {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #42d392;
+        }
+
+        /* =========================
+           Main
+        ========================= */
+
+        main {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 45px 30px 80px;
+            padding: 30px 20px 60px;
         }
 
-
-        /* BACK */
-
-        .page-back {
+        .back-link {
             display: inline-block;
             margin-bottom: 25px;
-            color: #8993a1;
+
+            color: #697482;
             text-decoration: none;
-            font-size: 12px;
-        }
-
-        .page-back:hover {
-            color: #f5f7fa;
-        }
-
-
-        /* TITLE */
-
-        .page-title {
-            margin: 0;
-            font-size: 36px;
-            font-weight: 600;
-        }
-
-        .page-description {
-            margin-top: 10px;
-            color: #8993a1;
             font-size: 13px;
         }
 
-
-        /* =========================
-           CALENDAR
-        ========================= */
-
-        .calendar-card {
-            margin-top: 35px;
-            padding: 25px;
-            border: 1px solid #252b33;
-            border-radius: 16px;
-            background:
-                linear-gradient(
-                    145deg,
-                    #131921,
-                    #0f141a
-                );
+        .back-link:hover {
+            color: #42d392;
         }
 
+        h1 {
+            margin: 0;
+            font-size: 26px;
+        }
 
-        /* CALENDAR HEADER */
+        .description {
+            margin-top: 6px;
+            color: #8a94a3;
+            font-size: 13px;
+        }
+
+        /* =========================
+           Calendar
+        ========================= */
+
+        .calendar-container {
+            margin-top: 30px;
+            padding: 22px;
+
+            background: #ffffff;
+            border: 1px solid #e1e6eb;
+            border-radius: 12px;
+        }
 
         .calendar-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 22px;
+            justify-content: space-between;
+
+            margin-bottom: 20px;
         }
 
-        .calendar-month {
+        .calendar-title {
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
-        .calendar-navigation {
+        .calendar-nav {
             display: flex;
             gap: 8px;
         }
 
-        .calendar-nav-button {
-            width: 36px;
-            height: 36px;
-            border: 1px solid #303945;
-            border-radius: 8px;
-            background: #11161d;
-            color: #aab3bf;
+        .calendar-nav button {
+            padding: 7px 12px;
+
+            border: 1px solid #d8dee5;
+            border-radius: 7px;
+
+            background: #ffffff;
+            color: #4b5563;
+
             cursor: pointer;
-            font-size: 16px;
+            font-size: 12px;
         }
 
-        .calendar-nav-button:hover {
-            background: #171d25;
-            border-color: #3b4654;
-            color: #f5f7fa;
+        .calendar-nav button:hover {
+            border-color: #42d392;
+            color: #42d392;
         }
 
+        /* =========================
+           Weekdays
+        ========================= */
 
-        /* WEEKDAYS */
-
-        .calendar-weekdays {
+        .weekdays {
             display: grid;
-            grid-template-columns:
-                repeat(7, 1fr);
-            margin-bottom: 8px;
+            grid-template-columns: repeat(7, 1fr);
+
+            margin-bottom: 5px;
         }
 
-        .calendar-weekday {
+        .weekday {
             padding: 8px 0;
+
             text-align: center;
-            font-size: 10px;
-            letter-spacing: 1px;
-            color: #697482;
+            font-size: 11px;
+            color: #8a94a3;
+            font-weight: 600;
         }
 
-
-        /* CALENDAR GRID */
+        /* =========================
+           Calendar Grid
+        ========================= */
 
         .calendar-grid {
             display: grid;
-            grid-template-columns:
-                repeat(7, 1fr);
-            gap: 5px;
+            grid-template-columns: repeat(7, 1fr);
+
+            border-top: 1px solid #e8edf1;
+            border-left: 1px solid #e8edf1;
         }
-
-
-        /* DAY */
 
         .calendar-day {
             position: relative;
-            min-height: 75px;
-            padding: 10px;
-            border: 1px solid transparent;
-            border-radius: 9px;
-            background: #11161d;
-            color: #aab3bf;
+
+            min-height: 82px;
+            padding: 8px;
+
+            border-right: 1px solid #e8edf1;
+            border-bottom: 1px solid #e8edf1;
+
+            background: #ffffff;
+
             cursor: pointer;
-            transition:
-                background 0.15s ease,
-                border-color 0.15s ease;
+            transition: background 0.15s;
         }
 
         .calendar-day:hover {
-            background: #171d25;
-            border-color: #303945;
+            background: #f8fafb;
         }
-
-
-        /* OTHER MONTH */
 
         .calendar-day.other-month {
-            background: #0d1117;
-            color: #3f4853;
+            color: #c5cbd2;
+            background: #fafbfc;
         }
-
-
-        /* TODAY */
 
         .calendar-day.today {
-            border-color: #42d392;
+            background: #f0faf6;
         }
-
-
-        .calendar-day.today
-        .calendar-day-number {
-            color: #42d392;
-            font-weight: 700;
-        }
-
-
-        /* SELECTED */
 
         .calendar-day.selected {
-            background: #1a222c;
-            border-color: #697482;
+            box-shadow: inset 0 0 0 2px #42d392;
         }
 
-
-        /* DAY NUMBER */
-
-        .calendar-day-number {
+        .day-number {
             font-size: 13px;
+            font-weight: 600;
         }
 
+        .calendar-day.today .day-number {
+            color: #42d392;
+        }
 
-        /* EVENT DOT */
+        /* =========================
+           Schedule Dot
+        ========================= */
 
-        .calendar-event-dot {
+        .schedule-dot {
             position: absolute;
-            bottom: 9px;
-            left: 10px;
-            width: 5px;
-            height: 5px;
+
+            bottom: 8px;
+            left: 8px;
+
+            width: 6px;
+            height: 6px;
+
             border-radius: 50%;
             background: #42d392;
         }
 
-
         /* =========================
-           SELECTED DATE
+           Selected Date
         ========================= */
 
-        .selected-date-section {
-            margin-top: 35px;
+        .selected-date-container {
+            margin-top: 25px;
+            padding: 20px;
+
+            background: #ffffff;
+            border: 1px solid #e1e6eb;
+            border-radius: 12px;
         }
 
         .selected-date-title {
+            font-size: 17px;
+            font-weight: 700;
+
             margin-bottom: 15px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: #6f7a88;
         }
-
-
-        .selected-date-card {
-            padding: 22px;
-            border: 1px solid #252b33;
-            border-radius: 12px;
-            background: #11161d;
-        }
-
-        .selected-date-heading {
-            margin-bottom: 20px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
 
         /* =========================
-           SCHEDULE LIST
+           Schedule Item
         ========================= */
 
         .schedule-list {
@@ -256,208 +257,234 @@
             gap: 10px;
         }
 
-
         .schedule-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 17px 18px;
-            border: 1px solid #252b33;
-            border-radius: 10px;
-            background: #0f141a;
+            gap: 15px;
+
+            padding: 14px;
+
+            border: 1px solid #e1e6eb;
+            border-radius: 9px;
+
+            background: #ffffff;
         }
-
-
-        .schedule-item-left {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            min-width: 0;
-        }
-
 
         .schedule-time {
             min-width: 55px;
-            font-size: 17px;
-            font-weight: 600;
+
+            font-size: 13px;
+            font-weight: 700;
+            color: #42d392;
         }
 
+        .schedule-content {
+            flex: 1;
+            min-width: 0;
+        }
 
         .schedule-title {
-            font-size: 13px;
-            color: #dce2e8;
+            font-size: 14px;
+            font-weight: 600;
             word-break: break-word;
         }
 
+        .schedule-actions {
+            display: flex;
+            gap: 6px;
+        }
 
-        .delete-button {
-            flex-shrink: 0;
+        /* =========================
+           完了済み予定
+        ========================= */
+
+        .schedule-item.completed {
+            opacity: 0.55;
+        }
+
+        .schedule-item.completed .schedule-title {
+            text-decoration: line-through;
+            color: #697482;
+        }
+
+        /* =========================
+           Buttons
+        ========================= */
+
+        .complete-button {
             padding: 7px 10px;
+
             border: 1px solid #3b4654;
             border-radius: 7px;
+
             background: transparent;
             color: #8993a1;
+
             font-size: 11px;
             cursor: pointer;
         }
 
-
-        .delete-button:hover {
-            color: #f5f7fa;
-            border-color: #697482;
-        }
-
-
-        .empty-message {
-            padding: 30px;
-            border: 1px dashed #303945;
-            border-radius: 10px;
-            text-align: center;
-            color: #697482;
-            font-size: 13px;
-        }
-
-
-        /* =========================
-           ADD FORM
-        ========================= */
-
-        .schedule-form-card {
-            margin-top: 30px;
-            padding: 25px;
-            border: 1px solid #252b33;
-            border-radius: 16px;
-            background:
-                linear-gradient(
-                    145deg,
-                    #131921,
-                    #0f141a
-                );
-        }
-
-
-        .form-title {
-            margin-bottom: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: #aab3bf;
-        }
-
-
-        .schedule-form {
-            display: grid;
-            grid-template-columns:
-                1fr
-                1fr
-                2fr
-                auto;
-            gap: 12px;
-        }
-
-
-        .schedule-input {
-            width: 100%;
-            padding: 13px;
-            border: 1px solid #303945;
-            border-radius: 9px;
-            background: #0b0f14;
-            color: #f5f7fa;
-            font-size: 13px;
-            outline: none;
-        }
-
-
-        .schedule-input:focus {
+        .complete-button:hover {
+            color: #42d392;
             border-color: #42d392;
         }
 
+        .complete-button.completed {
+            color: #42d392;
+            border-color: #42d392;
+        }
 
-        .add-button {
-            padding: 13px 20px;
-            border: none;
-            border-radius: 9px;
-            background: #42d392;
-            color: #08100c;
-            font-size: 13px;
-            font-weight: 600;
+        .edit-button,
+        .delete-button {
+            padding: 7px 10px;
+
+            border-radius: 7px;
+
+            background: transparent;
+
+            font-size: 11px;
             cursor: pointer;
         }
 
-
-        .add-button:hover {
-            opacity: 0.85;
+        .edit-button {
+            border: 1px solid #b8c0ca;
+            color: #697482;
         }
 
+        .edit-button:hover {
+            border-color: #42d392;
+            color: #42d392;
+        }
+
+        .delete-button {
+            border: 1px solid #d8a4a4;
+            color: #b56b6b;
+        }
+
+        .delete-button:hover {
+            border-color: #d95353;
+            color: #d95353;
+        }
+
+        .no-schedule {
+            padding: 20px 0;
+
+            color: #9aa3ad;
+            text-align: center;
+            font-size: 13px;
+        }
 
         /* =========================
-           MOBILE
+           Add Schedule
+        ========================= */
+
+        .add-schedule-container {
+            margin-top: 25px;
+            padding: 22px;
+
+            background: #ffffff;
+            border: 1px solid #e1e6eb;
+            border-radius: 12px;
+        }
+
+        .section-title {
+            margin-bottom: 18px;
+
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 6px;
+
+            font-size: 12px;
+            font-weight: 600;
+            color: #697482;
+        }
+
+        .form-group input {
+            width: 100%;
+
+            padding: 11px 12px;
+
+            border: 1px solid #d8dee5;
+            border-radius: 7px;
+
+            background: #ffffff;
+
+            font-size: 14px;
+            color: #1f2933;
+
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #42d392;
+            box-shadow: 0 0 0 2px rgba(66, 211, 146, 0.08);
+        }
+
+        #add-schedule-button {
+            width: 100%;
+
+            padding: 12px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: #42d392;
+            color: #ffffff;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        #add-schedule-button:hover {
+            opacity: 0.9;
+        }
+
+        /* =========================
+           Responsive
         ========================= */
 
         @media (max-width: 700px) {
 
-            .schedule-page {
-                padding: 35px 18px 60px;
+            main {
+                padding: 20px 12px 40px;
             }
 
-
-            .page-title {
-                font-size: 28px;
+            .calendar-container {
+                padding: 12px;
             }
-
-
-            .calendar-card {
-                padding: 15px;
-            }
-
-
-            .calendar-month {
-                font-size: 17px;
-            }
-
 
             .calendar-day {
-                min-height: 52px;
-                padding: 7px;
+                min-height: 65px;
+                padding: 6px;
             }
 
-
-            .calendar-day-number {
-                font-size: 11px;
+            .day-number {
+                font-size: 12px;
             }
-
-
-            .calendar-event-dot {
-                bottom: 6px;
-                left: 7px;
-                width: 4px;
-                height: 4px;
-            }
-
-
-            .calendar-weekday {
-                font-size: 8px;
-            }
-
-
-            .schedule-form {
-                grid-template-columns: 1fr;
-            }
-
 
             .schedule-item {
-                align-items: flex-start;
-                gap: 12px;
+                flex-wrap: wrap;
+                gap: 8px;
             }
 
-
-            .schedule-item-left {
-                gap: 12px;
+            .schedule-content {
+                width: calc(100% - 70px);
             }
 
-
-            .schedule-time {
-                min-width: 45px;
+            .schedule-actions {
+                width: 100%;
+                justify-content: flex-end;
             }
 
         }
@@ -466,261 +493,191 @@
 
 </head>
 
-
 <body>
 
+    <!-- =========================
+         Header
+    ========================= -->
 
-<header class="header">
+    <header>
 
-    <div class="brand">
-
-        <div class="brand-title">
+        <div class="header-title">
             LIFE DASHBOARD
         </div>
 
-        <div class="brand-subtitle">
+        <div class="header-subtitle">
             YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
         </div>
 
-    </div>
-
-
-    <div class="header-right">
-
-        <div class="status">
-
-            <span class="status-dot"></span>
-
-            <span id="auth-status">
-                CONNECTING...
-            </span>
-
+        <div id="auth-status">
+            Connecting...
         </div>
 
-    </div>
-
-</header>
-
-
-<main class="schedule-page">
-
-
-    <!-- BACK -->
-
-    <a
-        href="./index.html"
-        class="page-back"
-    >
-        ← Dashboard
-    </a>
-
-
-    <!-- TITLE -->
-
-    <h1 class="page-title">
-        Schedule
-    </h1>
-
-
-    <p class="page-description">
-        Manage your daily schedule.
-    </p>
+    </header>
 
 
     <!-- =========================
-         CALENDAR
+         Main
     ========================= -->
 
-    <section class="calendar-card">
+    <main>
+
+        <a href="./index.html" class="back-link">
+            ← Dashboard
+        </a>
 
 
-        <div class="calendar-header">
+        <h1>
+            Schedule
+        </h1>
 
-
-            <div
-                id="calendar-month"
-                class="calendar-month"
-            >
-                2026年10月
-            </div>
-
-
-            <div class="calendar-navigation">
-
-                <button
-                    id="previous-month"
-                    class="calendar-nav-button"
-                    type="button"
-                    aria-label="前の月"
-                >
-                    ←
-                </button>
-
-
-                <button
-                    id="next-month"
-                    class="calendar-nav-button"
-                    type="button"
-                    aria-label="次の月"
-                >
-                    →
-                </button>
-
-            </div>
-
+        <div class="description">
+            予定を管理します。
         </div>
 
 
-        <!-- WEEKDAYS -->
+        <!-- =========================
+             Calendar
+        ========================= -->
 
-        <div class="calendar-weekdays">
+        <div class="calendar-container">
 
-            <div class="calendar-weekday">
-                日
-            </div>
+            <div class="calendar-header">
 
-            <div class="calendar-weekday">
-                月
-            </div>
+                <div
+                    id="calendar-title"
+                    class="calendar-title">
+                </div>
 
-            <div class="calendar-weekday">
-                火
-            </div>
+                <div class="calendar-nav">
 
-            <div class="calendar-weekday">
-                水
-            </div>
+                    <button id="prev-month">
+                        ← 前月
+                    </button>
 
-            <div class="calendar-weekday">
-                木
-            </div>
+                    <button id="today-month">
+                        今日
+                    </button>
 
-            <div class="calendar-weekday">
-                金
-            </div>
+                    <button id="next-month">
+                        次月 →
+                    </button>
 
-            <div class="calendar-weekday">
-                土
-            </div>
-
-        </div>
-
-
-        <!-- CALENDAR -->
-
-        <div
-            id="calendar-grid"
-            class="calendar-grid"
-        >
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         SELECTED DATE
-    ========================= -->
-
-    <section class="selected-date-section">
-
-
-        <div class="selected-date-title">
-            SELECTED DATE
-        </div>
-
-
-        <div class="selected-date-card">
-
-
-            <div
-                id="selected-date-heading"
-                class="selected-date-heading"
-            >
-                今日
-            </div>
-
-
-            <div
-                id="schedule-list"
-                class="schedule-list"
-            >
-
-                <div class="empty-message">
-                    読み込み中...
                 </div>
 
             </div>
 
+
+            <div class="weekdays">
+
+                <div class="weekday">日</div>
+                <div class="weekday">月</div>
+                <div class="weekday">火</div>
+                <div class="weekday">水</div>
+                <div class="weekday">木</div>
+                <div class="weekday">金</div>
+                <div class="weekday">土</div>
+
+            </div>
+
+
+            <div
+                id="calendar-grid"
+                class="calendar-grid">
+            </div>
+
         </div>
 
-    </section>
+
+        <!-- =========================
+             Selected Date
+        ========================= -->
+
+        <div class="selected-date-container">
+
+            <div
+                id="selected-date-title"
+                class="selected-date-title">
+                予定
+            </div>
+
+            <div
+                id="schedule-list"
+                class="schedule-list">
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             Add Schedule
+        ========================= -->
+
+        <div class="add-schedule-container">
+
+            <div class="section-title">
+                予定を追加
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="schedule-date">
+                    日付
+                </label>
+
+                <input
+                    type="date"
+                    id="schedule-date">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="schedule-time">
+                    時刻
+                </label>
+
+                <input
+                    type="time"
+                    id="schedule-time">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="schedule-title">
+                    予定
+                </label>
+
+                <input
+                    type="text"
+                    id="schedule-title"
+                    placeholder="例：AWS SAA勉強">
+
+            </div>
+
+
+            <button id="add-schedule-button">
+                予定を追加
+            </button>
+
+        </div>
+
+    </main>
 
 
     <!-- =========================
-         ADD SCHEDULE
+         JavaScript
     ========================= -->
 
-    <section class="schedule-form-card">
+    <script type="module">
 
+        import "./js/schedule.js";
 
-        <div class="form-title">
-            ADD SCHEDULE
-        </div>
-
-
-        <form
-            id="schedule-form"
-            class="schedule-form"
-        >
-
-
-            <input
-                id="schedule-date"
-                class="schedule-input"
-                type="date"
-                required
-            >
-
-
-            <input
-                id="schedule-time"
-                class="schedule-input"
-                type="time"
-                required
-            >
-
-
-            <input
-                id="schedule-title"
-                class="schedule-input"
-                type="text"
-                placeholder="予定名"
-                maxlength="100"
-                required
-            >
-
-
-            <button
-                class="add-button"
-                type="submit"
-            >
-                ＋ 追加
-            </button>
-
-
-        </form>
-
-    </section>
-
-
-</main>
-
-
-<script
-    type="module"
-    src="./js/schedule.js"
-></script>
-
+    </script>
 
 </body>
 
