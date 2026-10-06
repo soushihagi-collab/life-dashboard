@@ -1,6 +1,5 @@
 import { startAnonymousAuth } from "./auth.js";
 
-
 import {
     collection,
     addDoc,
@@ -9,13 +8,11 @@ import {
     doc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-
 import { db } from "./firebase.js";
 
 
-
 /* =========================
-   ELEMENTS
+   DOM ELEMENTS
 ========================= */
 
 const form =
@@ -23,48 +20,74 @@ const form =
         "schedule-form"
     );
 
-
 const dateInput =
     document.getElementById(
         "schedule-date"
     );
-
 
 const timeInput =
     document.getElementById(
         "schedule-time"
     );
 
-
 const titleInput =
     document.getElementById(
         "schedule-title"
     );
-
 
 const listElement =
     document.getElementById(
         "schedule-list"
     );
 
-
 const statusElement =
     document.getElementById(
         "auth-status"
     );
 
+const calendarGrid =
+    document.getElementById(
+        "calendar-grid"
+    );
+
+const calendarMonth =
+    document.getElementById(
+        "calendar-month"
+    );
+
+const selectedDateHeading =
+    document.getElementById(
+        "selected-date-heading"
+    );
+
+const previousMonthButton =
+    document.getElementById(
+        "previous-month"
+    );
+
+const nextMonthButton =
+    document.getElementById(
+        "next-month"
+    );
 
 
 /* =========================
-   CURRENT USER
+   STATE
 ========================= */
 
 let currentUser = null;
 
+let schedules = [];
+
+let currentCalendarDate =
+    new Date();
+
+let selectedDate =
+    getToday();
 
 
 /* =========================
-   TODAY
+   DATE FUNCTIONS
 ========================= */
 
 function getToday() {
@@ -72,32 +95,77 @@ function getToday() {
     const now =
         new Date();
 
-
-    const year =
-        now.getFullYear();
-
-
-    const month =
-        String(
-            now.getMonth() + 1
-        ).padStart(2, "0");
-
-
-    const date =
-        String(
-            now.getDate()
-        ).padStart(2, "0");
-
-
-    return `${year}-${month}-${date}`;
-
+    return formatDate(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
 }
 
 
+function formatDate(
+    year,
+    month,
+    date
+) {
 
-dateInput.value =
-    getToday();
+    const monthText =
+        String(
+            month + 1
+        ).padStart(
+            2,
+            "0"
+        );
 
+    const dateText =
+        String(
+            date
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return `${year}-${monthText}-${dateText}`;
+}
+
+
+function formatJapaneseDate(
+    dateKey
+) {
+
+    const [
+        year,
+        month,
+        date
+    ] =
+        dateKey
+            .split("-")
+            .map(
+                Number
+            );
+
+
+    const dateObject =
+        new Date(
+            year,
+            month - 1,
+            date
+        );
+
+
+    const weekdays = [
+        "日",
+        "月",
+        "火",
+        "水",
+        "木",
+        "金",
+        "土"
+    ];
+
+
+    return `${year}年${month}月${date}日（${weekdays[dateObject.getDay()]}）`;
+}
 
 
 /* =========================
@@ -107,16 +175,14 @@ dateInput.value =
 async function loadSchedules() {
 
     if (!currentUser) {
-
         return;
-
     }
 
 
     try {
 
         listElement.innerHTML =
-            `<div class="loading-message">
+            `<div class="empty-message">
                 読み込み中...
             </div>`;
 
@@ -136,7 +202,7 @@ async function loadSchedules() {
             );
 
 
-        const schedules =
+        schedules =
             snapshot.docs.map(
                 (item) => ({
 
@@ -158,6 +224,7 @@ async function loadSchedules() {
                 const dateB =
                     `${b.date || ""} ${b.time || ""}`;
 
+
                 return dateA.localeCompare(
                     dateB
                 );
@@ -166,9 +233,9 @@ async function loadSchedules() {
         );
 
 
-        renderSchedules(
-            schedules
-        );
+        renderCalendar();
+
+        renderSelectedDate();
 
 
     } catch (error) {
@@ -185,37 +252,378 @@ async function loadSchedules() {
             </div>`;
 
     }
+}
+
+
+/* =========================
+   RENDER CALENDAR
+========================= */
+
+function renderCalendar() {
+
+    calendarGrid.innerHTML =
+        "";
+
+
+    const year =
+        currentCalendarDate.getFullYear();
+
+    const month =
+        currentCalendarDate.getMonth();
+
+
+    calendarMonth.textContent =
+        `${year}年${month + 1}月`;
+
+
+    /*
+     * 月初の曜日
+     */
+
+    const firstDay =
+        new Date(
+            year,
+            month,
+            1
+        ).getDay();
+
+
+    /*
+     * 月の日数
+     */
+
+    const daysInMonth =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    /*
+     * 前月の日数
+     */
+
+    const daysInPreviousMonth =
+        new Date(
+            year,
+            month,
+            0
+        ).getDate();
+
+
+    /*
+     * 前月の日付
+     */
+
+    for (
+        let i = firstDay - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const date =
+            daysInPreviousMonth - i;
+
+
+        const dayElement =
+            createCalendarDay(
+                year,
+                month - 1,
+                date,
+                true
+            );
+
+
+        calendarGrid.appendChild(
+            dayElement
+        );
+    }
+
+
+    /*
+     * 今月の日付
+     */
+
+    for (
+        let date = 1;
+        date <= daysInMonth;
+        date++
+    ) {
+
+        const dayElement =
+            createCalendarDay(
+                year,
+                month,
+                date,
+                false
+            );
+
+
+        calendarGrid.appendChild(
+            dayElement
+        );
+    }
+
+
+    /*
+     * 次月の日付
+     *
+     * カレンダーを6週間分にする
+     */
+
+    const totalCells =
+        calendarGrid.children.length;
+
+
+    const remainingCells =
+        42 - totalCells;
+
+
+    for (
+        let date = 1;
+        date <= remainingCells;
+        date++
+    ) {
+
+        const dayElement =
+            createCalendarDay(
+                year,
+                month + 1,
+                date,
+                true
+            );
+
+
+        calendarGrid.appendChild(
+            dayElement
+        );
+    }
 
 }
 
 
-
 /* =========================
-   RENDER
+   CREATE CALENDAR DAY
 ========================= */
 
-function renderSchedules(
-    schedules
+function createCalendarDay(
+    year,
+    month,
+    date,
+    isOtherMonth
 ) {
 
-    listElement.innerHTML = "";
+    const dateKey =
+        formatDate(
+            year,
+            month,
+            date
+        );
+
+
+    const dayElement =
+        document.createElement(
+            "button"
+        );
+
+
+    dayElement.type =
+        "button";
+
+
+    dayElement.className =
+        "calendar-day";
 
 
     if (
-        schedules.length === 0
+        isOtherMonth
+    ) {
+
+        dayElement.classList.add(
+            "other-month"
+        );
+    }
+
+
+    /*
+     * 今日
+     */
+
+    if (
+        dateKey === getToday()
+    ) {
+
+        dayElement.classList.add(
+            "today"
+        );
+    }
+
+
+    /*
+     * 選択中
+     */
+
+    if (
+        dateKey === selectedDate
+    ) {
+
+        dayElement.classList.add(
+            "selected"
+        );
+    }
+
+
+    /*
+     * 日付番号
+     */
+
+    const numberElement =
+        document.createElement(
+            "div"
+        );
+
+
+    numberElement.className =
+        "calendar-day-number";
+
+
+    numberElement.textContent =
+        date;
+
+
+    dayElement.appendChild(
+        numberElement
+    );
+
+
+    /*
+     * 予定の有無
+     */
+
+    const hasSchedule =
+        schedules.some(
+            (schedule) =>
+                schedule.date ===
+                dateKey
+        );
+
+
+    if (
+        hasSchedule
+    ) {
+
+        const dotElement =
+            document.createElement(
+                "span"
+            );
+
+
+        dotElement.className =
+            "calendar-event-dot";
+
+
+        dayElement.appendChild(
+            dotElement
+        );
+    }
+
+
+    /*
+     * クリック
+     */
+
+    dayElement.addEventListener(
+        "click",
+        () => {
+
+            selectedDate =
+                dateKey;
+
+
+            /*
+             * 別月の日付をクリックした場合、
+             * その月へ移動
+             */
+
+            currentCalendarDate =
+                new Date(
+                    year,
+                    month,
+                    1
+                );
+
+
+            renderCalendar();
+
+            renderSelectedDate();
+
+
+            /*
+             * 追加フォームの日付も変更
+             */
+
+            dateInput.value =
+                selectedDate;
+
+        }
+    );
+
+
+    return dayElement;
+}
+
+
+/* =========================
+   RENDER SELECTED DATE
+========================= */
+
+function renderSelectedDate() {
+
+    selectedDateHeading.textContent =
+        formatJapaneseDate(
+            selectedDate
+        );
+
+
+    listElement.innerHTML =
+        "";
+
+
+    const selectedSchedules =
+        schedules
+            .filter(
+                (schedule) =>
+                    schedule.date ===
+                    selectedDate
+            )
+            .sort(
+                (a, b) =>
+                    String(
+                        a.time || ""
+                    ).localeCompare(
+                        String(
+                            b.time || ""
+                        )
+                    )
+            );
+
+
+    if (
+        selectedSchedules.length === 0
     ) {
 
         listElement.innerHTML =
             `<div class="empty-message">
-                予定はありません。
+                この日の予定はありません。
             </div>`;
 
-        return;
 
+        return;
     }
 
 
-    schedules.forEach(
+    selectedSchedules.forEach(
         (schedule) => {
 
             const item =
@@ -228,63 +636,70 @@ function renderSchedules(
                 "schedule-item";
 
 
-            item.innerHTML = `
-
-                <div
-                    class="schedule-item-left"
-                >
-
-                    <div
-                        class="schedule-time"
-                    >
-                        ${escapeHTML(
-                            schedule.time || ""
-                        )}
-                    </div>
+            const left =
+                document.createElement(
+                    "div"
+                );
 
 
-                    <div>
-
-                        <div
-                            class="schedule-title"
-                        >
-                            ${escapeHTML(
-                                schedule.title || ""
-                            )}
-                        </div>
+            left.className =
+                "schedule-item-left";
 
 
-                        <div
-                            style="
-                                margin-top:5px;
-                                font-size:10px;
-                                color:#697482;
-                            "
-                        >
-                            ${escapeHTML(
-                                schedule.date || ""
-                            )}
-                        </div>
-
-                    </div>
-
-                </div>
+            const time =
+                document.createElement(
+                    "div"
+                );
 
 
-                <button
-                    class="delete-button"
-                    data-id="${schedule.id}"
-                >
-                    削除
-                </button>
+            time.className =
+                "schedule-time";
 
-            `;
+
+            time.textContent =
+                schedule.time || "";
+
+
+            const title =
+                document.createElement(
+                    "div"
+                );
+
+
+            title.className =
+                "schedule-title";
+
+
+            title.textContent =
+                schedule.title || "";
+
+
+            left.appendChild(
+                time
+            );
+
+
+            left.appendChild(
+                title
+            );
 
 
             const deleteButton =
-                item.querySelector(
-                    ".delete-button"
+                document.createElement(
+                    "button"
                 );
+
+
+            deleteButton.type =
+                "button";
+
+
+            deleteButton.className =
+                "delete-button";
+
+
+            deleteButton.textContent =
+                "削除";
 
 
             deleteButton.addEventListener(
@@ -299,6 +714,16 @@ function renderSchedules(
             );
 
 
+            item.appendChild(
+                left
+            );
+
+
+            item.appendChild(
+                deleteButton
+            );
+
+
             listElement.appendChild(
                 item
             );
@@ -309,9 +734,8 @@ function renderSchedules(
 }
 
 
-
 /* =========================
-   ADD
+   ADD SCHEDULE
 ========================= */
 
 form.addEventListener(
@@ -328,7 +752,6 @@ form.addEventListener(
             );
 
             return;
-
         }
 
 
@@ -351,7 +774,6 @@ form.addEventListener(
         ) {
 
             return;
-
         }
 
 
@@ -383,11 +805,50 @@ form.addEventListener(
             );
 
 
+            /*
+             * フォームをリセット
+             */
+
             titleInput.value =
                 "";
 
 
+            /*
+             * 登録した日付を選択
+             */
+
+            selectedDate =
+                date;
+
+
+            const [
+                year,
+                month
+            ] =
+                date
+                    .split("-")
+                    .map(
+                        Number
+                    );
+
+
+            currentCalendarDate =
+                new Date(
+                    year,
+                    month - 1,
+                    1
+                );
+
+
+            /*
+             * 再読み込み
+             */
+
             await loadSchedules();
+
+
+            dateInput.value =
+                selectedDate;
 
 
         } catch (error) {
@@ -401,16 +862,14 @@ form.addEventListener(
             alert(
                 "予定の追加に失敗しました。"
             );
-
         }
 
     }
 );
 
 
-
 /* =========================
-   DELETE
+   DELETE SCHEDULE
 ========================= */
 
 async function deleteSchedule(
@@ -424,16 +883,13 @@ async function deleteSchedule(
 
 
     if (!confirmed) {
-
         return;
-
     }
 
 
     try {
 
         await deleteDoc(
-
             doc(
                 db,
                 "users",
@@ -441,7 +897,6 @@ async function deleteSchedule(
                 "schedules",
                 scheduleId
             )
-
         );
 
 
@@ -459,54 +914,60 @@ async function deleteSchedule(
         alert(
             "予定の削除に失敗しました。"
         );
-
     }
-
 }
 
 
-
 /* =========================
-   HTML ESCAPE
+   MONTH NAVIGATION
 ========================= */
 
-function escapeHTML(
-    value
-) {
+previousMonthButton.addEventListener(
+    "click",
+    () => {
 
-    return String(value)
+        currentCalendarDate =
+            new Date(
+                currentCalendarDate.getFullYear(),
+                currentCalendarDate.getMonth() - 1,
+                1
+            );
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
 
-        .replace(
-            /</g,
-            "&lt;"
-        )
+        renderCalendar();
 
-        .replace(
-            />/g,
-            "&gt;"
-        )
+    }
+);
 
-        .replace(
-            /"/g,
-            "&quot;"
-        )
 
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+nextMonthButton.addEventListener(
+    "click",
+    () => {
 
-}
+        currentCalendarDate =
+            new Date(
+                currentCalendarDate.getFullYear(),
+                currentCalendarDate.getMonth() + 1,
+                1
+            );
 
+
+        renderCalendar();
+
+    }
+);
 
 
 /* =========================
-   AUTH
+   INITIAL DATE
+========================= */
+
+dateInput.value =
+    selectedDate;
+
+
+/* =========================
+   FIREBASE AUTH
 ========================= */
 
 startAnonymousAuth(
