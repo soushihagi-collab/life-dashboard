@@ -2,12 +2,104 @@
    LIFE DASHBOARD
    AWS SAA
    aws.js
+
+   AWS学習機能
+   ・問題表示
+   ・正誤判定
+   ・解説表示
+   ・問題数カウント
+   ・正解数カウント
+   ・不正解数カウント
+   ・正答率計算
+   ・学習進捗保存
+   ・目標日保存
+   ・学習メモ保存
+   ・Firebase / Firestore 保存
 ========================================================= */
+
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+import {
+    doc,
+    getDoc,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+import {
+    auth,
+    db
+} from "./firebase.js";
+
 
 
 /* =========================================================
    DOM
 ========================================================= */
+
+const authStatusElement =
+    document.getElementById("auth-status");
+
+
+const progressValueElement =
+    document.getElementById("aws-progress-value");
+
+
+const progressBarElement =
+    document.getElementById("aws-progress-bar");
+
+
+const progressTextElement =
+    document.getElementById("aws-progress-text");
+
+
+const accuracyValueElement =
+    document.getElementById("aws-accuracy-value");
+
+
+const questionCountElement =
+    document.getElementById("aws-question-count");
+
+
+const correctCountElement =
+    document.getElementById("aws-correct-count");
+
+
+const incorrectCountElement =
+    document.getElementById("aws-incorrect-count");
+
+
+const targetDateDisplayElement =
+    document.getElementById("aws-target-date-display");
+
+
+const targetDateInputElement =
+    document.getElementById("aws-target-date");
+
+
+const progressInputElement =
+    document.getElementById("aws-progress-input");
+
+
+const noteElement =
+    document.getElementById("aws-note");
+
+
+const saveButtonElement =
+    document.getElementById("aws-save-button");
+
+
+const saveStatusElement =
+    document.getElementById("aws-save-status");
+
 
 const questionNumberElement =
     document.getElementById("question-number");
@@ -27,6 +119,38 @@ const questionResultElement =
 
 const nextQuestionButtonElement =
     document.getElementById("next-question-button");
+
+
+
+/* =========================================================
+   AWS DATA
+========================================================= */
+
+let awsData = {
+
+    progress: 0,
+
+    accuracy: 0,
+
+    questionCount: 0,
+
+    correctCount: 0,
+
+    incorrectCount: 0,
+
+    targetDate: "",
+
+    note: ""
+
+};
+
+
+
+/* =========================================================
+   CURRENT USER
+========================================================= */
+
+let currentUser = null;
 
 
 
@@ -175,22 +299,463 @@ let questionAnswered = false;
 
 
 /* =========================================================
+   FIRESTORE REFERENCE
+========================================================= */
+
+function getAwsProgressRef(user) {
+
+    return doc(
+        db,
+        "users",
+        user.uid,
+        "aws",
+        "progress"
+    );
+
+}
+
+
+
+/* =========================================================
+   RENDER AWS DATA
+========================================================= */
+
+function renderAwsData() {
+
+
+    /* =====================================================
+       PROGRESS
+    ====================================================== */
+
+    const progress =
+        Number(awsData.progress) || 0;
+
+
+    if (progressValueElement) {
+
+        progressValueElement.textContent =
+            `${progress}%`;
+
+    }
+
+
+    if (progressBarElement) {
+
+        progressBarElement.style.width =
+            `${progress}%`;
+
+    }
+
+
+    if (progressTextElement) {
+
+        progressTextElement.textContent =
+            `${progress}%`;
+
+    }
+
+
+
+    /* =====================================================
+       ACCURACY
+    ====================================================== */
+
+    const accuracy =
+        Number(awsData.accuracy) || 0;
+
+
+    if (accuracyValueElement) {
+
+        accuracyValueElement.textContent =
+            `${accuracy}%`;
+
+    }
+
+
+
+    /* =====================================================
+       QUESTION COUNT
+    ====================================================== */
+
+    if (questionCountElement) {
+
+        questionCountElement.textContent =
+            Number(awsData.questionCount) || 0;
+
+    }
+
+
+
+    /* =====================================================
+       CORRECT
+    ====================================================== */
+
+    if (correctCountElement) {
+
+        correctCountElement.textContent =
+            Number(awsData.correctCount) || 0;
+
+    }
+
+
+
+    /* =====================================================
+       INCORRECT
+    ====================================================== */
+
+    if (incorrectCountElement) {
+
+        incorrectCountElement.textContent =
+            Number(awsData.incorrectCount) || 0;
+
+    }
+
+
+
+    /* =====================================================
+       TARGET DATE
+    ====================================================== */
+
+    if (targetDateDisplayElement) {
+
+        if (awsData.targetDate) {
+
+            targetDateDisplayElement.textContent =
+                awsData.targetDate;
+
+        } else {
+
+            targetDateDisplayElement.textContent =
+                "—";
+
+        }
+
+    }
+
+
+    if (targetDateInputElement) {
+
+        targetDateInputElement.value =
+            awsData.targetDate || "";
+
+    }
+
+
+
+    /* =====================================================
+       PROGRESS INPUT
+    ====================================================== */
+
+    if (progressInputElement) {
+
+        progressInputElement.value =
+            progress;
+
+    }
+
+
+
+    /* =====================================================
+       NOTE
+    ====================================================== */
+
+    if (noteElement) {
+
+        noteElement.value =
+            awsData.note || "";
+
+    }
+
+}
+
+
+
+/* =========================================================
+   LOAD AWS DATA
+========================================================= */
+
+async function loadAwsData(user) {
+
+    try {
+
+        const awsProgressRef =
+            getAwsProgressRef(user);
+
+
+        const snapshot =
+            await getDoc(awsProgressRef);
+
+
+        if (snapshot.exists()) {
+
+            const data =
+                snapshot.data();
+
+
+            awsData = {
+
+                progress:
+                    Number(data.progress) || 0,
+
+                accuracy:
+                    Number(data.accuracy) || 0,
+
+                questionCount:
+                    Number(data.questionCount) || 0,
+
+                correctCount:
+                    Number(data.correctCount) || 0,
+
+                incorrectCount:
+                    Number(data.incorrectCount) || 0,
+
+                targetDate:
+                    data.targetDate || "",
+
+                note:
+                    data.note || ""
+
+            };
+
+        }
+
+
+        renderAwsData();
+
+
+        console.log(
+            "AWSデータ読み込み完了",
+            awsData
+        );
+
+    } catch (error) {
+
+        console.error(
+            "AWSデータ読み込みエラー:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   SAVE AWS DATA
+========================================================= */
+
+async function saveAwsData() {
+
+    if (!currentUser) {
+
+        console.warn(
+            "Firebase認証済みユーザーがいません"
+        );
+
+        if (saveStatusElement) {
+
+            saveStatusElement.textContent =
+                "Firebaseにログインしていないため保存できません。";
+
+        }
+
+        return false;
+
+    }
+
+
+    try {
+
+        const awsProgressRef =
+            getAwsProgressRef(currentUser);
+
+
+        await setDoc(
+            awsProgressRef,
+            {
+
+                progress:
+                    Number(awsData.progress) || 0,
+
+                accuracy:
+                    Number(awsData.accuracy) || 0,
+
+                questionCount:
+                    Number(awsData.questionCount) || 0,
+
+                correctCount:
+                    Number(awsData.correctCount) || 0,
+
+                incorrectCount:
+                    Number(awsData.incorrectCount) || 0,
+
+                targetDate:
+                    awsData.targetDate || "",
+
+                note:
+                    awsData.note || ""
+
+            }
+        );
+
+
+        console.log(
+            "AWSデータ保存完了"
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "AWSデータ保存エラー:",
+            error
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+
+/* =========================================================
+   SAVE SETTINGS
+========================================================= */
+
+async function saveSettings() {
+
+    const progress =
+        Number(
+            progressInputElement
+                ? progressInputElement.value
+                : 0
+        );
+
+
+    const targetDate =
+        targetDateInputElement
+            ? targetDateInputElement.value
+            : "";
+
+
+    const note =
+        noteElement
+            ? noteElement.value
+            : "";
+
+
+
+    /* =====================================================
+       PROGRESS VALIDATION
+    ====================================================== */
+
+    let validProgress =
+        Number.isFinite(progress)
+            ? progress
+            : 0;
+
+
+    validProgress =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                validProgress
+            )
+        );
+
+
+
+    /* =====================================================
+       UPDATE DATA
+    ====================================================== */
+
+    awsData.progress =
+        validProgress;
+
+    awsData.targetDate =
+        targetDate;
+
+    awsData.note =
+        note;
+
+
+
+    renderAwsData();
+
+
+
+    if (saveStatusElement) {
+
+        saveStatusElement.textContent =
+            "保存中...";
+
+    }
+
+
+
+    const saved =
+        await saveAwsData();
+
+
+    if (saveStatusElement) {
+
+        if (saved) {
+
+            saveStatusElement.textContent =
+                "保存しました。";
+
+        } else {
+
+            saveStatusElement.textContent =
+                "保存に失敗しました。";
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       STATUS RESET
+    ====================================================== */
+
+    setTimeout(
+        () => {
+
+            if (saveStatusElement) {
+
+                saveStatusElement.textContent =
+                    "";
+
+            }
+
+        },
+        3000
+    );
+
+}
+
+
+
+/* =========================================================
    RENDER QUESTION
 ========================================================= */
 
 function renderQuestion() {
 
-    console.log("renderQuestion() 実行");
+    console.log(
+        "renderQuestion() 実行"
+    );
 
 
     const question =
         questionDatabase[currentQuestionIndex];
-
-
-    console.log(
-        "現在の問題:",
-        question
-    );
 
 
     if (!question) {
@@ -204,12 +769,13 @@ function renderQuestion() {
     }
 
 
-    questionAnswered = false;
+    questionAnswered =
+        false;
 
 
 
     /* =====================================================
-       問題番号
+       QUESTION NUMBER
     ====================================================== */
 
     if (questionNumberElement) {
@@ -222,7 +788,7 @@ function renderQuestion() {
 
 
     /* =====================================================
-       問題文
+       QUESTION TEXT
     ====================================================== */
 
     if (questionTextElement) {
@@ -230,24 +796,19 @@ function renderQuestion() {
         questionTextElement.textContent =
             question.question;
 
-    } else {
-
-        console.error(
-            "question-text が見つかりません"
-        );
-
     }
 
 
 
     /* =====================================================
-       解説を非表示
+       RESULT RESET
     ====================================================== */
 
     if (questionResultElement) {
 
         questionResultElement.style.display =
             "none";
+
 
         questionResultElement.textContent =
             "";
@@ -257,7 +818,7 @@ function renderQuestion() {
 
 
     /* =====================================================
-       次の問題ボタンを非表示
+       NEXT BUTTON RESET
     ====================================================== */
 
     if (nextQuestionButtonElement) {
@@ -270,12 +831,13 @@ function renderQuestion() {
 
 
     /* =====================================================
-       選択肢
+       ANSWERS
     ====================================================== */
 
     if (answerListElement) {
 
-        answerListElement.innerHTML = "";
+        answerListElement.innerHTML =
+            "";
 
 
         question.choices.forEach(
@@ -316,12 +878,6 @@ function renderQuestion() {
             }
         );
 
-    } else {
-
-        console.error(
-            "answer-list が見つかりません"
-        );
-
     }
 
 }
@@ -329,10 +885,10 @@ function renderQuestion() {
 
 
 /* =========================================================
-   ANSWER
+   ANSWER QUESTION
 ========================================================= */
 
-function answerQuestion(
+async function answerQuestion(
     selectedIndex
 ) {
 
@@ -343,12 +899,25 @@ function answerQuestion(
     }
 
 
-    questionAnswered = true;
-
-
     const question =
         questionDatabase[currentQuestionIndex];
 
+
+    if (!question) {
+
+        return;
+
+    }
+
+
+    questionAnswered =
+        true;
+
+
+
+    /* =====================================================
+       ANSWER BUTTONS
+    ====================================================== */
 
     const answerButtons =
         answerListElement
@@ -359,14 +928,11 @@ function answerQuestion(
 
 
 
-    /* =====================================================
-       ボタン無効化
-    ====================================================== */
-
     answerButtons.forEach(
         (button) => {
 
-            button.disabled = true;
+            button.disabled =
+                true;
 
         }
     );
@@ -374,7 +940,7 @@ function answerQuestion(
 
 
     /* =====================================================
-       正誤判定
+       CHECK ANSWER
     ====================================================== */
 
     const isCorrect =
@@ -383,7 +949,7 @@ function answerQuestion(
 
 
     /* =====================================================
-       正解・不正解表示
+       BUTTON COLORS
     ====================================================== */
 
     answerButtons.forEach(
@@ -417,7 +983,59 @@ function answerQuestion(
 
 
     /* =====================================================
-       解説表示
+       UPDATE STATISTICS
+    ====================================================== */
+
+    awsData.questionCount += 1;
+
+
+    if (isCorrect) {
+
+        awsData.correctCount += 1;
+
+    } else {
+
+        awsData.incorrectCount += 1;
+
+    }
+
+
+
+    /* =====================================================
+       CALCULATE ACCURACY
+    ====================================================== */
+
+    if (
+        awsData.questionCount > 0
+    ) {
+
+        awsData.accuracy =
+            Math.round(
+                (
+                    awsData.correctCount /
+                    awsData.questionCount
+                ) * 100
+            );
+
+    } else {
+
+        awsData.accuracy =
+            0;
+
+    }
+
+
+
+    /* =====================================================
+       RENDER STATISTICS
+    ====================================================== */
+
+    renderAwsData();
+
+
+
+    /* =====================================================
+       SHOW EXPLANATION
     ====================================================== */
 
     if (questionResultElement) {
@@ -443,13 +1061,31 @@ function answerQuestion(
 
 
     /* =====================================================
-       次の問題
+       NEXT QUESTION BUTTON
     ====================================================== */
 
     if (nextQuestionButtonElement) {
 
         nextQuestionButtonElement.style.display =
             "block";
+
+    }
+
+
+
+    /* =====================================================
+       SAVE TO FIREBASE
+    ====================================================== */
+
+    const saved =
+        await saveAwsData();
+
+
+    if (!saved) {
+
+        console.warn(
+            "問題結果のFirebase保存に失敗しました"
+        );
 
     }
 
@@ -471,12 +1107,28 @@ function nextQuestion() {
         questionDatabase.length
     ) {
 
-        currentQuestionIndex = 0;
+        currentQuestionIndex =
+            0;
 
     }
 
 
     renderQuestion();
+
+}
+
+
+
+/* =========================================================
+   SAVE BUTTON
+========================================================= */
+
+if (saveButtonElement) {
+
+    saveButtonElement.addEventListener(
+        "click",
+        saveSettings
+    );
 
 }
 
@@ -498,8 +1150,14 @@ if (nextQuestionButtonElement) {
 
 
 /* =========================================================
-   INITIALIZE
+   INITIAL QUESTION
 ========================================================= */
+
+/*
+   問題表示はFirebase認証とは独立させる。
+   Firebaseに問題があっても、
+   問題そのものは表示される。
+*/
 
 console.log(
     "AWS SAA JavaScript 読み込み開始"
@@ -514,6 +1172,88 @@ console.log(
 
 renderQuestion();
 
+
+
+/* =========================================================
+   FIREBASE AUTH
+========================================================= */
+
+onAuthStateChanged(
+    auth,
+    async (user) => {
+
+        console.log(
+            "Firebase Auth状態:",
+            user
+        );
+
+
+        if (user) {
+
+            /* =============================================
+               USER LOGIN
+            ============================================== */
+
+            currentUser =
+                user;
+
+
+            if (authStatusElement) {
+
+                authStatusElement.textContent =
+                    "CONNECTED";
+
+            }
+
+
+            console.log(
+                "Firebase認証成功:",
+                user.uid
+            );
+
+
+
+            /* =============================================
+               LOAD AWS DATA
+            ============================================== */
+
+            await loadAwsData(
+                user
+            );
+
+
+        } else {
+
+            /* =============================================
+               USER LOGOUT
+            ============================================== */
+
+            currentUser =
+                null;
+
+
+            if (authStatusElement) {
+
+                authStatusElement.textContent =
+                    "NOT CONNECTED";
+
+            }
+
+
+            console.warn(
+                "Firebaseユーザー未認証"
+            );
+
+        }
+
+    }
+);
+
+
+
+/* =========================================================
+   COMPLETE
+========================================================= */
 
 console.log(
     "AWS SAA JavaScript 読み込み完了"
