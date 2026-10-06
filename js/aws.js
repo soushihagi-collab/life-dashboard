@@ -5,193 +5,34 @@
 ========================================================= */
 
 
-import {
-
-    doc,
-    getDoc,
-    setDoc
-
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
-
-import {
-
-    onAuthStateChanged
-
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-
-import {
-
-    auth,
-    db
-
-} from "./firebase.js";
-
-
-
 /* =========================================================
    DOM
 ========================================================= */
 
-
-const authStatusElement =
-    document.getElementById(
-        "auth-status"
-    );
-
-
-const progressValueElement =
-    document.getElementById(
-        "aws-progress-value"
-    );
-
-
-const progressBarElement =
-    document.getElementById(
-        "aws-progress-bar"
-    );
-
-
-const progressTextElement =
-    document.getElementById(
-        "aws-progress-text"
-    );
-
-
-const accuracyValueElement =
-    document.getElementById(
-        "aws-accuracy-value"
-    );
-
-
-const questionCountElement =
-    document.getElementById(
-        "aws-question-count"
-    );
-
-
-const correctCountElement =
-    document.getElementById(
-        "aws-correct-count"
-    );
-
-
-const incorrectCountElement =
-    document.getElementById(
-        "aws-incorrect-count"
-    );
-
-
-const targetDateDisplayElement =
-    document.getElementById(
-        "aws-target-date-display"
-    );
-
-
-const targetDateInputElement =
-    document.getElementById(
-        "aws-target-date"
-    );
-
-
-const progressInputElement =
-    document.getElementById(
-        "aws-progress-input"
-    );
-
-
-const noteElement =
-    document.getElementById(
-        "aws-note"
-    );
-
-
-const saveButtonElement =
-    document.getElementById(
-        "aws-save-button"
-    );
-
-
-const saveStatusElement =
-    document.getElementById(
-        "aws-save-status"
-    );
-
-
 const questionNumberElement =
-    document.getElementById(
-        "question-number"
-    );
+    document.getElementById("question-number");
 
 
 const questionTextElement =
-    document.getElementById(
-        "question-text"
-    );
+    document.getElementById("question-text");
 
 
 const answerListElement =
-    document.getElementById(
-        "answer-list"
-    );
+    document.getElementById("answer-list");
 
 
 const questionResultElement =
-    document.getElementById(
-        "question-result"
-    );
+    document.getElementById("question-result");
 
 
 const nextQuestionButtonElement =
-    document.getElementById(
-        "next-question-button"
-    );
-
-
-
-/* =========================================================
-   AWS DATA
-========================================================= */
-
-
-let awsData = {
-
-    progress: 0,
-
-    accuracy: 0,
-
-    questionCount: 0,
-
-    correctCount: 0,
-
-    incorrectCount: 0,
-
-    targetDate: "",
-
-    note: ""
-
-};
-
-
-
-/*
- * 現在のユーザー
- */
-let currentUser = null;
+    document.getElementById("next-question-button");
 
 
 
 /* =========================================================
    QUESTION DATABASE
 ========================================================= */
-
-
-/*
- * AWS SAA 学習用問題
- *
- * 今後ここへ問題を追加していく。
- */
 
 const questionDatabase = [
 
@@ -327,600 +168,51 @@ const questionDatabase = [
    QUESTION STATE
 ========================================================= */
 
+let currentQuestionIndex = 0;
 
-let currentQuestionIndex =
-    0;
-
-
-let questionAnswered =
-    false;
+let questionAnswered = false;
 
 
 
 /* =========================================================
-   UTILITY
+   RENDER QUESTION
 ========================================================= */
 
-
-/*
- * 数値を0～100にする
- */
-function normalizePercentage(value) {
-
-    const number =
-        Number(value);
-
-
-    if (
-        Number.isNaN(number)
-    ) {
-
-        return 0;
-
-    }
-
-
-    return Math.min(
-        100,
-        Math.max(
-            0,
-            number
-        )
-    );
-
-}
-
-
-
-/*
- * 正答率を計算
- */
-function calculateAccuracy(
-    correctCount,
-    questionCount
-) {
-
-    if (
-        questionCount <= 0
-    ) {
-
-        return 0;
-
-    }
-
-
-    return Math.round(
-
-        (
-            correctCount /
-            questionCount
-        ) * 100
-
-    );
-
-}
-
-
-
-/* =========================================================
-   DISPLAY
-========================================================= */
-
-
-/*
- * AWSデータを画面へ反映
- */
-function renderAwsData() {
-
-    const progress =
-        normalizePercentage(
-            awsData.progress
-        );
-
-
-    const accuracy =
-        normalizePercentage(
-            awsData.accuracy
-        );
-
-
-
-    /* =====================================================
-       Progress
-    ====================================================== */
-
-    if (
-        progressValueElement
-    ) {
-
-        progressValueElement.textContent =
-            `${progress}%`;
-
-    }
-
-
-    if (
-        progressBarElement
-    ) {
-
-        progressBarElement.style.width =
-            `${progress}%`;
-
-    }
-
-
-    if (
-        progressTextElement
-    ) {
-
-        progressTextElement.textContent =
-            `${progress}%`;
-
-    }
-
-
-
-    /* =====================================================
-       Accuracy
-    ====================================================== */
-
-    if (
-        accuracyValueElement
-    ) {
-
-        accuracyValueElement.textContent =
-            `${accuracy}%`;
-
-    }
-
-
-
-    /* =====================================================
-       Questions
-    ====================================================== */
-
-    if (
-        questionCountElement
-    ) {
-
-        questionCountElement.textContent =
-            awsData.questionCount;
-
-    }
-
-
-    if (
-        correctCountElement
-    ) {
-
-        correctCountElement.textContent =
-            awsData.correctCount;
-
-    }
-
-
-    if (
-        incorrectCountElement
-    ) {
-
-        incorrectCountElement.textContent =
-            awsData.incorrectCount;
-
-    }
-
-
-
-    /* =====================================================
-       Target Date
-    ====================================================== */
-
-    if (
-        targetDateInputElement
-    ) {
-
-        targetDateInputElement.value =
-            awsData.targetDate || "";
-
-    }
-
-
-    if (
-        targetDateDisplayElement
-    ) {
-
-        if (
-            awsData.targetDate
-        ) {
-
-            targetDateDisplayElement.textContent =
-                awsData.targetDate;
-
-        } else {
-
-            targetDateDisplayElement.textContent =
-                "—";
-
-        }
-
-    }
-
-
-
-    /* =====================================================
-       Note
-    ====================================================== */
-
-    if (
-        noteElement
-    ) {
-
-        noteElement.value =
-            awsData.note || "";
-
-    }
-
-
-    if (
-        progressInputElement
-    ) {
-
-        progressInputElement.value =
-            progress;
-
-    }
-
-}
-
-
-
-/* =========================================================
-   FIRESTORE
-========================================================= */
-
-
-/*
- * AWS progress document
- *
- * users
- *  └─ UID
- *      └─ aws
- *          └─ progress
- */
-function getAwsProgressRef(user) {
-
-    return doc(
-
-        db,
-
-        "users",
-
-        user.uid,
-
-        "aws",
-
-        "progress"
-
-    );
-
-}
-
-
-
-/*
- * AWSデータ読み込み
- */
-async function loadAwsData(user) {
-
-    try {
-
-        const awsRef =
-            getAwsProgressRef(
-                user
-            );
-
-
-        const snapshot =
-            await getDoc(
-                awsRef
-            );
-
-
-
-        if (
-            snapshot.exists()
-        ) {
-
-            const data =
-                snapshot.data();
-
-
-            awsData = {
-
-                progress:
-                    typeof data.progress === "number"
-                        ? data.progress
-                        : 0,
-
-                accuracy:
-                    typeof data.accuracy === "number"
-                        ? data.accuracy
-                        : 0,
-
-                questionCount:
-                    typeof data.questionCount === "number"
-                        ? data.questionCount
-                        : 0,
-
-                correctCount:
-                    typeof data.correctCount === "number"
-                        ? data.correctCount
-                        : 0,
-
-                incorrectCount:
-                    typeof data.incorrectCount === "number"
-                        ? data.incorrectCount
-                        : 0,
-
-                targetDate:
-                    data.targetDate || "",
-
-                note:
-                    data.note || ""
-
-            };
-
-        } else {
-
-            awsData = {
-
-                progress: 0,
-
-                accuracy: 0,
-
-                questionCount: 0,
-
-                correctCount: 0,
-
-                incorrectCount: 0,
-
-                targetDate: "",
-
-                note: ""
-
-            };
-
-        }
-
-
-
-        renderAwsData();
-
-
-
-    } catch (error) {
-
-        console.error(
-            "AWSデータ読み込みエラー:",
-            error
-        );
-
-    }
-
-}
-
-
-
-/*
- * AWSデータ保存
- */
-async function saveAwsData() {
-
-    if (
-        !currentUser
-    ) {
-
-        if (
-            saveStatusElement
-        ) {
-
-            saveStatusElement.textContent =
-                "認証が完了していません";
-
-        }
-
-        return;
-
-    }
-
-
-
-    try {
-
-        if (
-            saveButtonElement
-        ) {
-
-            saveButtonElement.disabled =
-                true;
-
-        }
-
-
-        if (
-            saveStatusElement
-        ) {
-
-            saveStatusElement.textContent =
-                "保存しています...";
-
-        }
-
-
-
-        const progress =
-            normalizePercentage(
-
-                progressInputElement
-                    ? progressInputElement.value
-                    : awsData.progress
-
-            );
-
-
-        const targetDate =
-            targetDateInputElement
-                ? targetDateInputElement.value
-                : "";
-
-
-        const note =
-            noteElement
-                ? noteElement.value.trim()
-                : "";
-
-
-
-        awsData.progress =
-            progress;
-
-
-        awsData.targetDate =
-            targetDate;
-
-
-        awsData.note =
-            note;
-
-
-
-        const awsRef =
-            getAwsProgressRef(
-                currentUser
-            );
-
-
-        await setDoc(
-
-            awsRef,
-
-            {
-
-                progress:
-                    awsData.progress,
-
-                accuracy:
-                    awsData.accuracy,
-
-                questionCount:
-                    awsData.questionCount,
-
-                correctCount:
-                    awsData.correctCount,
-
-                incorrectCount:
-                    awsData.incorrectCount,
-
-                targetDate:
-                    awsData.targetDate,
-
-                note:
-                    awsData.note
-
-            }
-
-        );
-
-
-
-        renderAwsData();
-
-
-
-        if (
-            saveStatusElement
-        ) {
-
-            saveStatusElement.textContent =
-                "保存しました";
-
-        }
-
-
-
-    } catch (error) {
-
-        console.error(
-            "AWSデータ保存エラー:",
-            error
-        );
-
-
-        if (
-            saveStatusElement
-        ) {
-
-            saveStatusElement.textContent =
-                "保存に失敗しました";
-
-        }
-
-
-
-    } finally {
-
-        if (
-            saveButtonElement
-        ) {
-
-            saveButtonElement.disabled =
-                false;
-
-        }
-
-    }
-
-}
-
-
-
-/* =========================================================
-   QUESTION
-========================================================= */
-
-
-/*
- * 現在の問題を表示
- */
 function renderQuestion() {
 
+    console.log("renderQuestion() 実行");
+
+
     const question =
-        questionDatabase[
-            currentQuestionIndex
-        ];
+        questionDatabase[currentQuestionIndex];
 
 
-    if (
-        !question
-    ) {
+    console.log(
+        "現在の問題:",
+        question
+    );
 
-        currentQuestionIndex =
-            0;
 
-        renderQuestion();
+    if (!question) {
+
+        console.error(
+            "問題データが存在しません"
+        );
 
         return;
 
     }
 
 
-    questionAnswered =
-        false;
+    questionAnswered = false;
 
 
 
-    if (
-        questionNumberElement
-    ) {
+    /* =====================================================
+       問題番号
+    ====================================================== */
+
+    if (questionNumberElement) {
 
         questionNumberElement.textContent =
             `QUESTION ${currentQuestionIndex + 1}`;
@@ -928,29 +220,31 @@ function renderQuestion() {
     }
 
 
-    if (
-        questionTextElement
-    ) {
+
+    /* =====================================================
+       問題文
+    ====================================================== */
+
+    if (questionTextElement) {
 
         questionTextElement.textContent =
             question.question;
 
-    }
+    } else {
 
-
-    if (
-        answerListElement
-    ) {
-
-        answerListElement.innerHTML =
-            "";
+        console.error(
+            "question-text が見つかりません"
+        );
 
     }
 
 
-    if (
-        questionResultElement
-    ) {
+
+    /* =====================================================
+       解説を非表示
+    ====================================================== */
+
+    if (questionResultElement) {
 
         questionResultElement.style.display =
             "none";
@@ -961,9 +255,12 @@ function renderQuestion() {
     }
 
 
-    if (
-        nextQuestionButtonElement
-    ) {
+
+    /* =====================================================
+       次の問題ボタンを非表示
+    ====================================================== */
+
+    if (nextQuestionButtonElement) {
 
         nextQuestionButtonElement.style.display =
             "none";
@@ -972,86 +269,85 @@ function renderQuestion() {
 
 
 
-    question.choices.forEach(
+    /* =====================================================
+       選択肢
+    ====================================================== */
 
-        (choice, index) => {
+    if (answerListElement) {
 
-
-            const button =
-                document.createElement(
-                    "button"
-                );
+        answerListElement.innerHTML = "";
 
 
-            button.type =
-                "button";
+        question.choices.forEach(
+            (choice, index) => {
 
-
-            button.className =
-                "answer-button";
-
-
-            button.textContent =
-                `${index + 1}. ${choice}`;
-
-
-            button.addEventListener(
-
-                "click",
-
-                () => {
-
-                    answerQuestion(
-                        index
+                const button =
+                    document.createElement(
+                        "button"
                     );
 
-                }
 
-            );
+                button.type =
+                    "button";
 
 
-            if (
-                answerListElement
-            ) {
+                button.className =
+                    "answer-button";
+
+
+                button.textContent =
+                    `${index + 1}. ${choice}`;
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        answerQuestion(index);
+
+                    }
+                );
+
 
                 answerListElement.appendChild(
                     button
                 );
 
             }
+        );
 
-        }
+    } else {
 
-    );
+        console.error(
+            "answer-list が見つかりません"
+        );
+
+    }
 
 }
 
 
 
-/*
- * 問題に回答
- */
-async function answerQuestion(
+/* =========================================================
+   ANSWER
+========================================================= */
+
+function answerQuestion(
     selectedIndex
 ) {
 
-    if (
-        questionAnswered
-    ) {
+    if (questionAnswered) {
 
         return;
 
     }
 
 
-    questionAnswered =
-        true;
+    questionAnswered = true;
 
 
     const question =
-        questionDatabase[
-            currentQuestionIndex
-        ];
+        questionDatabase[currentQuestionIndex];
 
 
     const answerButtons =
@@ -1064,18 +360,15 @@ async function answerQuestion(
 
 
     /* =====================================================
-       ボタンを停止
+       ボタン無効化
     ====================================================== */
 
     answerButtons.forEach(
-
         (button) => {
 
-            button.disabled =
-                true;
+            button.disabled = true;
 
         }
-
     );
 
 
@@ -1085,17 +378,15 @@ async function answerQuestion(
     ====================================================== */
 
     const isCorrect =
-        selectedIndex ===
-        question.answer;
+        selectedIndex === question.answer;
 
 
 
     /* =====================================================
-       正解表示
+       正解・不正解表示
     ====================================================== */
 
     answerButtons.forEach(
-
         (button, index) => {
 
             if (
@@ -1121,68 +412,21 @@ async function answerQuestion(
             }
 
         }
-
     );
 
 
 
     /* =====================================================
-       統計更新
+       解説表示
     ====================================================== */
 
-    awsData.questionCount +=
-        1;
-
-
-    if (
-        isCorrect
-    ) {
-
-        awsData.correctCount +=
-            1;
-
-    } else {
-
-        awsData.incorrectCount +=
-            1;
-
-    }
-
-
-    awsData.accuracy =
-        calculateAccuracy(
-
-            awsData.correctCount,
-
-            awsData.questionCount
-
-        );
-
-
-
-    /* =====================================================
-       Firestore保存
-    ====================================================== */
-
-    await saveQuestionResult();
-
-
-
-    /* =====================================================
-       結果表示
-    ====================================================== */
-
-    if (
-        questionResultElement
-    ) {
+    if (questionResultElement) {
 
         questionResultElement.style.display =
             "block";
 
 
-        if (
-            isCorrect
-        ) {
+        if (isCorrect) {
 
             questionResultElement.textContent =
                 `正解です。\n\n解説：${question.explanation}`;
@@ -1198,83 +442,14 @@ async function answerQuestion(
 
 
 
-    if (
-        nextQuestionButtonElement
-    ) {
+    /* =====================================================
+       次の問題
+    ====================================================== */
+
+    if (nextQuestionButtonElement) {
 
         nextQuestionButtonElement.style.display =
             "block";
-
-    }
-
-}
-
-
-
-/*
- * 問題結果をFirestoreへ保存
- */
-async function saveQuestionResult() {
-
-    if (
-        !currentUser
-    ) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const awsRef =
-            getAwsProgressRef(
-                currentUser
-            );
-
-
-        await setDoc(
-
-            awsRef,
-
-            {
-
-                progress:
-                    awsData.progress,
-
-                accuracy:
-                    awsData.accuracy,
-
-                questionCount:
-                    awsData.questionCount,
-
-                correctCount:
-                    awsData.correctCount,
-
-                incorrectCount:
-                    awsData.incorrectCount,
-
-                targetDate:
-                    awsData.targetDate,
-
-                note:
-                    awsData.note
-
-            }
-
-        );
-
-
-        renderAwsData();
-
-
-
-    } catch (error) {
-
-        console.error(
-            "問題結果保存エラー:",
-            error
-        );
 
     }
 
@@ -1286,14 +461,9 @@ async function saveQuestionResult() {
    NEXT QUESTION
 ========================================================= */
 
-
-/*
- * 次の問題
- */
 function nextQuestion() {
 
-    currentQuestionIndex +=
-        1;
+    currentQuestionIndex += 1;
 
 
     if (
@@ -1301,8 +471,7 @@ function nextQuestion() {
         questionDatabase.length
     ) {
 
-        currentQuestionIndex =
-            0;
+        currentQuestionIndex = 0;
 
     }
 
@@ -1314,36 +483,14 @@ function nextQuestion() {
 
 
 /* =========================================================
-   EVENT
+   NEXT BUTTON
 ========================================================= */
 
-
-if (
-    saveButtonElement
-) {
-
-    saveButtonElement.addEventListener(
-
-        "click",
-
-        saveAwsData
-
-    );
-
-}
-
-
-
-if (
-    nextQuestionButtonElement
-) {
+if (nextQuestionButtonElement) {
 
     nextQuestionButtonElement.addEventListener(
-
         "click",
-
         nextQuestion
-
     );
 
 }
@@ -1351,94 +498,23 @@ if (
 
 
 /* =========================================================
-   INITIAL QUESTION
+   INITIALIZE
 ========================================================= */
 
+console.log(
+    "AWS SAA JavaScript 読み込み開始"
+);
 
-/*
- * 問題はFirebase認証に依存しない。
- *
- * ページを開いた時点で
- * QUESTION 1を表示する。
- */
+
+console.log(
+    "問題数:",
+    questionDatabase.length
+);
+
 
 renderQuestion();
 
 
-
-/* =========================================================
-   FIREBASE AUTH
-========================================================= */
-
-
-onAuthStateChanged(
-
-    auth,
-
-    async (user) => {
-
-
-        /* =================================================
-           NOT AUTHENTICATED
-        ================================================== */
-
-        if (
-            !user
-        ) {
-
-            currentUser =
-                null;
-
-
-            if (
-                authStatusElement
-            ) {
-
-                authStatusElement.textContent =
-                    "Authentication required";
-
-            }
-
-
-            /*
-             * 問題はすでに表示済みなので、
-             * ここでは問題表示を変更しない。
-             */
-
-            return;
-
-        }
-
-
-
-        /* =================================================
-           USER
-        ================================================== */
-
-        currentUser =
-            user;
-
-
-
-        if (
-            authStatusElement
-        ) {
-
-            authStatusElement.textContent =
-                "Connected";
-
-        }
-
-
-
-        /* =================================================
-           AWS DATA
-        ================================================== */
-
-        await loadAwsData(
-            user
-        );
-
-    }
-
+console.log(
+    "AWS SAA JavaScript 読み込み完了"
 );
