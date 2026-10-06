@@ -637,4 +637,166 @@ body {
 
 
     .brand-title {
-```
+
+        font-size: 17px;
+
+        letter-spacing: 1.5px;
+
+    }
+
+
+    .brand-subtitle {
+
+        font-size: 8px;
+
+        letter-spacing: 1.5px;
+
+    }
+
+
+    .status {
+
+        font-size: 9px;
+
+    }
+
+
+    .status-dot {
+
+        width: 6px;
+
+        height: 6px;
+
+    }
+
+
+    .dashboard {
+
+        padding:
+            40px 18px 60px;
+
+    }
+
+
+    .greeting {
+
+        margin-bottom: 30px;
+
+    }
+
+
+    .greeting-label {
+
+        font-size: 9px;
+
+        letter-spacing: 2px;
+
+    }
+
+
+    .greeting h1 {
+
+        font-size: 28px;
+
+        letter-spacing: -0.5px;
+
+    }
+
+
+    .date {
+
+        font-size: 12px;
+
+    }
+
+
+    .dashboard-grid {
+
+        grid-template-columns:
+            1fr;
+
+        gap: 14px;
+
+    }
+
+
+    .dashboard-card {
+
+        min-height: 210px;
+
+        padding: 23px;
+
+        border-radius: 15px;
+
+    }
+
+
+    .card-main-value {
+
+        margin-top: 30px;
+
+        font-size: 46px;
+
+    }
+
+
+    .score-number {
+
+        font-size: 52px;
+
+    }
+
+
+    .quick-section {
+
+        margin-top: 40px;
+
+    }
+
+
+    .quick-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 10px;
+
+    }
+
+
+    .quick-card {
+
+        padding: 15px;
+
+        font-size: 12px;
+
+    }
+
+
+    .account-section {
+
+        margin-top: 35px;
+
+    }
+
+
+    .account-card {
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+        flex-direction: column;
+
+    }
+
+
+    .footer {
+
+        padding: 20px;
+
+        font-size: 8px;
+
+    }
+
+}
