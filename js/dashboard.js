@@ -60,10 +60,6 @@ const lifeScoreDetailElement =
    Utility
 ========================================================= */
 
-/*
- * 現在のローカル日付を
- * YYYY-MM-DD に変換
- */
 function getLocalDateKey(date = new Date()) {
 
     const year =
@@ -78,12 +74,10 @@ function getLocalDateKey(date = new Date()) {
             .padStart(2, "0");
 
     return `${year}-${month}-${day}`;
+
 }
 
 
-/*
- * 今日の日付表示
- */
 function updateTodayDate() {
 
     if (!todayDateElement) {
@@ -114,12 +108,10 @@ function updateTodayDate() {
 
     todayDateElement.textContent =
         `${year}/${month}/${day} (${weekday})`;
+
 }
 
 
-/*
- * 現在時刻を HH:MM にする
- */
 function getCurrentTimeKey() {
 
     const now = new Date();
@@ -133,12 +125,10 @@ function getCurrentTimeKey() {
             .padStart(2, "0");
 
     return `${hours}:${minutes}`;
+
 }
 
 
-/*
- * 「あと○分」
- */
 function getMinutesUntil(time) {
 
     const now = new Date();
@@ -162,6 +152,7 @@ function getMinutesUntil(time) {
         );
 
     return difference;
+
 }
 
 
@@ -171,9 +162,10 @@ function getMinutesUntil(time) {
 
 async function loadTodaySchedule(user) {
 
-    if (!todayValueElement ||
-        !todayDetailElement) {
-
+    if (
+        !todayValueElement ||
+        !todayDetailElement
+    ) {
         return;
     }
 
@@ -195,86 +187,86 @@ async function loadTodaySchedule(user) {
 
         const todaySchedules = [];
 
-        snapshot.forEach((docSnapshot) => {
+        snapshot.forEach(
+            (docSnapshot) => {
 
-            const data =
-                docSnapshot.data();
+                const data =
+                    docSnapshot.data();
 
-            if (data.date !== today) {
-                return;
+                if (data.date !== today) {
+                    return;
+                }
+
+                todaySchedules.push({
+
+                    id:
+                        docSnapshot.id,
+
+                    date:
+                        data.date,
+
+                    time:
+                        data.time || "",
+
+                    title:
+                        data.title || "",
+
+                    completed:
+                        data.completed === true
+
+                });
+
             }
-
-            todaySchedules.push({
-                id: docSnapshot.id,
-                date: data.date,
-                time: data.time || "",
-                title: data.title || "",
-                completed:
-                    data.completed === true
-            });
-
-        });
+        );
 
 
-        /*
-         * 今日の予定数
-         */
         todayValueElement.textContent =
             `${todaySchedules.length}件`;
 
 
-        /*
-         * 時刻順
-         */
-        todaySchedules.sort((a, b) => {
+        todaySchedules.sort(
+            (a, b) => {
 
-            return a.time.localeCompare(b.time);
+                return a.time.localeCompare(
+                    b.time
+                );
 
-        });
+            }
+        );
 
 
-        /*
-         * 現在時刻
-         */
         const currentTime =
             getCurrentTimeKey();
 
 
-        /*
-         * 次に表示する予定
-         *
-         * 条件：
-         * 1. 未完了
-         * 2. 現在時刻以降
-         */
         const nextSchedules =
-            todaySchedules.filter((schedule) => {
+            todaySchedules.filter(
+                (schedule) => {
 
-                return (
-                    schedule.completed !== true &&
-                    schedule.time >= currentTime
-                );
+                    return (
+                        schedule.completed !== true &&
+                        schedule.time >= currentTime
+                    );
 
-            });
+                }
+            );
 
 
-        /*
-         * 予定が1件もない
-         */
-        if (todaySchedules.length === 0) {
+        if (
+            todaySchedules.length === 0
+        ) {
 
             todayDetailElement.textContent =
                 "今日の予定はありません";
 
             return;
+
         }
 
 
-        /*
-         * 今日の予定はあるが、
-         * 次の予定がない
-         */
-        if (nextSchedules.length === 0) {
+        if (
+            nextSchedules.length === 0
+        ) {
 
             const incompleteSchedules =
                 todaySchedules.filter(
@@ -283,11 +275,9 @@ async function loadTodaySchedule(user) {
                 );
 
 
-            /*
-             * 未完了予定はあるが
-             * 時刻を過ぎている場合
-             */
-            if (incompleteSchedules.length > 0) {
+            if (
+                incompleteSchedules.length > 0
+            ) {
 
                 todayDetailElement.textContent =
                     "今日の予定はすべて終了";
@@ -300,47 +290,32 @@ async function loadTodaySchedule(user) {
             }
 
             return;
+
         }
 
 
-        /*
-         * 一番近い予定
-         */
         const nextSchedule =
             nextSchedules[0];
 
 
-        /*
-         * Dashboard TODAY
-         */
-        todayDetailElement.textContent =
-            `${nextSchedule.time}　${nextSchedule.title}`;
-
-
-        /*
-         * あと○分を追加表示
-         */
         const minutesUntil =
             getMinutesUntil(
                 nextSchedule.time
             );
 
 
-        /*
-         * 既存の表示を上書きせず、
-         * 可能なら detail の後ろに
-         * 時間情報を追加
-         *
-         * ただし、元のDOM構造が
-         * シンプルな場合でも動作するよう
-         * textContentのみで構成。
-         */
         if (minutesUntil >= 0) {
 
             todayDetailElement.textContent =
                 `${nextSchedule.time}　${nextSchedule.title}　（あと${minutesUntil}分）`;
 
+        } else {
+
+            todayDetailElement.textContent =
+                `${nextSchedule.time}　${nextSchedule.title}`;
+
         }
+
 
     } catch (error) {
 
@@ -366,21 +341,15 @@ async function loadTodaySchedule(user) {
 
 async function loadAwsProgress(user) {
 
-    if (!awsValueElement &&
-        !awsDetailElement) {
-
+    if (
+        !awsValueElement &&
+        !awsDetailElement
+    ) {
         return;
     }
 
     try {
 
-        /*
-         * aws コレクションを取得
-         *
-         * 将来的に
-         * users/{uid}/aws/
-         * 以下へ学習データを保存する想定。
-         */
         const awsRef =
             collection(
                 db,
@@ -393,54 +362,60 @@ async function loadAwsProgress(user) {
             await getDocs(awsRef);
 
 
-        /*
-         * データがまだ存在しない場合
-         */
         if (snapshot.empty) {
 
             if (awsValueElement) {
+
                 awsValueElement.textContent =
                     "0%";
+
             }
 
             if (awsDetailElement) {
+
                 awsDetailElement.textContent =
                     "学習データなし";
+
             }
 
             return;
+
         }
 
 
-        /*
-         * 最初のデータを確認
-         *
-         * 今後AWS学習機能を作った際に
-         * progress / accuracy を利用可能。
-         */
         let progress = null;
+
         let accuracy = null;
 
-        snapshot.forEach((docSnapshot) => {
 
-            const data =
-                docSnapshot.data();
+        snapshot.forEach(
+            (docSnapshot) => {
 
-            if (
-                typeof data.progress === "number"
-            ) {
-                progress =
-                    data.progress;
+                const data =
+                    docSnapshot.data();
+
+
+                if (
+                    typeof data.progress === "number"
+                ) {
+
+                    progress =
+                        data.progress;
+
+                }
+
+
+                if (
+                    typeof data.accuracy === "number"
+                ) {
+
+                    accuracy =
+                        data.accuracy;
+
+                }
+
             }
-
-            if (
-                typeof data.accuracy === "number"
-            ) {
-                accuracy =
-                    data.accuracy;
-            }
-
-        });
+        );
 
 
         if (awsValueElement) {
@@ -471,9 +446,11 @@ async function loadAwsProgress(user) {
 
                 awsDetailElement.textContent =
                     "AWS SAA 学習";
+
             }
 
         }
+
 
     } catch (error) {
 
@@ -482,14 +459,20 @@ async function loadAwsProgress(user) {
             error
         );
 
+
         if (awsValueElement) {
+
             awsValueElement.textContent =
                 "—";
+
         }
 
+
         if (awsDetailElement) {
+
             awsDetailElement.textContent =
                 "データ取得エラー";
+
         }
 
     }
@@ -503,9 +486,10 @@ async function loadAwsProgress(user) {
 
 async function loadGoals(user) {
 
-    if (!goalsValueElement &&
-        !goalsDetailElement) {
-
+    if (
+        !goalsValueElement &&
+        !goalsDetailElement
+    ) {
         return;
     }
 
@@ -523,73 +507,121 @@ async function loadGoals(user) {
             await getDocs(goalsRef);
 
 
-        /*
-         * 完了していない目標
-         */
         const activeGoals = [];
 
-        snapshot.forEach((docSnapshot) => {
+        let completedGoals = 0;
 
-            const data =
-                docSnapshot.data();
 
-            if (data.completed !== true) {
+        snapshot.forEach(
+            (docSnapshot) => {
+
+                const data =
+                    docSnapshot.data();
+
+
+                if (
+                    data.completed === true
+                ) {
+
+                    completedGoals++;
+
+                    return;
+
+                }
+
 
                 activeGoals.push({
-                    id: docSnapshot.id,
-                    title: data.title || "",
+
+                    id:
+                        docSnapshot.id,
+
+                    title:
+                        data.title || "",
+
                     progress:
                         typeof data.progress === "number"
                             ? data.progress
                             : 0,
+
                     deadline:
                         data.deadline || ""
+
                 });
 
             }
-
-        });
+        );
 
 
         /*
-         * 目標なし
+         * 目標が1件もない
          */
-        if (activeGoals.length === 0) {
+
+        if (
+            activeGoals.length === 0 &&
+            completedGoals === 0
+        ) {
 
             if (goalsValueElement) {
+
                 goalsValueElement.textContent =
                     "0";
+
             }
 
             if (goalsDetailElement) {
+
                 goalsDetailElement.textContent =
                     "目標を設定しましょう";
+
             }
 
             return;
+
         }
 
 
         /*
-         * 目標数
+         * 現在の目標数 / 全目標数
          */
+
         if (goalsValueElement) {
 
             goalsValueElement.textContent =
-                `${activeGoals.length}`;
+                `${activeGoals.length} / ${
+                    activeGoals.length +
+                    completedGoals
+                }`;
 
         }
 
 
         /*
-         * 進捗平均
+         * 未完了目標の平均進捗
          */
+
+        if (
+            activeGoals.length === 0
+        ) {
+
+            if (goalsDetailElement) {
+
+                goalsDetailElement.textContent =
+                    "すべての目標を達成しました";
+
+            }
+
+            return;
+
+        }
+
+
         const totalProgress =
             activeGoals.reduce(
                 (sum, goal) =>
                     sum + goal.progress,
                 0
             );
+
 
         const averageProgress =
             Math.round(
@@ -605,6 +637,7 @@ async function loadGoals(user) {
 
         }
 
+
     } catch (error) {
 
         console.error(
@@ -612,14 +645,20 @@ async function loadGoals(user) {
             error
         );
 
+
         if (goalsValueElement) {
+
             goalsValueElement.textContent =
                 "—";
+
         }
 
+
         if (goalsDetailElement) {
+
             goalsDetailElement.textContent =
                 "データ取得エラー";
+
         }
 
     }
@@ -633,9 +672,10 @@ async function loadGoals(user) {
 
 async function loadLifeScore(user) {
 
-    if (!lifeScoreValueElement &&
-        !lifeScoreDetailElement) {
-
+    if (
+        !lifeScoreValueElement &&
+        !lifeScoreDetailElement
+    ) {
         return;
     }
 
@@ -653,66 +693,39 @@ async function loadLifeScore(user) {
             await getDocs(lifeScoreRef);
 
 
-        /*
-         * データなし
-         */
         if (snapshot.empty) {
 
             if (lifeScoreValueElement) {
+
                 lifeScoreValueElement.textContent =
                     "—";
+
             }
 
             if (lifeScoreDetailElement) {
+
                 lifeScoreDetailElement.textContent =
                     "まだ記録がありません";
+
             }
 
             return;
+
         }
 
 
-        /*
-         * current を優先
-         */
         let currentScore = null;
 
-        snapshot.forEach((docSnapshot) => {
 
-            const data =
-                docSnapshot.data();
-
-            if (
-                docSnapshot.id === "current"
-            ) {
-
-                if (
-                    typeof data.score === "number"
-                ) {
-
-                    currentScore =
-                        data.score;
-
-                }
-
-            }
-
-        });
-
-
-        /*
-         * currentがなければ
-         * 最初のscoreを使用
-         */
-        if (currentScore === null) {
-
-            snapshot.forEach((docSnapshot) => {
+        snapshot.forEach(
+            (docSnapshot) => {
 
                 const data =
                     docSnapshot.data();
 
+
                 if (
-                    currentScore === null &&
+                    docSnapshot.id === "current" &&
                     typeof data.score === "number"
                 ) {
 
@@ -721,7 +734,31 @@ async function loadLifeScore(user) {
 
                 }
 
-            });
+            }
+        );
+
+
+        if (currentScore === null) {
+
+            snapshot.forEach(
+                (docSnapshot) => {
+
+                    const data =
+                        docSnapshot.data();
+
+
+                    if (
+                        currentScore === null &&
+                        typeof data.score === "number"
+                    ) {
+
+                        currentScore =
+                            data.score;
+
+                    }
+
+                }
+            );
 
         }
 
@@ -759,6 +796,7 @@ async function loadLifeScore(user) {
 
         }
 
+
     } catch (error) {
 
         console.error(
@@ -766,14 +804,20 @@ async function loadLifeScore(user) {
             error
         );
 
+
         if (lifeScoreValueElement) {
+
             lifeScoreValueElement.textContent =
                 "—";
+
         }
 
+
         if (lifeScoreDetailElement) {
+
             lifeScoreDetailElement.textContent =
                 "データ取得エラー";
+
         }
 
     }
@@ -798,7 +842,7 @@ function updateUserInfo(user) {
 
 
 /* =========================================================
-   Dashboard 全体読み込み
+   Dashboard
 ========================================================= */
 
 async function loadDashboard(user) {
@@ -806,6 +850,7 @@ async function loadDashboard(user) {
     updateTodayDate();
 
     updateUserInfo(user);
+
 
     await Promise.all([
 
@@ -840,12 +885,14 @@ onAuthStateChanged(
             }
 
             return;
+
         }
 
 
         console.log(
             "Firebase認証成功"
         );
+
 
         console.log(
             "UID:",
@@ -871,38 +918,27 @@ onAuthStateChanged(
    時刻更新
 ========================================================= */
 
-/*
- * 1分ごとにTODAYを更新。
- *
- * 例：
- *
- * 19:00 AWS SAA
- * ↓
- * 完了
- * ↓
- * 19:30 英語
- *
- * のように、時間経過によって
- * 次の予定へ自動的に切り替わる。
- */
+setInterval(
+    () => {
 
-setInterval(() => {
+        updateTodayDate();
 
-    updateTodayDate();
 
-    if (auth.currentUser) {
+        if (auth.currentUser) {
 
-        loadTodaySchedule(
-            auth.currentUser
-        );
+            loadTodaySchedule(
+                auth.currentUser
+            );
 
-    }
+        }
 
-}, 60 * 1000);
+    },
+    60 * 1000
+);
 
 
 /* =========================================================
-   初期日付表示
+   初期表示
 ========================================================= */
 
 updateTodayDate();
