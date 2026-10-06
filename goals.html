@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Goals | LIFE DASHBOARD</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background: #f5f7fa;
+
+            color: #263238;
+        }
+
+
+        /* =========================
+           Header
+        ========================= */
+
+        header {
+
+            padding: 24px 20px 20px;
+
+            background: #263238;
+
+            color: white;
+
+            text-align: center;
+        }
+
+
+        .header-title {
+
+            font-size: 24px;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+        }
+
+
+        .header-subtitle {
+
+            margin-top: 6px;
+
+            font-size: 11px;
+
+            letter-spacing: 1.5px;
+
+            color: #b0bec5;
+        }
+
+
+        #auth-status {
+
+            margin-top: 10px;
+
+            font-size: 12px;
+
+            color: #81c784;
+        }
+
+
+        /* =========================
+           Main
+        ========================= */
+
+        main {
+
+            width: min(1000px, calc(100% - 32px));
+
+            margin: 32px auto 60px;
+        }
+
+
+        .back-link {
+
+            display: inline-block;
+
+            margin-bottom: 20px;
+
+            color: #546e7a;
+
+            text-decoration: none;
+
+            font-size: 14px;
+        }
+
+
+        .back-link:hover {
+
+            text-decoration: underline;
+        }
+
+
+        h1 {
+
+            margin: 0;
+
+            font-size: 30px;
+
+            color: #263238;
+        }
+
+
+        .description {
+
+            margin-top: 8px;
+
+            margin-bottom: 28px;
+
+            color: #78909c;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           Add Goal
+        ========================= */
+
+        .add-goal-container {
+
+            padding: 24px;
+
+            margin-bottom: 30px;
+
+            background: white;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 4px 16px rgba(38, 50, 56, 0.08);
+        }
+
+
+        .section-title {
+
+            margin-bottom: 20px;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            color: #263238;
+        }
+
+
+        .form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 180px 120px;
+
+            gap: 16px;
+
+            align-items: end;
+        }
+
+
+        .form-group {
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .form-group label {
+
+            margin-bottom: 7px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #546e7a;
+        }
+
+
+        .form-group input {
+
+            width: 100%;
+
+            padding: 11px 12px;
+
+            border: 1px solid #cfd8dc;
+
+            border-radius: 8px;
+
+            background: white;
+
+            color: #263238;
+
+            font-size: 14px;
+
+            outline: none;
+        }
+
+
+        .form-group input:focus {
+
+            border-color: #607d8b;
+
+            box-shadow:
+                0 0 0 2px rgba(96, 125, 139, 0.12);
+        }
+
+
+        .add-button {
+
+            width: 100%;
+
+            padding: 11px 14px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #37474f;
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+
+        .add-button:hover {
+
+            background: #263238;
+        }
+
+
+        .add-button:disabled {
+
+            opacity: 0.5;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =========================
+           Goals Header
+        ========================= */
+
+        .goals-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 16px;
+        }
+
+
+        .goals-count {
+
+            color: #78909c;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           Goal List
+        ========================= */
+
+        #goals-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 14px;
+        }
+
+
+        .goal-card {
+
+            padding: 20px;
+
+            background: white;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px rgba(38, 50, 56, 0.07);
+
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+
+        .goal-card:hover {
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 5px 18px rgba(38, 50, 56, 0.10);
+        }
+
+
+        .goal-card.completed {
+
+            opacity: 0.62;
+        }
+
+
+        .goal-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-start;
+
+            gap: 20px;
+        }
+
+
+        .goal-title-area {
+
+            min-width: 0;
+
+            flex: 1;
+        }
+
+
+        .goal-title {
+
+            margin: 0;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            color: #263238;
+
+            word-break: break-word;
+        }
+
+
+        .goal-card.completed .goal-title {
+
+            text-decoration: line-through;
+
+            color: #78909c;
+        }
+
+
+        .goal-deadline {
+
+            margin-top: 7px;
+
+            font-size: 12px;
+
+            color: #78909c;
+        }
+
+
+        .goal-deadline.overdue {
+
+            color: #d32f2f;
+
+            font-weight: 600;
+        }
+
+
+        .goal-progress-number {
+
+            min-width: 58px;
+
+            text-align: right;
+
+            font-size: 22px;
+
+            font-weight: 700;
+
+            color: #37474f;
+        }
+
+
+        .goal-progress-bar-container {
+
+            width: 100%;
+
+            height: 10px;
+
+            margin-top: 18px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background: #eceff1;
+        }
+
+
+        .goal-progress-bar {
+
+            height: 100%;
+
+            border-radius: 999px;
+
+            background: #607d8b;
+
+            transition: width 0.25s ease;
+        }
+
+
+        .goal-card.completed
+        .goal-progress-bar {
+
+            background: #78909c;
+        }
+
+
+        .goal-actions {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            margin-top: 16px;
+        }
+
+
+        .goal-button {
+
+            padding: 7px 11px;
+
+            border: 1px solid #cfd8dc;
+
+            border-radius: 7px;
+
+            background: white;
+
+            color: #546e7a;
+
+            font-size: 12px;
+
+            cursor: pointer;
+        }
+
+
+        .goal-button:hover {
+
+            background: #f5f7fa;
+        }
+
+
+        .goal-button.complete {
+
+            border-color: #78909c;
+
+            color: #455a64;
+        }
+
+
+        .goal-button.delete {
+
+            color: #c62828;
+
+            border-color: #e0b4b4;
+        }
+
+
+        .goal-button.delete:hover {
+
+            background: #fff5f5;
+        }
+
+
+        /* =========================
+           Empty
+        ========================= */
+
+        .empty-message {
+
+            padding: 50px 20px;
+
+            text-align: center;
+
+            color: #90a4ae;
+
+            background: white;
+
+            border-radius: 12px;
+        }
+
+
+        .empty-message-title {
+
+            margin-bottom: 8px;
+
+            font-size: 17px;
+
+            font-weight: 600;
+
+            color: #607d8b;
+        }
+
+
+        .empty-message-text {
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           Mobile
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            main {
+
+                width:
+                    calc(100% - 20px);
+
+                margin-top: 22px;
+            }
+
+
+            .form-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .goal-top {
+
+                gap: 10px;
+            }
+
+
+            .goal-progress-number {
+
+                min-width: 50px;
+
+                font-size: 20px;
+            }
+
+
+            .goal-actions {
+
+                justify-content: flex-start;
+            }
+
+        }
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         Header
+    ========================= -->
+
+    <header>
+
+        <div class="header-title">
+            LIFE DASHBOARD
+        </div>
+
+        <div class="header-subtitle">
+            YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
+        </div>
+
+        <div id="auth-status">
+            Connecting...
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         Main
+    ========================= -->
+
+    <main>
+
+
+        <a
+            href="./index.html"
+            class="back-link">
+
+            ← Dashboard
+
+        </a>
+
+
+        <h1>
+            Goals
+        </h1>
+
+
+        <div class="description">
+
+            目標を管理します。
+
+        </div>
+
+
+        <!-- =========================
+             Add Goal
+        ========================= -->
+
+        <div class="add-goal-container">
+
+
+            <div class="section-title">
+
+                目標を追加
+
+            </div>
+
+
+            <div class="form-grid">
+
+
+                <div class="form-group">
+
+                    <label for="goal-title">
+                        目標
+                    </label>
+
+                    <input
+                        type="text"
+                        id="goal-title"
+                        placeholder="例：AWS SAAに合格する">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="goal-deadline">
+                        期限
+                    </label>
+
+                    <input
+                        type="date"
+                        id="goal-deadline">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <button
+                        id="add-goal-button"
+                        class="add-button">
+
+                        追加する
+
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             Goal List
+        ========================= -->
+
+        <div class="goals-header">
+
+            <div class="section-title">
+                現在の目標
+            </div>
+
+            <div
+                id="goals-count"
+                class="goals-count">
+
+                0件
+
+            </div>
+
+        </div>
+
+
+        <div id="goals-list">
+
+        </div>
+
+
+    </main>
+
+
+    <!-- =========================
+         JavaScript
+    ========================= -->
+
+    <script type="module">
+
+        import "./js/goals.js";
+
+    </script>
+
+
+</body>
+
+</html>
