@@ -5,6 +5,7 @@ import {
     addDoc,
     getDocs,
     deleteDoc,
+    updateDoc,
     doc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
@@ -276,10 +277,6 @@ function renderCalendar() {
         `${year}年${month + 1}月`;
 
 
-    /*
-     * 月初の曜日
-     */
-
     const firstDay =
         new Date(
             year,
@@ -288,10 +285,6 @@ function renderCalendar() {
         ).getDay();
 
 
-    /*
-     * 月の日数
-     */
-
     const daysInMonth =
         new Date(
             year,
@@ -299,10 +292,6 @@ function renderCalendar() {
             0
         ).getDate();
 
-
-    /*
-     * 前月の日数
-     */
 
     const daysInPreviousMonth =
         new Date(
@@ -313,7 +302,7 @@ function renderCalendar() {
 
 
     /*
-     * 前月の日付
+     * 前月
      */
 
     for (
@@ -338,11 +327,12 @@ function renderCalendar() {
         calendarGrid.appendChild(
             dayElement
         );
+
     }
 
 
     /*
-     * 今月の日付
+     * 今月
      */
 
     for (
@@ -363,13 +353,14 @@ function renderCalendar() {
         calendarGrid.appendChild(
             dayElement
         );
+
     }
 
 
     /*
-     * 次月の日付
+     * 次月
      *
-     * カレンダーを6週間分にする
+     * 6週間 = 42マス
      */
 
     const totalCells =
@@ -398,6 +389,7 @@ function renderCalendar() {
         calendarGrid.appendChild(
             dayElement
         );
+
     }
 
 }
@@ -443,6 +435,7 @@ function createCalendarDay(
         dayElement.classList.add(
             "other-month"
         );
+
     }
 
 
@@ -457,6 +450,7 @@ function createCalendarDay(
         dayElement.classList.add(
             "today"
         );
+
     }
 
 
@@ -471,6 +465,7 @@ function createCalendarDay(
         dayElement.classList.add(
             "selected"
         );
+
     }
 
 
@@ -498,7 +493,7 @@ function createCalendarDay(
 
 
     /*
-     * 予定の有無
+     * 予定がある場合
      */
 
     const hasSchedule =
@@ -526,11 +521,12 @@ function createCalendarDay(
         dayElement.appendChild(
             dotElement
         );
+
     }
 
 
     /*
-     * クリック
+     * 日付クリック
      */
 
     dayElement.addEventListener(
@@ -540,11 +536,6 @@ function createCalendarDay(
             selectedDate =
                 dateKey;
 
-
-            /*
-             * 別月の日付をクリックした場合、
-             * その月へ移動
-             */
 
             currentCalendarDate =
                 new Date(
@@ -609,6 +600,10 @@ function renderSelectedDate() {
             );
 
 
+    /*
+     * 予定なし
+     */
+
     if (
         selectedSchedules.length === 0
     ) {
@@ -623,6 +618,10 @@ function renderSelectedDate() {
     }
 
 
+    /*
+     * 予定表示
+     */
+
     selectedSchedules.forEach(
         (schedule) => {
 
@@ -636,6 +635,10 @@ function renderSelectedDate() {
                 "schedule-item";
 
 
+            /*
+             * 左側
+             */
+
             const left =
                 document.createElement(
                     "div"
@@ -645,6 +648,10 @@ function renderSelectedDate() {
             left.className =
                 "schedule-item-left";
 
+
+            /*
+             * 時刻
+             */
 
             const time =
                 document.createElement(
@@ -659,6 +666,10 @@ function renderSelectedDate() {
             time.textContent =
                 schedule.time || "";
 
+
+            /*
+             * タイトル
+             */
 
             const title =
                 document.createElement(
@@ -683,6 +694,62 @@ function renderSelectedDate() {
                 title
             );
 
+
+            /*
+             * ボタンエリア
+             */
+
+            const buttonArea =
+                document.createElement(
+                    "div"
+                );
+
+
+            buttonArea.style.display =
+                "flex";
+
+
+            buttonArea.style.gap =
+                "6px";
+
+
+            /*
+             * 編集ボタン
+             */
+
+            const editButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            editButton.type =
+                "button";
+
+
+            editButton.className =
+                "delete-button";
+
+
+            editButton.textContent =
+                "編集";
+
+
+            editButton.addEventListener(
+                "click",
+                async () => {
+
+                    await editSchedule(
+                        schedule
+                    );
+
+                }
+            );
+
+
+            /*
+             * 削除ボタン
+             */
 
             const deleteButton =
                 document.createElement(
@@ -714,13 +781,27 @@ function renderSelectedDate() {
             );
 
 
+            buttonArea.appendChild(
+                editButton
+            );
+
+
+            buttonArea.appendChild(
+                deleteButton
+            );
+
+
+            /*
+             * 全体
+             */
+
             item.appendChild(
                 left
             );
 
 
             item.appendChild(
-                deleteButton
+                buttonArea
             );
 
 
@@ -730,6 +811,225 @@ function renderSelectedDate() {
 
         }
     );
+
+}
+
+
+/* =========================
+   EDIT SCHEDULE
+========================= */
+
+async function editSchedule(
+    schedule
+) {
+
+    /*
+     * 予定名
+     */
+
+    const newTitle =
+        prompt(
+            "予定名を入力してください。",
+            schedule.title || ""
+        );
+
+
+    /*
+     * キャンセル
+     */
+
+    if (
+        newTitle === null
+    ) {
+
+        return;
+    }
+
+
+    const trimmedTitle =
+        newTitle.trim();
+
+
+    if (
+        !trimmedTitle
+    ) {
+
+        alert(
+            "予定名を入力してください。"
+        );
+
+        return;
+    }
+
+
+    /*
+     * 時刻
+     */
+
+    const newTime =
+        prompt(
+            "時刻を入力してください。\n例：20:00",
+            schedule.time || ""
+        );
+
+
+    if (
+        newTime === null
+    ) {
+
+        return;
+    }
+
+
+    const trimmedTime =
+        newTime.trim();
+
+
+    /*
+     * 時刻チェック
+     */
+
+    const timePattern =
+        /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+
+
+    if (
+        !timePattern.test(
+            trimmedTime
+        )
+    ) {
+
+        alert(
+            "時刻は「20:00」のような形式で入力してください。"
+        );
+
+        return;
+    }
+
+
+    /*
+     * 日付
+     */
+
+    const newDate =
+        prompt(
+            "日付を入力してください。\n例：2026-10-06",
+            schedule.date || ""
+        );
+
+
+    if (
+        newDate === null
+    ) {
+
+        return;
+    }
+
+
+    const trimmedDate =
+        newDate.trim();
+
+
+    /*
+     * 日付チェック
+     */
+
+    const datePattern =
+        /^\d{4}-\d{2}-\d{2}$/;
+
+
+    if (
+        !datePattern.test(
+            trimmedDate
+        )
+    ) {
+
+        alert(
+            "日付は「2026-10-06」のような形式で入力してください。"
+        );
+
+        return;
+    }
+
+
+    /*
+     * Firestore更新
+     */
+
+    try {
+
+        await updateDoc(
+            doc(
+                db,
+                "users",
+                currentUser.uid,
+                "schedules",
+                schedule.id
+            ),
+            {
+                title:
+                    trimmedTitle,
+
+                time:
+                    trimmedTime,
+
+                date:
+                    trimmedDate
+            }
+        );
+
+
+        /*
+         * 編集した日付を選択
+         */
+
+        selectedDate =
+            trimmedDate;
+
+
+        const [
+            year,
+            month
+        ] =
+            trimmedDate
+                .split("-")
+                .map(
+                    Number
+                );
+
+
+        currentCalendarDate =
+            new Date(
+                year,
+                month - 1,
+                1
+            );
+
+
+        /*
+         * 再読み込み
+         */
+
+        await loadSchedules();
+
+
+        dateInput.value =
+            selectedDate;
+
+
+    } catch (error) {
+
+        console.error(
+            "予定編集失敗:",
+            error
+        );
+
+
+        alert(
+            "予定の編集に失敗しました。"
+        );
+
+    }
 
 }
 
@@ -806,7 +1106,7 @@ form.addEventListener(
 
 
             /*
-             * フォームをリセット
+             * 入力欄をクリア
              */
 
             titleInput.value =
@@ -814,7 +1114,7 @@ form.addEventListener(
 
 
             /*
-             * 登録した日付を選択
+             * 登録した日を選択
              */
 
             selectedDate =
@@ -862,6 +1162,7 @@ form.addEventListener(
             alert(
                 "予定の追加に失敗しました。"
             );
+
         }
 
     }
@@ -914,7 +1215,9 @@ async function deleteSchedule(
         alert(
             "予定の削除に失敗しました。"
         );
+
     }
+
 }
 
 
