@@ -1,6 +1,5 @@
 import { startAnonymousAuth } from "./auth.js";
 
-
 import {
     doc,
     setDoc,
@@ -12,13 +11,11 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-
 import { db } from "./firebase.js";
 
 
-
 /* =========================
-   ELEMENTS
+   DOM ELEMENTS
 ========================= */
 
 const uidElement =
@@ -31,10 +28,7 @@ const dateElement =
     document.getElementById("today-date");
 
 
-
-/* =========================
-   TODAY CARD
-========================= */
+/* TODAY */
 
 const todayValueElement =
     document.querySelector(
@@ -47,10 +41,7 @@ const todayDetailElement =
     );
 
 
-
-/* =========================
-   AWS CARD
-========================= */
+/* AWS */
 
 const awsValueElement =
     document.querySelector(
@@ -68,10 +59,7 @@ const awsDetailElement =
     );
 
 
-
-/* =========================
-   GOALS CARD
-========================= */
+/* GOALS */
 
 const goalsValueElement =
     document.querySelector(
@@ -89,10 +77,7 @@ const goalsDetailElement =
     );
 
 
-
-/* =========================
-   LIFE SCORE CARD
-========================= */
+/* LIFE SCORE */
 
 const scoreElement =
     document.querySelector(
@@ -105,7 +90,6 @@ const scoreMessageElement =
     );
 
 
-
 /* =========================
    DATE
 ========================= */
@@ -115,21 +99,17 @@ function displayToday() {
     const now =
         new Date();
 
-
     const year =
         now.getFullYear();
 
-
     const month =
         now.getMonth() + 1;
-
 
     const date =
         now.getDate();
 
 
     const weekdayNames = [
-
         "日",
         "月",
         "火",
@@ -137,7 +117,6 @@ function displayToday() {
         "木",
         "金",
         "土"
-
     ];
 
 
@@ -149,13 +128,11 @@ function displayToday() {
 
     dateElement.textContent =
         `${year}年${month}月${date}日（${weekday}）`;
-
 }
 
 
-
 /* =========================
-   DATE KEY
+   TODAY KEY
 ========================= */
 
 function getTodayKey() {
@@ -163,16 +140,13 @@ function getTodayKey() {
     const now =
         new Date();
 
-
     const year =
         now.getFullYear();
-
 
     const month =
         String(
             now.getMonth() + 1
         ).padStart(2, "0");
-
 
     const date =
         String(
@@ -181,13 +155,11 @@ function getTodayKey() {
 
 
     return `${year}-${month}-${date}`;
-
 }
 
 
-
 /* =========================
-   SCHEDULE
+   TODAY SCHEDULE
 ========================= */
 
 async function loadTodaySchedule(user) {
@@ -227,23 +199,25 @@ async function loadTodaySchedule(user) {
         const schedules =
             snapshot.docs.map(
                 (item) => ({
-                    id: item.id,
+                    id:
+                        item.id,
+
                     ...item.data()
                 })
             );
 
 
-        /* =========================
-           件数
-        ========================= */
+        /*
+         * 今日の予定数
+         */
 
         todayValueElement.textContent =
             schedules.length;
 
 
-        /* =========================
-           次の予定
-        ========================= */
+        /*
+         * 予定がない場合
+         */
 
         if (
             schedules.length === 0
@@ -253,36 +227,88 @@ async function loadTodaySchedule(user) {
                 "今日の予定はありません";
 
             return;
-
         }
 
 
-        schedules.sort(
-            (a, b) =>
-                String(a.time || "")
-                .localeCompare(
-                    String(b.time || "")
+        /*
+         * 現在時刻を取得
+         */
+
+        const now =
+            new Date();
+
+
+        const currentHour =
+            String(
+                now.getHours()
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        const currentMinute =
+            String(
+                now.getMinutes()
+            ).padStart(
+                2,
+                "0"
+            );
+
+
+        const currentTime =
+            `${currentHour}:${currentMinute}`;
+
+
+        /*
+         * 現在時刻以降の予定だけ取得
+         */
+
+        const upcomingSchedules =
+            schedules
+                .filter(
+                    (schedule) =>
+                        schedule.time &&
+                        schedule.time >= currentTime
                 )
-        );
+                .sort(
+                    (a, b) =>
+                        String(
+                            a.time
+                        ).localeCompare(
+                            String(
+                                b.time
+                            )
+                        )
+                );
 
 
-        const nextSchedule =
-            schedules[0];
-
+        /*
+         * 次の予定がある場合
+         */
 
         if (
-            nextSchedule.time
+            upcomingSchedules.length > 0
         ) {
+
+            const nextSchedule =
+                upcomingSchedules[0];
+
 
             todayDetailElement.textContent =
                 `次の予定：${nextSchedule.time}`;
 
-        } else {
 
-            todayDetailElement.textContent =
-                "今日の予定があります";
-
+            return;
         }
+
+
+        /*
+         * 今日の予定がすべて終了
+         */
+
+        todayDetailElement.textContent =
+            "今日の予定はすべて終了";
 
 
     } catch (error) {
@@ -292,14 +318,19 @@ async function loadTodaySchedule(user) {
             error
         );
 
-    }
 
+        todayValueElement.textContent =
+            "—";
+
+
+        todayDetailElement.textContent =
+            "予定を取得できませんでした";
+    }
 }
 
 
-
 /* =========================
-   AWS
+   AWS PROGRESS
 ========================= */
 
 async function loadAWSProgress(user) {
@@ -331,7 +362,6 @@ async function loadAWSProgress(user) {
             );
 
             return;
-
         }
 
 
@@ -357,7 +387,10 @@ async function loadAWSProgress(user) {
 
         awsProgressBar.style.width =
             `${Math.min(
-                Math.max(progress, 0),
+                Math.max(
+                    progress,
+                    0
+                ),
                 100
             )}%`;
 
@@ -372,11 +405,8 @@ async function loadAWSProgress(user) {
             "AWS学習データ取得失敗:",
             error
         );
-
     }
-
 }
-
 
 
 /* =========================
@@ -404,7 +434,8 @@ async function loadGoals(user) {
 
         const goals =
             snapshot.docs.map(
-                (item) => item.data()
+                (item) =>
+                    item.data()
             );
 
 
@@ -447,11 +478,8 @@ async function loadGoals(user) {
             "目標データ取得失敗:",
             error
         );
-
     }
-
 }
-
 
 
 /* =========================
@@ -487,7 +515,6 @@ async function loadLifeScore(user) {
             );
 
             return;
-
         }
 
 
@@ -505,7 +532,9 @@ async function loadLifeScore(user) {
             score;
 
 
-        if (score >= 80) {
+        if (
+            score >= 80
+        ) {
 
             scoreMessageElement.textContent =
                 "GOOD CONDITION";
@@ -528,7 +557,6 @@ async function loadLifeScore(user) {
 
             scoreMessageElement.textContent =
                 "TAKE CARE";
-
         }
 
 
@@ -538,15 +566,12 @@ async function loadLifeScore(user) {
             "LIFE SCORE取得失敗:",
             error
         );
-
     }
-
 }
 
 
-
 /* =========================
-   AUTH
+   INITIALIZE
 ========================= */
 
 displayToday();
@@ -554,7 +579,6 @@ displayToday();
 
 startAnonymousAuth(
     async (user) => {
-
 
         console.log(
             "LIFE DASHBOARD 起動"
@@ -567,55 +591,44 @@ startAnonymousAuth(
         );
 
 
-
-        /* =========================
-           UID
-        ========================= */
+        /*
+         * UID表示
+         */
 
         uidElement.textContent =
             user.uid;
 
 
-
-        /* =========================
-           ONLINE
-        ========================= */
+        /*
+         * ONLINE表示
+         */
 
         statusElement.textContent =
             "ONLINE";
 
 
-
-        /* =========================
-           USER DATA
-        ========================= */
+        /*
+         * Firestoreユーザー情報
+         */
 
         try {
 
             await setDoc(
-
                 doc(
                     db,
                     "users",
                     user.uid
                 ),
-
                 {
-
                     accountType:
                         "anonymous",
 
                     lastLoginAt:
                         serverTimestamp()
-
                 },
-
                 {
-
                     merge: true
-
                 }
-
             );
 
 
@@ -630,14 +643,12 @@ startAnonymousAuth(
                 "Firestore接続失敗:",
                 error
             );
-
         }
 
 
-
-        /* =========================
-           DASHBOARD DATA
-        ========================= */
+        /*
+         * Dashboardデータ取得
+         */
 
         await Promise.all([
 
