@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -20,26 +21,36 @@
 <body>
 
 
+<!-- =========================
+     HEADER
+========================= -->
+
 <header class="header">
 
-    <div>
+    <div class="brand">
 
-        <h1>LIFE DASHBOARD</h1>
+        <div class="brand-title">
+            LIFE DASHBOARD
+        </div>
 
-        <p>
+        <div class="brand-subtitle">
             YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
-        </p>
+        </div>
 
     </div>
 
 
-    <div class="status">
+    <div class="header-right">
 
-        <span class="status-dot"></span>
+        <div class="status">
 
-        <span id="auth-status">
-            CONNECTING...
-        </span>
+            <span class="status-dot"></span>
+
+            <span id="auth-status">
+                CONNECTING...
+            </span>
+
+        </div>
 
     </div>
 
@@ -47,56 +58,30 @@
 
 
 
+<!-- =========================
+     MAIN
+========================= -->
+
 <main class="dashboard">
 
 
-    <!-- Welcome -->
+    <!-- Greeting -->
 
-    <section class="welcome-card">
+    <section class="greeting">
 
-        <p class="label">
-            TODAY
-        </p>
+        <div>
 
+            <p class="greeting-label">
+                GOOD EVENING
+            </p>
 
-        <h2>
-            Welcome to your LIFE.
-        </h2>
+            <h1>
+                Welcome to your LIFE.
+            </h1>
 
-
-        <p>
-            あなたの予定・学習・目標などを
-            一つのダッシュボードで管理します。
-        </p>
-
-    </section>
-
-
-
-    <!-- Account -->
-
-    <section class="info-card">
-
-        <h3>
-            ACCOUNT
-        </h3>
-
-
-        <p>
-            Anonymous User
-        </p>
-
-
-        <div class="uid-box">
-
-            <span>
-                UID
-            </span>
-
-
-            <code id="user-uid">
-                CONNECTING...
-            </code>
+            <p class="date" id="today-date">
+                ----年--月--日
+            </p>
 
         </div>
 
@@ -104,77 +89,38 @@
 
 
 
-    <!-- Coming Soon -->
+    <!-- Dashboard Grid -->
 
-    <section class="coming-card">
-
-        <h3>
-            COMING SOON
-        </h3>
+    <section class="dashboard-grid">
 
 
-        <div class="feature-list">
+        <!-- =========================
+             TODAY
+        ========================= -->
 
+        <article class="dashboard-card">
 
-            <div>
+            <div class="card-header">
 
-                📅
+                <div>
 
-                <span>
-                    Schedule
+                    <span class="card-icon">
+                        📅
+                    </span>
+
+                    <span class="card-title">
+                        TODAY
+                    </span>
+
+                </div>
+
+                <span class="card-arrow">
+                    →
                 </span>
 
             </div>
 
 
-            <div>
-
-                ☁️
-
-                <span>
-                    AWS SAA 50
-                </span>
-
-            </div>
-
-
-            <div>
-
-                📊
-
-                <span>
-                    LIFE SCORE
-                </span>
-
-            </div>
-
-
-            <div>
-
-                🎯
-
-                <span>
-                    Goals
-                </span>
-
-            </div>
-
-
-        </div>
-
-    </section>
-
-
-</main>
-
-
-
-<script
-    type="module"
-    src="./js/dashboard.js"
-></script>
-
-
-</body>
-
-</html>
+            <div class="card-main-value">
+                3
+```
