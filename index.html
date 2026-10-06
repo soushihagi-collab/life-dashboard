@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>LIFE DASHBOARD</title>
+
+    <link rel="stylesheet" href="./style.css">
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div>
+
+        <h1>LIFE DASHBOARD</h1>
+
+        <p>
+            YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
+        </p>
+
+    </div>
+
+
+    <div class="status">
+
+        <span class="status-dot"></span>
+
+        <span id="auth-status">
+            CONNECTING...
+        </span>
+
+    </div>
+
+</header>
+
+
+
+<main class="dashboard">
+
+
+    <!-- Welcome -->
+
+    <section class="welcome-card">
+
+        <p class="label">
+            TODAY
+        </p>
+
+
+        <h2>
+            Welcome to your LIFE.
+        </h2>
+
+
+        <p>
+            あなたの予定・学習・目標などを
+            一つのダッシュボードで管理します。
+        </p>
+
+    </section>
+
+
+
+    <!-- Account -->
+
+    <section class="info-card">
+
+        <h3>
+            ACCOUNT
+        </h3>
+
+
+        <p>
+            Anonymous User
+        </p>
+
+
+        <div class="uid-box">
+
+            <span>
+                UID
+            </span>
+
+
+            <code id="user-uid">
+                CONNECTING...
+            </code>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- Coming Soon -->
+
+    <section class="coming-card">
+
+        <h3>
+            COMING SOON
+        </h3>
+
+
+        <div class="feature-list">
+
+
+            <div>
+
+                📅
+
+                <span>
+                    Schedule
+                </span>
+
+            </div>
+
+
+            <div>
+
+                ☁️
+
+                <span>
+                    AWS SAA 50
+                </span>
+
+            </div>
+
+
+            <div>
+
+                📊
+
+                <span>
+                    LIFE SCORE
+                </span>
+
+            </div>
+
+
+            <div>
+
+                🎯
+
+                <span>
+                    Goals
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<script
+    type="module"
+    src="./js/dashboard.js"
+></script>
+
+
+</body>
+
+</html>
