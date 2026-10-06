@@ -12,179 +12,592 @@
 
     <title>AWS SAA | LIFE DASHBOARD</title>
 
+
     <link
         rel="stylesheet"
         href="./style.css"
     >
 
+
     <style>
 
-        .aws-container {
-            max-width: 1000px;
+        /* =========================================================
+           AWS PAGE
+        ========================================================= */
+
+        .aws-page {
+
+            max-width: 1100px;
+
             margin: 0 auto;
-            padding: 40px 20px 60px;
+
+            padding: 35px 20px 60px;
+
         }
 
-        .back-link {
+
+        /* =========================================================
+           BACK
+        ========================================================= */
+
+        .aws-back {
+
             display: inline-block;
+
             margin-bottom: 25px;
-            color: inherit;
+
+            color: #42d392;
+
             text-decoration: none;
+
+            font-size: 14px;
+
             font-weight: 600;
+
         }
 
-        .page-description {
-            color: #666;
-            margin-bottom: 30px;
+
+        .aws-back:hover {
+
+            text-decoration: underline;
+
         }
+
+
+        /* =========================================================
+           PAGE HEADER
+        ========================================================= */
+
+        .aws-page-header {
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .aws-page-title {
+
+            margin: 0 0 8px;
+
+            font-size: 32px;
+
+            font-weight: 800;
+
+        }
+
+
+        .aws-page-description {
+
+            margin: 0;
+
+            color: #697482;
+
+            font-size: 14px;
+
+        }
+
+
+        /* =========================================================
+           GRID
+        ========================================================= */
 
         .aws-grid {
+
             display: grid;
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-            gap: 20px;
-        }
 
-        .aws-card {
-            background: #fff;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow:
-                0 4px 15px rgba(0, 0, 0, 0.06);
-        }
-
-        .aws-card.full {
-            grid-column: 1 / -1;
-        }
-
-        .aws-card-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #666;
-            margin-bottom: 12px;
-        }
-
-        .aws-main-value {
-            font-size: 42px;
-            font-weight: 800;
-            margin-bottom: 15px;
-        }
-
-        .aws-sub {
-            color: #777;
-            font-size: 14px;
-        }
-
-        .progress {
-            width: 100%;
-            height: 12px;
-            background: #e9edf2;
-            border-radius: 999px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: #333;
-            border-radius: 999px;
-            transition: width 0.3s ease;
-        }
-
-        .stats {
-            display: grid;
             grid-template-columns:
                 repeat(3, minmax(0, 1fr));
-            gap: 15px;
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+
         }
 
-        .stat {
-            background: #f7f8fa;
-            border-radius: 12px;
-            padding: 18px;
-            text-align: center;
+
+        /* =========================================================
+           CARD
+        ========================================================= */
+
+        .aws-card {
+
+            background: #ffffff;
+
+            border: 1px solid #e4e8ed;
+
+            border-radius: 14px;
+
+            padding: 22px;
+
+            box-shadow:
+                0 3px 12px rgba(
+                    0,
+                    0,
+                    0,
+                    0.04
+                );
+
         }
 
-        .stat-value {
-            font-size: 28px;
+
+        .aws-card-title {
+
+            margin-bottom: 12px;
+
+            color: #697482;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.04em;
+
+        }
+
+
+        .aws-card-value {
+
+            font-size: 32px;
+
             font-weight: 800;
+
+            color: #1f2933;
+
         }
 
-        .stat-label {
-            font-size: 13px;
-            color: #777;
-            margin-top: 5px;
+
+        .aws-card-sub {
+
+            margin-top: 8px;
+
+            color: #697482;
+
+            font-size: 12px;
+
         }
 
-        .form-group {
-            margin-bottom: 18px;
-        }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 7px;
-            font-weight: 700;
-        }
+        /* =========================================================
+           PROGRESS
+        ========================================================= */
 
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font: inherit;
-        }
+        .aws-progress-container {
 
-        .form-group textarea {
-            min-height: 130px;
-            resize: vertical;
-        }
-
-        .save-button {
-            border: none;
-            border-radius: 10px;
-            padding: 13px 22px;
-            background: #222;
-            color: #fff;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .save-button:hover {
-            opacity: 0.85;
-        }
-
-        .message {
-            margin-top: 12px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .study-button {
-            display: inline-block;
             margin-top: 15px;
-            padding: 12px 18px;
-            border-radius: 10px;
-            background: #f1f3f5;
-            color: inherit;
-            text-decoration: none;
-            font-weight: 700;
+
         }
 
-        @media (max-width: 700px) {
+
+        .aws-progress-background {
+
+            width: 100%;
+
+            height: 10px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background: #edf0f3;
+
+        }
+
+
+        .aws-progress-bar {
+
+            width: 0%;
+
+            height: 100%;
+
+            border-radius: 999px;
+
+            background: #42d392;
+
+            transition:
+                width 0.3s ease;
+
+        }
+
+
+        .aws-progress-text {
+
+            margin-top: 8px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            font-size: 12px;
+
+            color: #697482;
+
+        }
+
+
+        /* =========================================================
+           SECTION
+        ========================================================= */
+
+        .aws-section {
+
+            margin-top: 25px;
+
+            padding: 24px;
+
+            background: #ffffff;
+
+            border: 1px solid #e4e8ed;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 3px 12px rgba(
+                    0,
+                    0,
+                    0,
+                    0.04
+                );
+
+        }
+
+
+        .aws-section-title {
+
+            margin-bottom: 20px;
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+        }
+
+
+        /* =========================================================
+           FORM
+        ========================================================= */
+
+        .aws-form-group {
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .aws-form-group label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            color: #697482;
+
+        }
+
+
+        .aws-form-group input,
+        .aws-form-group textarea {
+
+            width: 100%;
+
+            padding: 11px 12px;
+
+            border:
+                1px solid #d8dee5;
+
+            border-radius: 8px;
+
+            background: #ffffff;
+
+            color: #1f2933;
+
+            font-size: 14px;
+
+            outline: none;
+
+            font-family: inherit;
+
+        }
+
+
+        .aws-form-group input:focus,
+        .aws-form-group textarea:focus {
+
+            border-color: #42d392;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(
+                    66,
+                    211,
+                    146,
+                    0.08
+                );
+
+        }
+
+
+        .aws-form-group textarea {
+
+            min-height: 100px;
+
+            resize: vertical;
+
+        }
+
+
+        /* =========================================================
+           TWO COLUMN FORM
+        ========================================================= */
+
+        .aws-form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 18px;
+
+        }
+
+
+        /* =========================================================
+           BUTTON
+        ========================================================= */
+
+        .aws-button {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #42d392;
+
+            color: #ffffff;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+        }
+
+
+        .aws-button:hover {
+
+            opacity: 0.9;
+
+        }
+
+
+        .aws-button:disabled {
+
+            opacity: 0.6;
+
+            cursor: default;
+
+        }
+
+
+        /* =========================================================
+           QUESTION
+        ========================================================= */
+
+        .question-number {
+
+            margin-bottom: 10px;
+
+            color: #42d392;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .question-text {
+
+            margin-bottom: 22px;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            line-height: 1.7;
+
+        }
+
+
+        .answer-list {
+
+            display: grid;
+
+            gap: 10px;
+
+        }
+
+
+        .answer-button {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border:
+                1px solid #d8dee5;
+
+            border-radius: 8px;
+
+            background: #ffffff;
+
+            color: #1f2933;
+
+            text-align: left;
+
+            font-size: 14px;
+
+            cursor: pointer;
+
+        }
+
+
+        .answer-button:hover {
+
+            border-color: #42d392;
+
+            background: #f8fffb;
+
+        }
+
+
+        .answer-button.correct {
+
+            border-color: #42d392;
+
+            background: #ecfff6;
+
+        }
+
+
+        .answer-button.incorrect {
+
+            border-color: #e57373;
+
+            background: #fff3f3;
+
+        }
+
+
+        .answer-button:disabled {
+
+            cursor: default;
+
+        }
+
+
+        .question-result {
+
+            margin-top: 18px;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            background: #f5f7fa;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+
+        }
+
+
+        .next-question-button {
+
+            margin-top: 15px;
+
+        }
+
+
+        /* =========================================================
+           STATUS
+        ========================================================= */
+
+        .aws-status {
+
+            margin-top: 12px;
+
+            min-height: 20px;
+
+            font-size: 12px;
+
+            color: #697482;
+
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 800px) {
 
             .aws-grid {
-                grid-template-columns: 1fr;
+
+                grid-template-columns:
+                    1fr;
+
             }
 
-            .aws-card.full {
-                grid-column: auto;
+
+            .aws-form-grid {
+
+                grid-template-columns:
+                    1fr;
+
             }
 
-            .stats {
-                grid-template-columns: 1fr;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .aws-page {
+
+                padding:
+                    25px 12px 40px;
+
+            }
+
+
+            .aws-page-title {
+
+                font-size: 26px;
+
+            }
+
+
+            .aws-card-value {
+
+                font-size: 28px;
+
+            }
+
+
+            .aws-section {
+
+                padding: 18px;
+
             }
 
         }
@@ -197,279 +610,541 @@
 <body>
 
 
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
 <header class="header">
+
 
     <div class="brand">
 
+
         <div class="brand-title">
+
             LIFE DASHBOARD
+
         </div>
 
+
         <div class="brand-subtitle">
+
             YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
+
         </div>
+
 
     </div>
 
 
     <div class="header-right">
 
+
         <div class="status">
+
 
             <span class="status-dot"></span>
 
+
             <span id="auth-status">
+
                 CONNECTING...
+
             </span>
+
 
         </div>
 
+
     </div>
+
 
 </header>
 
 
-<main class="aws-container">
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="aws-page">
+
 
     <a
         href="./index.html"
-        class="back-link"
+        class="aws-back"
     >
+
         ← Dashboard
+
     </a>
 
 
-    <h1>
-        ☁️ AWS SAA
-    </h1>
 
-    <p class="page-description">
-        AWS Certified Solutions Architect - Associate
-        の学習状況を管理します。
-    </p>
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
 
+    <section class="aws-page-header">
+
+
+        <h1 class="aws-page-title">
+
+            AWS SAA
+
+        </h1>
+
+
+        <p class="aws-page-description">
+
+            AWS Certified Solutions Architect - Associate
+
+        </p>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
 
     <section class="aws-grid">
 
 
-        <!-- 進捗 -->
+        <!-- PROGRESS -->
 
         <div class="aws-card">
 
+
             <div class="aws-card-title">
+
                 LEARNING PROGRESS
+
             </div>
 
+
             <div
-                class="aws-main-value"
-                id="progress-value"
+                class="aws-card-value"
+                id="aws-progress-value"
             >
+
                 0%
-            </div>
-
-            <div class="progress">
-
-                <div
-                    class="progress-bar"
-                    id="progress-bar"
-                ></div>
 
             </div>
 
-            <div
-                class="aws-sub"
-                id="progress-detail"
-            >
-                学習データを読み込んでいます...
+
+            <div class="aws-progress-container">
+
+
+                <div class="aws-progress-background">
+
+
+                    <div
+                        class="aws-progress-bar"
+                        id="aws-progress-bar"
+                    ></div>
+
+
+                </div>
+
+
+                <div class="aws-progress-text">
+
+
+                    <span>
+
+                        学習進捗
+
+                    </span>
+
+
+                    <span
+                        id="aws-progress-text"
+                    >
+
+                        0%
+
+                    </span>
+
+
+                </div>
+
+
             </div>
+
 
         </div>
 
 
-        <!-- 正答率 -->
+
+        <!-- ACCURACY -->
 
         <div class="aws-card">
 
+
             <div class="aws-card-title">
+
                 ACCURACY
+
             </div>
 
+
             <div
-                class="aws-main-value"
-                id="accuracy-value"
+                class="aws-card-value"
+                id="aws-accuracy-value"
             >
+
                 0%
+
             </div>
 
-            <div
-                class="aws-sub"
-                id="accuracy-detail"
-            >
-                問題データを読み込んでいます...
+
+            <div class="aws-card-sub">
+
+                現在の正答率
+
             </div>
+
 
         </div>
 
 
-        <!-- 統計 -->
 
-        <div class="aws-card full">
+        <!-- QUESTIONS -->
+
+        <div class="aws-card">
+
 
             <div class="aws-card-title">
-                STUDY STATISTICS
-            </div>
 
-
-            <div class="stats">
-
-                <div class="stat">
-
-                    <div
-                        class="stat-value"
-                        id="question-count"
-                    >
-                        0
-                    </div>
-
-                    <div class="stat-label">
-                        解答問題数
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div
-                        class="stat-value"
-                        id="correct-count"
-                    >
-                        0
-                    </div>
-
-                    <div class="stat-label">
-                        正解数
-                    </div>
-
-                </div>
-
-
-                <div class="stat">
-
-                    <div
-                        class="stat-value"
-                        id="incorrect-count"
-                    >
-                        0
-                    </div>
-
-                    <div class="stat-label">
-                        不正解数
-                    </div>
-
-                </div>
+                QUESTIONS
 
             </div>
-
-        </div>
-
-
-        <!-- 設定 -->
-
-        <div class="aws-card full">
-
-            <div class="aws-card-title">
-                STUDY SETTINGS
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="target-date">
-                    目標受験日
-                </label>
-
-                <input
-                    type="date"
-                    id="target-date"
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="study-note">
-                    学習メモ
-                </label>
-
-                <textarea
-                    id="study-note"
-                    placeholder="現在の学習状況、苦手分野、次に勉強する内容など"
-                ></textarea>
-
-            </div>
-
-
-            <button
-                type="button"
-                class="save-button"
-                id="save-button"
-            >
-                保存する
-            </button>
 
 
             <div
-                class="message"
-                id="save-message"
-            ></div>
+                class="aws-card-value"
+                id="aws-question-count"
+            >
 
-        </div>
+                0
 
-
-        <!-- 問題演習 -->
-
-        <div class="aws-card full">
-
-            <div class="aws-card-title">
-                STUDY
             </div>
 
-            <h2>
-                AWS SAA 問題演習
-            </h2>
 
-            <p class="aws-sub">
-                今後ここにAWS SAAの問題演習機能を追加できます。
-            </p>
+            <div class="aws-card-sub">
 
-            <a
-                href="#"
-                class="study-button"
-                onclick="return false;"
-            >
-                Coming Soon
-            </a>
+                解答した問題数
+
+            </div>
+
 
         </div>
 
 
     </section>
 
+
+
+    <!-- =====================================================
+         STUDY STATISTICS
+    ====================================================== -->
+
+    <section class="aws-section">
+
+
+        <div class="aws-section-title">
+
+            STUDY STATISTICS
+
+        </div>
+
+
+        <div class="aws-grid">
+
+
+            <div class="aws-card">
+
+
+                <div class="aws-card-title">
+
+                    CORRECT
+
+                </div>
+
+
+                <div
+                    class="aws-card-value"
+                    id="aws-correct-count"
+                >
+
+                    0
+
+                </div>
+
+
+                <div class="aws-card-sub">
+
+                    正解数
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="aws-card">
+
+
+                <div class="aws-card-title">
+
+                    INCORRECT
+
+                </div>
+
+
+                <div
+                    class="aws-card-value"
+                    id="aws-incorrect-count"
+                >
+
+                    0
+
+                </div>
+
+
+                <div class="aws-card-sub">
+
+                    不正解数
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="aws-card">
+
+
+                <div class="aws-card-title">
+
+                    TARGET DATE
+
+                </div>
+
+
+                <div
+                    class="aws-card-value"
+                    id="aws-target-date-display"
+                >
+
+                    —
+
+                </div>
+
+
+                <div class="aws-card-sub">
+
+                    受験目標日
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         STUDY SETTINGS
+    ====================================================== -->
+
+    <section class="aws-section">
+
+
+        <div class="aws-section-title">
+
+            STUDY SETTINGS
+
+        </div>
+
+
+        <div class="aws-form-grid">
+
+
+            <div class="aws-form-group">
+
+
+                <label for="aws-target-date">
+
+                    目標日
+
+                </label>
+
+
+                <input
+                    type="date"
+                    id="aws-target-date"
+                >
+
+
+            </div>
+
+
+
+            <div class="aws-form-group">
+
+
+                <label for="aws-progress-input">
+
+                    学習進捗（%）
+
+                </label>
+
+
+                <input
+                    type="number"
+                    id="aws-progress-input"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="0"
+                >
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="aws-form-group">
+
+
+            <label for="aws-note">
+
+                学習メモ
+
+            </label>
+
+
+            <textarea
+                id="aws-note"
+                placeholder="例：VPCとIAMを重点的に復習する"
+            ></textarea>
+
+
+        </div>
+
+
+        <button
+            class="aws-button"
+            id="aws-save-button"
+            type="button"
+        >
+
+            学習設定を保存
+
+        </button>
+
+
+        <div
+            class="aws-status"
+            id="aws-save-status"
+        ></div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         QUESTION
+    ====================================================== -->
+
+    <section class="aws-section">
+
+
+        <div class="aws-section-title">
+
+            STUDY
+
+        </div>
+
+
+        <div
+            id="question-container"
+        >
+
+
+            <div
+                class="question-number"
+                id="question-number"
+            >
+
+                QUESTION 1
+
+            </div>
+
+
+            <div
+                class="question-text"
+                id="question-text"
+            >
+
+                読み込み中...
+
+            </div>
+
+
+            <div
+                class="answer-list"
+                id="answer-list"
+            ></div>
+
+
+            <div
+                class="question-result"
+                id="question-result"
+                style="display: none;"
+            ></div>
+
+
+            <button
+                class="aws-button next-question-button"
+                id="next-question-button"
+                type="button"
+                style="display: none;"
+            >
+
+                次の問題
+
+            </button>
+
+
+        </div>
+
+
+    </section>
+
+
 </main>
 
 
-<footer class="footer">
 
-    LIFE DASHBOARD
-
-    <span>•</span>
-
-    YOUR LIFE. YOUR DATA.
-
-</footer>
-
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
 
 <script
     type="module"
