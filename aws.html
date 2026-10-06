@@ -12,7 +12,6 @@
 
     <title>AWS SAA | LIFE DASHBOARD</title>
 
-
     <link
         rel="stylesheet"
         href="./style.css"
@@ -27,11 +26,11 @@
 
         .aws-page {
 
-            max-width: 1100px;
+            max-width: 1200px;
 
             margin: 0 auto;
 
-            padding: 35px 20px 60px;
+            padding: 40px 24px 80px;
 
         }
 
@@ -44,15 +43,13 @@
 
             display: inline-block;
 
-            margin-bottom: 25px;
+            margin-bottom: 30px;
 
-            color: #42d392;
+            color: #374151;
 
             text-decoration: none;
 
             font-size: 14px;
-
-            font-weight: 600;
 
         }
 
@@ -70,29 +67,33 @@
 
         .aws-page-header {
 
-            margin-bottom: 30px;
+            margin-bottom: 35px;
 
         }
 
 
         .aws-page-title {
 
-            margin: 0 0 8px;
+            margin: 0;
 
-            font-size: 32px;
+            font-size: 36px;
 
-            font-weight: 800;
+            font-weight: 700;
+
+            color: #111827;
 
         }
 
 
         .aws-page-description {
 
-            margin: 0;
+            margin-top: 8px;
 
-            color: #697482;
+            margin-bottom: 0;
 
-            font-size: 14px;
+            color: #6b7280;
+
+            font-size: 15px;
 
         }
 
@@ -108,9 +109,7 @@
             grid-template-columns:
                 repeat(3, minmax(0, 1fr));
 
-            gap: 18px;
-
-            margin-bottom: 25px;
+            gap: 20px;
 
         }
 
@@ -123,14 +122,14 @@
 
             background: #ffffff;
 
-            border: 1px solid #e4e8ed;
+            border: 1px solid #e5e7eb;
 
             border-radius: 14px;
 
-            padding: 22px;
+            padding: 24px;
 
             box-shadow:
-                0 3px 12px rgba(
+                0 4px 12px rgba(
                     0,
                     0,
                     0,
@@ -142,15 +141,15 @@
 
         .aws-card-title {
 
-            margin-bottom: 12px;
-
-            color: #697482;
-
             font-size: 12px;
 
             font-weight: 700;
 
-            letter-spacing: 0.04em;
+            letter-spacing: 0.08em;
+
+            color: #6b7280;
+
+            margin-bottom: 12px;
 
         }
 
@@ -159,9 +158,9 @@
 
             font-size: 32px;
 
-            font-weight: 800;
+            font-weight: 700;
 
-            color: #1f2933;
+            color: #111827;
 
         }
 
@@ -170,9 +169,9 @@
 
             margin-top: 8px;
 
-            color: #697482;
+            font-size: 13px;
 
-            font-size: 12px;
+            color: #6b7280;
 
         }
 
@@ -183,7 +182,7 @@
 
         .aws-progress-container {
 
-            margin-top: 15px;
+            margin-top: 18px;
 
         }
 
@@ -194,11 +193,11 @@
 
             height: 10px;
 
-            overflow: hidden;
+            background: #e5e7eb;
 
             border-radius: 999px;
 
-            background: #edf0f3;
+            overflow: hidden;
 
         }
 
@@ -209,9 +208,9 @@
 
             height: 100%;
 
-            border-radius: 999px;
+            background: #111827;
 
-            background: #42d392;
+            border-radius: 999px;
 
             transition:
                 width 0.3s ease;
@@ -221,15 +220,15 @@
 
         .aws-progress-text {
 
-            margin-top: 8px;
-
             display: flex;
 
             justify-content: space-between;
 
+            margin-top: 8px;
+
             font-size: 12px;
 
-            color: #697482;
+            color: #6b7280;
 
         }
 
@@ -240,117 +239,28 @@
 
         .aws-section {
 
-            margin-top: 25px;
-
-            padding: 24px;
-
-            background: #ffffff;
-
-            border: 1px solid #e4e8ed;
-
-            border-radius: 14px;
-
-            box-shadow:
-                0 3px 12px rgba(
-                    0,
-                    0,
-                    0,
-                    0.04
-                );
+            margin-top: 40px;
 
         }
 
 
         .aws-section-title {
 
-            margin-bottom: 20px;
+            margin-bottom: 18px;
 
-            font-size: 18px;
+            font-size: 14px;
 
-            font-weight: 800;
+            font-weight: 700;
+
+            letter-spacing: 0.08em;
+
+            color: #374151;
 
         }
 
 
         /* =========================================================
            FORM
-        ========================================================= */
-
-        .aws-form-group {
-
-            margin-bottom: 18px;
-
-        }
-
-
-        .aws-form-group label {
-
-            display: block;
-
-            margin-bottom: 7px;
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-            color: #697482;
-
-        }
-
-
-        .aws-form-group input,
-        .aws-form-group textarea {
-
-            width: 100%;
-
-            padding: 11px 12px;
-
-            border:
-                1px solid #d8dee5;
-
-            border-radius: 8px;
-
-            background: #ffffff;
-
-            color: #1f2933;
-
-            font-size: 14px;
-
-            outline: none;
-
-            font-family: inherit;
-
-        }
-
-
-        .aws-form-group input:focus,
-        .aws-form-group textarea:focus {
-
-            border-color: #42d392;
-
-            box-shadow:
-                0 0 0 2px
-                rgba(
-                    66,
-                    211,
-                    146,
-                    0.08
-                );
-
-        }
-
-
-        .aws-form-group textarea {
-
-            min-height: 100px;
-
-            resize: vertical;
-
-        }
-
-
-        /* =========================================================
-           TWO COLUMN FORM
         ========================================================= */
 
         .aws-form-grid {
@@ -360,7 +270,83 @@
             grid-template-columns:
                 repeat(2, minmax(0, 1fr));
 
-            gap: 18px;
+            gap: 20px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .aws-form-group {
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .aws-form-group label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #374151;
+
+        }
+
+
+        .aws-form-group input,
+        .aws-form-group textarea {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 12px 14px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            background: #ffffff;
+
+            color: #111827;
+
+            font-size: 14px;
+
+            font-family: inherit;
+
+            outline: none;
+
+        }
+
+
+        .aws-form-group input:focus,
+        .aws-form-group textarea:focus {
+
+            border-color: #6b7280;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(
+                    107,
+                    114,
+                    128,
+                    0.12
+                );
+
+        }
+
+
+        .aws-form-group textarea {
+
+            min-height: 120px;
+
+            resize: vertical;
 
         }
 
@@ -371,30 +357,45 @@
 
         .aws-button {
 
-            width: 100%;
+            display: inline-flex;
 
-            padding: 12px;
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 12px 20px;
 
             border: none;
 
             border-radius: 8px;
 
-            background: #42d392;
+            background: #111827;
 
             color: #ffffff;
 
-            font-size: 13px;
+            font-size: 14px;
 
-            font-weight: 700;
+            font-weight: 600;
 
             cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                transform 0.1s ease;
 
         }
 
 
         .aws-button:hover {
 
-            opacity: 0.9;
+            background: #374151;
+
+        }
+
+
+        .aws-button:active {
+
+            transform: translateY(1px);
 
         }
 
@@ -403,97 +404,158 @@
 
             opacity: 0.6;
 
-            cursor: default;
+            cursor: not-allowed;
 
         }
 
 
         /* =========================================================
-           QUESTION
+           SAVE STATUS
+        ========================================================= */
+
+        .aws-status {
+
+            margin-top: 12px;
+
+            min-height: 20px;
+
+            font-size: 13px;
+
+            color: #374151;
+
+        }
+
+
+        /* =========================================================
+           QUESTION AREA
+        ========================================================= */
+
+        #question-container {
+
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 14px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 4px 12px rgba(
+                    0,
+                    0,
+                    0,
+                    0.04
+                );
+
+        }
+
+
+        /* =========================================================
+           QUESTION NUMBER
         ========================================================= */
 
         .question-number {
 
-            margin-bottom: 10px;
+            margin-bottom: 14px;
 
-            color: #42d392;
+            color: #6b7280;
 
             font-size: 12px;
 
             font-weight: 700;
 
+            letter-spacing: 0.08em;
+
         }
 
+
+        /* =========================================================
+           QUESTION TEXT
+        ========================================================= */
 
         .question-text {
 
-            margin-bottom: 22px;
+            margin-bottom: 24px;
+
+            color: #111827;
+
+            background: #ffffff;
 
             font-size: 18px;
 
-            font-weight: 700;
+            font-weight: 600;
 
-            line-height: 1.7;
+            line-height: 1.8;
+
+            white-space: normal;
 
         }
 
+
+        /* =========================================================
+           ANSWER LIST
+        ========================================================= */
 
         .answer-list {
 
-            display: grid;
+            display: flex;
 
-            gap: 10px;
+            flex-direction: column;
+
+            gap: 12px;
+
+            color: #111827;
 
         }
 
+
+        /* =========================================================
+           ANSWER BUTTON
+        ========================================================= */
 
         .answer-button {
 
             width: 100%;
 
-            padding: 14px;
+            padding: 16px 18px;
 
-            border:
-                1px solid #d8dee5;
+            border: 1px solid #d1d5db;
 
-            border-radius: 8px;
+            border-radius: 10px;
 
             background: #ffffff;
 
-            color: #1f2933;
+            color: #111827;
+
+            font-size: 15px;
+
+            line-height: 1.6;
 
             text-align: left;
 
-            font-size: 14px;
-
             cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.1s ease;
 
         }
 
 
         .answer-button:hover {
 
-            border-color: #42d392;
+            background: #f3f4f6;
 
-            background: #f8fffb;
-
-        }
-
-
-        .answer-button.correct {
-
-            border-color: #42d392;
-
-            background: #ecfff6;
+            border-color: #9ca3af;
 
         }
 
 
-        .answer-button.incorrect {
+        .answer-button:active {
 
-            border-color: #e57373;
-
-            background: #fff3f3;
+            transform: translateY(1px);
 
         }
 
@@ -505,43 +567,72 @@
         }
 
 
-        .question-result {
+        /* =========================================================
+           CORRECT
+        ========================================================= */
 
-            margin-top: 18px;
+        .answer-button.correct {
 
-            padding: 15px;
+            background: #ecfdf5;
 
-            border-radius: 8px;
+            border-color: #10b981;
 
-            background: #f5f7fa;
-
-            font-size: 13px;
-
-            line-height: 1.7;
-
-        }
-
-
-        .next-question-button {
-
-            margin-top: 15px;
+            color: #065f46;
 
         }
 
 
         /* =========================================================
-           STATUS
+           INCORRECT
         ========================================================= */
 
-        .aws-status {
+        .answer-button.incorrect {
 
-            margin-top: 12px;
+            background: #fef2f2;
 
-            min-height: 20px;
+            border-color: #ef4444;
 
-            font-size: 12px;
+            color: #991b1b;
 
-            color: #697482;
+        }
+
+
+        /* =========================================================
+           QUESTION RESULT / EXPLANATION
+        ========================================================= */
+
+        .question-result {
+
+            margin-top: 24px;
+
+            padding: 20px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 10px;
+
+            background: #f8fafc;
+
+            color: #111827;
+
+            font-size: 14px;
+
+            line-height: 1.8;
+
+            white-space: pre-line;
+
+        }
+
+
+        /* =========================================================
+           NEXT QUESTION
+        ========================================================= */
+
+        .next-question-button {
+
+            margin-top: 20px;
+
+            color: #ffffff;
 
         }
 
@@ -550,12 +641,35 @@
            RESPONSIVE
         ========================================================= */
 
-        @media (max-width: 800px) {
+        @media (
+            max-width: 900px
+        ) {
 
             .aws-grid {
 
                 grid-template-columns:
                     1fr;
+
+            }
+
+        }
+
+
+        @media (
+            max-width: 700px
+        ) {
+
+            .aws-page {
+
+                padding:
+                    30px 16px 60px;
+
+            }
+
+
+            .aws-page-title {
+
+                font-size: 30px;
 
             }
 
@@ -567,36 +681,26 @@
 
             }
 
-        }
 
+            #question-container {
 
-        @media (max-width: 600px) {
-
-            .aws-page {
-
-                padding:
-                    25px 12px 40px;
+                padding: 22px;
 
             }
 
 
-            .aws-page-title {
+            .question-text {
 
-                font-size: 26px;
-
-            }
-
-
-            .aws-card-value {
-
-                font-size: 28px;
+                font-size: 16px;
 
             }
 
 
-            .aws-section {
+            .answer-button {
 
-                padding: 18px;
+                padding: 14px;
+
+                font-size: 14px;
 
             }
 
@@ -616,48 +720,32 @@
 
 <header class="header">
 
-
     <div class="brand">
 
-
         <div class="brand-title">
-
             LIFE DASHBOARD
-
         </div>
-
 
         <div class="brand-subtitle">
-
             YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
-
         </div>
-
 
     </div>
 
 
     <div class="header-right">
 
-
         <div class="status">
-
 
             <span class="status-dot"></span>
 
-
             <span id="auth-status">
-
                 CONNECTING...
-
             </span>
-
 
         </div>
 
-
     </div>
-
 
 </header>
 
@@ -670,13 +758,15 @@
 <main class="aws-page">
 
 
+    <!-- =====================================================
+         BACK
+    ====================================================== -->
+
     <a
         href="./index.html"
         class="aws-back"
     >
-
         ← Dashboard
-
     </a>
 
 
@@ -687,20 +777,13 @@
 
     <section class="aws-page-header">
 
-
         <h1 class="aws-page-title">
-
             AWS SAA
-
         </h1>
 
-
         <p class="aws-page-description">
-
             AWS Certified Solutions Architect - Associate
-
         </p>
-
 
     </section>
 
@@ -713,67 +796,47 @@
     <section class="aws-grid">
 
 
-        <!-- PROGRESS -->
+        <!-- LEARNING PROGRESS -->
 
         <div class="aws-card">
 
-
             <div class="aws-card-title">
-
                 LEARNING PROGRESS
-
             </div>
-
 
             <div
                 class="aws-card-value"
                 id="aws-progress-value"
             >
-
                 0%
-
             </div>
 
 
             <div class="aws-progress-container">
 
-
                 <div class="aws-progress-background">
-
 
                     <div
                         class="aws-progress-bar"
                         id="aws-progress-bar"
                     ></div>
 
-
                 </div>
 
 
                 <div class="aws-progress-text">
 
-
                     <span>
-
                         学習進捗
-
                     </span>
 
-
-                    <span
-                        id="aws-progress-text"
-                    >
-
+                    <span id="aws-progress-text">
                         0%
-
                     </span>
-
 
                 </div>
 
-
             </div>
-
 
         </div>
 
@@ -783,30 +846,20 @@
 
         <div class="aws-card">
 
-
             <div class="aws-card-title">
-
                 ACCURACY
-
             </div>
-
 
             <div
                 class="aws-card-value"
                 id="aws-accuracy-value"
             >
-
                 0%
-
             </div>
-
 
             <div class="aws-card-sub">
-
                 現在の正答率
-
             </div>
-
 
         </div>
 
@@ -816,33 +869,22 @@
 
         <div class="aws-card">
 
-
             <div class="aws-card-title">
-
                 QUESTIONS
-
             </div>
-
 
             <div
                 class="aws-card-value"
                 id="aws-question-count"
             >
-
                 0
-
             </div>
-
 
             <div class="aws-card-sub">
-
                 解答した問題数
-
             </div>
 
-
         </div>
-
 
     </section>
 
@@ -854,111 +896,82 @@
 
     <section class="aws-section">
 
-
         <div class="aws-section-title">
-
             STUDY STATISTICS
-
         </div>
 
 
         <div class="aws-grid">
 
 
+            <!-- CORRECT -->
+
             <div class="aws-card">
 
-
                 <div class="aws-card-title">
-
                     CORRECT
-
                 </div>
-
 
                 <div
                     class="aws-card-value"
                     id="aws-correct-count"
                 >
-
                     0
-
                 </div>
-
 
                 <div class="aws-card-sub">
-
                     正解数
-
                 </div>
-
 
             </div>
 
 
 
+            <!-- INCORRECT -->
+
             <div class="aws-card">
 
-
                 <div class="aws-card-title">
-
                     INCORRECT
-
                 </div>
-
 
                 <div
                     class="aws-card-value"
                     id="aws-incorrect-count"
                 >
-
                     0
-
                 </div>
-
 
                 <div class="aws-card-sub">
-
                     不正解数
-
                 </div>
-
 
             </div>
 
 
 
+            <!-- TARGET DATE -->
+
             <div class="aws-card">
 
-
                 <div class="aws-card-title">
-
                     TARGET DATE
-
                 </div>
-
 
                 <div
                     class="aws-card-value"
                     id="aws-target-date-display"
                 >
-
                     —
-
                 </div>
-
 
                 <div class="aws-card-sub">
-
                     受験目標日
-
                 </div>
-
 
             </div>
 
-
         </div>
-
 
     </section>
 
@@ -970,148 +983,142 @@
 
     <section class="aws-section">
 
-
         <div class="aws-section-title">
-
             STUDY SETTINGS
-
         </div>
 
 
-        <div class="aws-form-grid">
+        <div class="aws-card">
 
 
-            <div class="aws-form-group">
+            <div class="aws-form-grid">
 
 
-                <label for="aws-target-date">
+                <!-- TARGET DATE -->
 
-                    目標日
+                <div class="aws-form-group">
 
-                </label>
+                    <label for="aws-target-date">
+                        目標日
+                    </label>
+
+                    <input
+                        type="date"
+                        id="aws-target-date"
+                    >
+
+                </div>
 
 
-                <input
-                    type="date"
-                    id="aws-target-date"
-                >
 
+                <!-- PROGRESS -->
+
+                <div class="aws-form-group">
+
+                    <label for="aws-progress-input">
+                        学習進捗（%）
+                    </label>
+
+                    <input
+                        type="number"
+                        id="aws-progress-input"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value="0"
+                    >
+
+                </div>
 
             </div>
 
 
 
+            <!-- NOTE -->
+
             <div class="aws-form-group">
 
-
-                <label for="aws-progress-input">
-
-                    学習進捗（%）
-
+                <label for="aws-note">
+                    学習メモ
                 </label>
 
-
-                <input
-                    type="number"
-                    id="aws-progress-input"
-                    min="0"
-                    max="100"
-                    step="1"
-                    value="0"
-                >
-
+                <textarea
+                    id="aws-note"
+                    placeholder="例：VPCとIAMを重点的に復習する"
+                ></textarea>
 
             </div>
 
 
-        </div>
+
+            <!-- SAVE -->
+
+            <button
+                class="aws-button"
+                id="aws-save-button"
+                type="button"
+            >
+                学習設定を保存
+            </button>
 
 
-
-        <div class="aws-form-group">
-
-
-            <label for="aws-note">
-
-                学習メモ
-
-            </label>
-
-
-            <textarea
-                id="aws-note"
-                placeholder="例：VPCとIAMを重点的に復習する"
-            ></textarea>
-
+            <div
+                class="aws-status"
+                id="aws-save-status"
+            ></div>
 
         </div>
-
-
-        <button
-            class="aws-button"
-            id="aws-save-button"
-            type="button"
-        >
-
-            学習設定を保存
-
-        </button>
-
-
-        <div
-            class="aws-status"
-            id="aws-save-status"
-        ></div>
-
 
     </section>
 
 
 
     <!-- =====================================================
-         QUESTION
+         STUDY
     ====================================================== -->
 
     <section class="aws-section">
 
-
         <div class="aws-section-title">
-
             STUDY
-
         </div>
 
 
-        <div
-            id="question-container"
-        >
+        <div id="question-container">
 
+
+            <!-- QUESTION NUMBER -->
 
             <div
                 class="question-number"
                 id="question-number"
             >
-
                 QUESTION 1
-
             </div>
 
+
+
+            <!-- QUESTION -->
 
             <div
                 class="question-text"
                 id="question-text"
             >
-
                 読み込み中...
-
             </div>
 
+
+
+            <!-- ANSWERS -->
 
             <div
                 class="answer-list"
                 id="answer-list"
             ></div>
 
+
+
+            <!-- RESULT -->
 
             <div
                 class="question-result"
@@ -1120,20 +1127,19 @@
             ></div>
 
 
+
+            <!-- NEXT -->
+
             <button
                 class="aws-button next-question-button"
                 id="next-question-button"
                 type="button"
                 style="display: none;"
             >
-
                 次の問題
-
             </button>
 
-
         </div>
-
 
     </section>
 
