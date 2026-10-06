@@ -13365,6 +13365,113 @@ function getFilteredQuestions(){
     return pool;
 }
 function getPriorityWrongQuestions(){return [...questionDatabase].filter(q=>wrongQuestionIds.has(q.id)).sort((a,b)=>(wrongQuestionCounts[b.id]||0)-(wrongQuestionCounts[a.id]||0));}
+
+// =========================================================
+// FAVORITE STUDY
+// =========================================================
+function getFavoriteQuestions(){
+    return [...questionDatabase].filter(q=>favoriteQuestionIds.has(q.id));
+}
+
+function startFavoriteStudy(){
+    stopMockExam();
+
+    if(!currentUser){
+        alert("ログインしてください。");
+        return;
+    }
+
+    const favorites=getFavoriteQuestions();
+
+    if(!favorites.length){
+        alert(
+            "お気に入り登録されている問題がありません。\n\n" +
+            "問題を解いたあと「☆ お気に入り」を押すと登録できます。"
+        );
+        return;
+    }
+
+    studyMode="favorite";
+    currentFilter="favorite";
+    currentCategory="all";
+    currentStudyQuestions=[...favorites];
+    currentStudyIndex=0;
+    previousQuestionId=null;
+
+    renderFavoriteQuestion();
+
+    if($("study-section"))$("study-section").scrollIntoView({behavior:"smooth"});
+}
+
+function renderFavoriteQuestion(){
+    if(!currentStudyQuestions.length){
+        finishFavoriteStudy();
+        return;
+    }
+
+    if(currentStudyIndex>=currentStudyQuestions.length){
+        finishFavoriteStudy();
+        return;
+    }
+
+    currentQuestion=currentStudyQuestions[currentStudyIndex];
+    previousQuestionId=currentQuestion.id;
+
+    if($("question-number")){
+        $("question-number").textContent=
+            `FAVORITE ${currentStudyIndex+1} / ${currentStudyQuestions.length}`;
+    }
+
+    if($("question-tags")){
+        $("question-tags").innerHTML=
+            `<span>${currentQuestion.category}</span><span>${currentQuestion.difficulty}</span><span>⭐ お気に入り</span>`;
+    }
+
+    if($("question-text"))$("question-text").textContent=currentQuestion.question;
+
+    const answerList=$("answer-list");
+    if(!answerList)return;
+
+    answerList.innerHTML="";
+
+    currentQuestion.choices.forEach((choice,index)=>{
+        const button=document.createElement("button");
+        button.className="answer-button";
+        button.textContent=`${String.fromCharCode(65+index)}. ${choice}`;
+        button.addEventListener("click",()=>answerQuestion(index));
+        answerList.appendChild(button);
+    });
+
+    if($("question-result")){
+        $("question-result").innerHTML="";
+        $("question-result").style.display="none";
+    }
+
+    if($("next-question-button"))$("next-question-button").style.display="none";
+
+    updateFavoriteButton();
+}
+
+function finishFavoriteStudy(){
+    const total=currentStudyQuestions.length;
+
+    if($("question-number"))
+        $("question-number").textContent="FAVORITE COMPLETE";
+
+    if($("question-text"))
+        $("question-text").textContent=
+            `⭐ お気に入り問題 ${total}問の演習が完了しました！`;
+
+    if($("answer-list"))$("answer-list").innerHTML="";
+    if($("question-result")){
+        $("question-result").innerHTML=
+            `<div class="result-title">🎉 お疲れさまでした！</div>` +
+            `<div class="result-explanation">お気に入り登録した ${total} 問をすべて演習しました。</div>`;
+        $("question-result").style.display="block";
+    }
+    if($("next-question-button"))$("next-question-button").style.display="none";
+}
+
 function getRandomQuestion(pool){
     if(!pool.length)return null;
     let candidates=pool;
@@ -13412,7 +13519,21 @@ async function answerQuestion(selectedIndex){
     if($("next-question-button"))$("next-question-button").style.display="block";
     updateAnalytics();
 }
-function nextQuestion(){if(studyMode==="wrong")currentStudyQuestions=getPriorityWrongQuestions();if(!currentStudyQuestions.length){alert("現在、対象となる問題はありません。");return;}currentStudyIndex++;renderQuestion();}
+function nextQuestion(){
+    if(studyMode==="favorite"){
+        currentStudyIndex++;
+        renderFavoriteQuestion();
+        return;
+    }
+
+    if(studyMode==="wrong")currentStudyQuestions=getPriorityWrongQuestions();
+    if(!currentStudyQuestions.length){
+        alert("現在、対象となる問題はありません。");
+        return;
+    }
+    currentStudyIndex++;
+    renderQuestion();
+}
 
 // =========================================================
 // CATEGORY / FILTER UI
@@ -13494,6 +13615,7 @@ function setupEventListeners(){
     if($("start-study-button"))$("start-study-button").addEventListener("click",()=>startStudy("normal","all"));
     if($("start-mock-button"))$("start-mock-button").addEventListener("click",startMockExam);
     if($("start-review-button"))$("start-review-button").addEventListener("click",()=>{rebuildWrongQuestions();startStudy("wrong","all");});
+    if($("start-favorite-button"))$("start-favorite-button").addEventListener("click",startFavoriteStudy);
     if($("close-mock-result"))$("close-mock-result").addEventListener("click",()=>{if($("mock-result-modal"))$("mock-result-modal").style.display="none";});
     setupFilters();createCategoryButtons();
 }
