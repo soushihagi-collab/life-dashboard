@@ -1,4 +1,3 @@
-```javascript
 import { startAnonymousAuth } from "./auth.js";
 
 import {
