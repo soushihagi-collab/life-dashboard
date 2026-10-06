@@ -4281,7 +4281,8 @@ function updateMockTimer() {
 
 
     const seconds =
-        remaining % 60;
+        remaining %
+        60;
 
 
     const timer =
@@ -4372,7 +4373,8 @@ async function finishMockExam() {
 
 
     const seconds =
-        elapsed % 60;
+        elapsed %
+        60;
 
 
     const timeText =
@@ -4735,10 +4737,13 @@ function initialize() {
     updateAnalytics();
 
 
-    /*
-       Question is intentionally not
-       loaded automatically.
-    */
+    /* Initial question */
+
+    currentStudyQuestions =
+        [...questionDatabase];
+
+
+    renderQuestion();
 
 }
 
