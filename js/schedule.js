@@ -65,7 +65,8 @@ let schedules = [];
 
 let currentMonth = new Date();
 
-let selectedDate = getDateKey(new Date());
+let selectedDate =
+    getDateKey(new Date());
 
 
 // ============================================================
@@ -81,13 +82,18 @@ function padNumber(number) {
 
 function getDateKey(date) {
 
-    const year = date.getFullYear();
+    const year =
+        date.getFullYear();
 
     const month =
-        padNumber(date.getMonth() + 1);
+        padNumber(
+            date.getMonth() + 1
+        );
 
     const day =
-        padNumber(date.getDate());
+        padNumber(
+            date.getDate()
+        );
 
     return `${year}-${month}-${day}`;
 
@@ -96,11 +102,23 @@ function getDateKey(date) {
 
 function formatJapaneseDate(dateKey) {
 
-    const [year, month, day] =
-        dateKey.split("-").map(Number);
+    const [
+        year,
+        month,
+        day
+    ] =
+        dateKey
+            .split("-")
+            .map(Number);
+
 
     const date =
-        new Date(year, month - 1, day);
+        new Date(
+            year,
+            month - 1,
+            day
+        );
+
 
     const weekdays = [
         "日",
@@ -112,61 +130,63 @@ function formatJapaneseDate(dateKey) {
         "土"
     ];
 
-    return `${year}年${month}月${day}日（${weekdays[date.getDay()]}）`;
 
-}
-
-
-function escapeText(value) {
-
-    if (value === null || value === undefined) {
-        return "";
-    }
-
-    return String(value);
+    return (
+        `${year}年` +
+        `${month}月` +
+        `${day}日` +
+        `（${weekdays[date.getDay()]}）`
+    );
 
 }
 
 
 // ============================================================
-// Firebase Auth
+// Firebase Authentication
 // ============================================================
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(
+    auth,
+    async (user) => {
 
-    if (!user) {
+        if (!user) {
 
-        currentUser = null;
+            currentUser = null;
+
+            authStatusElement.textContent =
+                "Authentication required";
+
+            return;
+
+        }
+
+
+        currentUser =
+            user;
+
 
         authStatusElement.textContent =
-            "Authentication required";
+            "● Online";
 
-        scheduleListElement.innerHTML =
-            `<div class="no-schedule">
-                Firebase認証を確認しています...
-            </div>`;
 
-        return;
+        console.log(
+            "Schedule Firebase認証成功"
+        );
+
+        console.log(
+            "UID:",
+            currentUser.uid
+        );
+
+
+        await loadSchedules();
+
     }
-
-
-    currentUser = user;
-
-    authStatusElement.textContent =
-        "● Online";
-
-
-    console.log("Schedule Firebase認証成功");
-    console.log("UID:", currentUser.uid);
-
-
-    await loadSchedules();
-
-});
+);
 
 
 // ============================================================
-// Firestore
+// Firestoreから予定を取得
 // ============================================================
 
 async function loadSchedules() {
@@ -188,44 +208,45 @@ async function loadSchedules() {
 
 
         const snapshot =
-            await getDocs(schedulesRef);
+            await getDocs(
+                schedulesRef
+            );
 
 
         schedules = [];
 
 
-        snapshot.forEach((scheduleDoc) => {
+        snapshot.forEach(
+            (scheduleDoc) => {
 
-            const data = scheduleDoc.data();
-
-
-            schedules.push({
-
-                id: scheduleDoc.id,
-
-                date: data.date || "",
-
-                time: data.time || "",
-
-                title: data.title || "",
-
-                completed:
-                    data.completed === true
-
-            });
-
-        });
+                const data =
+                    scheduleDoc.data();
 
 
-        schedules.sort((a, b) => {
+                schedules.push({
 
-            if (a.date !== b.date) {
-                return a.date.localeCompare(b.date);
+                    id:
+                        scheduleDoc.id,
+
+                    date:
+                        data.date || "",
+
+                    time:
+                        data.time || "",
+
+                    title:
+                        data.title || "",
+
+                    completed:
+                        data.completed === true
+
+                });
+
             }
+        );
 
-            return a.time.localeCompare(b.time);
 
-        });
+        sortSchedules();
 
 
         renderCalendar();
@@ -252,7 +273,38 @@ async function loadSchedules() {
 
 
 // ============================================================
-// Calendar
+// 予定を並び替え
+// ============================================================
+
+function sortSchedules() {
+
+    schedules.sort(
+        (a, b) => {
+
+            if (
+                a.date !==
+                b.date
+            ) {
+
+                return a.date.localeCompare(
+                    b.date
+                );
+
+            }
+
+
+            return a.time.localeCompare(
+                b.time
+            );
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// カレンダー描画
 // ============================================================
 
 function renderCalendar() {
@@ -268,22 +320,24 @@ function renderCalendar() {
         `${year}年 ${month + 1}月`;
 
 
-    calendarGridElement.innerHTML = "";
+    calendarGridElement.innerHTML =
+        "";
 
 
-    // 月初
     const firstDay =
-        new Date(year, month, 1);
+        new Date(
+            year,
+            month,
+            1
+        );
 
 
-    // 月末
-    const lastDay =
-        new Date(year, month + 1, 0);
-
-
-    // カレンダー開始日
     const startDate =
-        new Date(year, month, 1);
+        new Date(
+            year,
+            month,
+            1
+        );
 
 
     startDate.setDate(
@@ -291,11 +345,23 @@ function renderCalendar() {
     );
 
 
-    // 6週間分表示
-    for (let i = 0; i < 42; i++) {
+    const todayKey =
+        getDateKey(
+            new Date()
+        );
+
+
+    for (
+        let i = 0;
+        i < 42;
+        i++
+    ) {
 
         const date =
-            new Date(startDate);
+            new Date(
+                startDate
+            );
+
 
         date.setDate(
             startDate.getDate() + i
@@ -307,15 +373,19 @@ function renderCalendar() {
 
 
         const dayElement =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         dayElement.className =
             "calendar-day";
 
 
-        // 前月 / 次月
-        if (date.getMonth() !== month) {
+        if (
+            date.getMonth() !==
+            month
+        ) {
 
             dayElement.classList.add(
                 "other-month"
@@ -324,12 +394,10 @@ function renderCalendar() {
         }
 
 
-        // 今日
-        const todayKey =
-            getDateKey(new Date());
-
-
-        if (dateKey === todayKey) {
+        if (
+            dateKey ===
+            todayKey
+        ) {
 
             dayElement.classList.add(
                 "today"
@@ -338,8 +406,10 @@ function renderCalendar() {
         }
 
 
-        // 選択中
-        if (dateKey === selectedDate) {
+        if (
+            dateKey ===
+            selectedDate
+        ) {
 
             dayElement.classList.add(
                 "selected"
@@ -348,9 +418,10 @@ function renderCalendar() {
         }
 
 
-        // 日付
         const dayNumberElement =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         dayNumberElement.className =
@@ -366,22 +437,46 @@ function renderCalendar() {
         );
 
 
-        // 予定があるか
-        const hasSchedule =
-            schedules.some(
+        // ====================================================
+        // この日に予定があるか
+        // ====================================================
+
+        const daySchedules =
+            schedules.filter(
                 (schedule) =>
-                    schedule.date === dateKey
+                    schedule.date ===
+                    dateKey
             );
 
 
-        if (hasSchedule) {
+        if (
+            daySchedules.length > 0
+        ) {
 
             const dotElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             dotElement.className =
                 "schedule-dot";
+
+
+            // 未完了予定がない場合は薄くする
+            const hasIncomplete =
+                daySchedules.some(
+                    (schedule) =>
+                        schedule.completed !== true
+                );
+
+
+            if (!hasIncomplete) {
+
+                dotElement.style.opacity =
+                    "0.35";
+
+            }
 
 
             dayElement.appendChild(
@@ -391,7 +486,10 @@ function renderCalendar() {
         }
 
 
+        // ====================================================
         // 日付クリック
+        // ====================================================
+
         dayElement.addEventListener(
             "click",
             () => {
@@ -422,34 +520,44 @@ function renderCalendar() {
 
 
 // ============================================================
-// Selected Date
+// 選択日の予定表示
 // ============================================================
 
 function renderSelectedDate() {
 
     selectedDateTitleElement.textContent =
-        formatJapaneseDate(selectedDate);
+        formatJapaneseDate(
+            selectedDate
+        );
 
 
-    scheduleListElement.innerHTML = "";
+    scheduleListElement.innerHTML =
+        "";
 
 
     const selectedSchedules =
         schedules
             .filter(
                 (schedule) =>
-                    schedule.date === selectedDate
+                    schedule.date ===
+                    selectedDate
             )
             .sort(
                 (a, b) =>
-                    a.time.localeCompare(b.time)
+                    a.time.localeCompare(
+                        b.time
+                    )
             );
 
 
-    if (selectedSchedules.length === 0) {
+    if (
+        selectedSchedules.length === 0
+    ) {
 
         const emptyElement =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         emptyElement.className =
@@ -466,6 +574,7 @@ function renderSelectedDate() {
 
 
         return;
+
     }
 
 
@@ -473,14 +582,18 @@ function renderSelectedDate() {
         (schedule) => {
 
             const itemElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             itemElement.className =
                 "schedule-item";
 
 
-            if (schedule.completed === true) {
+            if (
+                schedule.completed === true
+            ) {
 
                 itemElement.classList.add(
                     "completed"
@@ -489,12 +602,14 @@ function renderSelectedDate() {
             }
 
 
-            // =========================
-            // Time
-            // =========================
+            // ==================================================
+            // 時刻
+            // ==================================================
 
             const timeElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             timeElement.className =
@@ -502,15 +617,17 @@ function renderSelectedDate() {
 
 
             timeElement.textContent =
-                escapeText(schedule.time);
+                schedule.time;
 
 
-            // =========================
-            // Content
-            // =========================
+            // ==================================================
+            // 内容
+            // ==================================================
 
             const contentElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             contentElement.className =
@@ -518,7 +635,9 @@ function renderSelectedDate() {
 
 
             const titleElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             titleElement.className =
@@ -526,7 +645,7 @@ function renderSelectedDate() {
 
 
             titleElement.textContent =
-                escapeText(schedule.title);
+                schedule.title;
 
 
             contentElement.appendChild(
@@ -534,31 +653,37 @@ function renderSelectedDate() {
             );
 
 
-            // =========================
-            // Actions
-            // =========================
+            // ==================================================
+            // 操作
+            // ==================================================
 
             const actionsElement =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             actionsElement.className =
                 "schedule-actions";
 
 
-            // =========================
-            // Complete Button
-            // =========================
+            // ==================================================
+            // 完了
+            // ==================================================
 
             const completeButton =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
 
 
             completeButton.className =
                 "complete-button";
 
 
-            if (schedule.completed === true) {
+            if (
+                schedule.completed === true
+            ) {
 
                 completeButton.textContent =
                     "✓ 完了";
@@ -587,12 +712,14 @@ function renderSelectedDate() {
             );
 
 
-            // =========================
-            // Edit Button
-            // =========================
+            // ==================================================
+            // 編集
+            // ==================================================
 
             const editButton =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
 
 
             editButton.className =
@@ -615,12 +742,14 @@ function renderSelectedDate() {
             );
 
 
-            // =========================
-            // Delete Button
-            // =========================
+            // ==================================================
+            // 削除
+            // ==================================================
 
             const deleteButton =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
 
 
             deleteButton.className =
@@ -680,7 +809,7 @@ function renderSelectedDate() {
 
 
 // ============================================================
-// Add Schedule
+// 予定追加
 // ============================================================
 
 addScheduleButton.addEventListener(
@@ -707,10 +836,6 @@ addScheduleButton.addEventListener(
         const title =
             scheduleTitleInput.value.trim();
 
-
-        // =========================
-        // Validation
-        // =========================
 
         if (!date) {
 
@@ -746,7 +871,9 @@ addScheduleButton.addEventListener(
 
 
         if (
-            !/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(time)
+            !/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(
+                time
+            )
         ) {
 
             alert(
@@ -762,6 +889,7 @@ addScheduleButton.addEventListener(
 
             addScheduleButton.disabled =
                 true;
+
 
             addScheduleButton.textContent =
                 "追加中...";
@@ -780,19 +908,22 @@ addScheduleButton.addEventListener(
                 schedulesRef,
                 {
 
-                    date: date,
+                    date:
+                        date,
 
-                    time: time,
+                    time:
+                        time,
 
-                    title: title,
+                    title:
+                        title,
 
-                    completed: false
+                    completed:
+                        false
 
                 }
             );
 
 
-            // 入力欄クリア
             scheduleTitleInput.value =
                 "";
 
@@ -800,13 +931,17 @@ addScheduleButton.addEventListener(
                 "";
 
 
-            // 追加した日の表示
             selectedDate =
                 date;
 
 
-            const [year, month, day] =
-                date.split("-").map(Number);
+            const [
+                year,
+                month
+            ] =
+                date
+                    .split("-")
+                    .map(Number);
 
 
             currentMonth =
@@ -837,6 +972,7 @@ addScheduleButton.addEventListener(
             addScheduleButton.disabled =
                 false;
 
+
             addScheduleButton.textContent =
                 "予定を追加";
 
@@ -847,7 +983,7 @@ addScheduleButton.addEventListener(
 
 
 // ============================================================
-// Toggle Complete
+// 完了 / 未完了
 // ============================================================
 
 async function toggleScheduleComplete(
@@ -910,7 +1046,7 @@ async function toggleScheduleComplete(
 
 
 // ============================================================
-// Edit Schedule
+// 編集
 // ============================================================
 
 async function editSchedule(
@@ -929,7 +1065,9 @@ async function editSchedule(
         );
 
 
-    if (newTitle === null) {
+    if (
+        newTitle === null
+    ) {
         return;
     }
 
@@ -956,7 +1094,9 @@ async function editSchedule(
         );
 
 
-    if (newTime === null) {
+    if (
+        newTime === null
+    ) {
         return;
     }
 
@@ -987,7 +1127,9 @@ async function editSchedule(
         );
 
 
-    if (newDate === null) {
+    if (
+        newDate === null
+    ) {
         return;
     }
 
@@ -1053,7 +1195,10 @@ async function editSchedule(
             trimmedDate;
 
 
-        const [year, month] =
+        const [
+            year,
+            month
+        ] =
             trimmedDate
                 .split("-")
                 .map(Number);
@@ -1066,6 +1211,8 @@ async function editSchedule(
                 1
             );
 
+
+        sortSchedules();
 
         renderCalendar();
 
@@ -1094,7 +1241,7 @@ async function editSchedule(
 
 
 // ============================================================
-// Delete Schedule
+// 削除
 // ============================================================
 
 async function deleteSchedule(
@@ -1135,7 +1282,8 @@ async function deleteSchedule(
         schedules =
             schedules.filter(
                 (item) =>
-                    item.id !== schedule.id
+                    item.id !==
+                    schedule.id
             );
 
 
@@ -1162,7 +1310,7 @@ async function deleteSchedule(
 
 
 // ============================================================
-// Month Navigation
+// 月移動
 // ============================================================
 
 prevMonthButton.addEventListener(
@@ -1172,6 +1320,7 @@ prevMonthButton.addEventListener(
         currentMonth.setMonth(
             currentMonth.getMonth() - 1
         );
+
 
         renderCalendar();
 
@@ -1187,11 +1336,16 @@ nextMonthButton.addEventListener(
             currentMonth.getMonth() + 1
         );
 
+
         renderCalendar();
 
     }
 );
 
+
+// ============================================================
+// 今日
+// ============================================================
 
 todayMonthButton.addEventListener(
     "click",
@@ -1210,7 +1364,9 @@ todayMonthButton.addEventListener(
 
 
         selectedDate =
-            getDateKey(today);
+            getDateKey(
+                today
+            );
 
 
         scheduleDateInput.value =
@@ -1226,16 +1382,12 @@ todayMonthButton.addEventListener(
 
 
 // ============================================================
-// Initial Date
+// 初期状態
 // ============================================================
 
 scheduleDateInput.value =
     selectedDate;
 
-
-// ============================================================
-// Initial Calendar
-// ============================================================
 
 renderCalendar();
 
