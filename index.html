@@ -1,267 +1,359 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 
 <head>
 
-    <meta charset="UTF-8">
+```
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>LIFE DASHBOARD</title>
+<title>LIFE DASHBOARD</title>
 
-    <link
-        rel="stylesheet"
-        href="./style.css"
-    >
+<link
+    rel="stylesheet"
+    href="./style.css"
+>
 
-    <style>
+<style>
 
-        /* =========================================================
-           Dashboard Card Link
-        ========================================================= */
+    /* =========================================================
+       Dashboard Card Link
+    ========================================================= */
 
-        .dashboard-card-link {
-            display: block;
+    .dashboard-card-link {
 
-            color: inherit;
+        display: block;
 
-            text-decoration: none;
-        }
+        color: inherit;
 
+        text-decoration: none;
 
-        .dashboard-card-link .dashboard-card {
-            cursor: pointer;
-
-            transition:
-                transform 0.15s ease,
-                box-shadow 0.15s ease;
-        }
+    }
 
 
-        .dashboard-card-link:hover .dashboard-card {
+    .dashboard-card-link .dashboard-card {
 
-            transform: translateY(-2px);
+        cursor: pointer;
 
-            box-shadow:
-                0 6px 18px rgba(0, 0, 0, 0.10);
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease;
 
-        }
-
-
-        .dashboard-card-link:active .dashboard-card {
-
-            transform: translateY(0);
-
-        }
+    }
 
 
-        /* =========================================================
-           Quick Access Link
-        ========================================================= */
+    .dashboard-card-link:hover .dashboard-card {
 
-        .quick-card-link {
+        transform: translateY(-2px);
 
-            display: block;
+        box-shadow:
+            0 6px 18px rgba(0, 0, 0, 0.10);
 
-            color: inherit;
-
-            text-decoration: none;
-
-        }
+    }
 
 
-        .quick-card-link .quick-card {
+    .dashboard-card-link:active .dashboard-card {
 
-            width: 100%;
+        transform: translateY(0);
 
-            cursor: pointer;
+    }
 
-        }
 
-    </style>
+    /* =========================================================
+       Quick Access Link
+    ========================================================= */
+
+    .quick-card-link {
+
+        display: block;
+
+        color: inherit;
+
+        text-decoration: none;
+
+    }
+
+
+    .quick-card-link .quick-card {
+
+        width: 100%;
+
+        cursor: pointer;
+
+    }
+
+
+    .quick-card-link:hover .quick-card {
+
+        transform: translateY(-2px);
+
+    }
+
+</style>
+```
 
 </head>
 
-
 <body>
 
-
-<!-- =========================
+<!-- =========================================================
      HEADER
-========================= -->
+========================================================= -->
 
 <header class="header">
 
-    <div class="brand">
+```
+<div class="brand">
 
-        <div class="brand-title">
-            LIFE DASHBOARD
-        </div>
 
-        <div class="brand-subtitle">
-            YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
-        </div>
+    <div class="brand-title">
+
+        LIFE DASHBOARD
 
     </div>
 
 
-    <div class="header-right">
+    <div class="brand-subtitle">
 
-        <div class="status">
-
-            <span class="status-dot"></span>
-
-            <span id="auth-status">
-                CONNECTING...
-            </span>
-
-        </div>
+        YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
 
     </div>
+
+
+</div>
+
+
+
+<div class="header-right">
+
+
+    <div class="status">
+
+
+        <span class="status-dot"></span>
+
+
+        <span id="auth-status">
+
+            CONNECTING...
+
+        </span>
+
+
+    </div>
+
+
+</div>
+```
 
 </header>
 
-
-
-<!-- =========================
+<!-- =========================================================
      MAIN
-========================= -->
+========================================================= -->
 
 <main class="dashboard">
 
+```
+<!-- =====================================================
+     GREETING
+====================================================== -->
 
-    <!-- =========================
-         GREETING
-    ========================= -->
+<section class="greeting">
 
-    <section class="greeting">
 
-        <div>
+    <div>
 
-            <p class="greeting-label">
-                GOOD EVENING
-            </p>
 
-            <h1>
-                Welcome to your LIFE.
-            </h1>
+        <p class="greeting-label">
 
-            <p
-                class="date"
-                id="today-date"
-            >
-                ----年--月--日
-            </p>
+            GOOD EVENING
+
+        </p>
+
+
+        <h1>
+
+            Welcome to your LIFE.
+
+        </h1>
+
+
+        <p
+            class="date"
+            id="today-date"
+        >
+
+            ----年--月--日
+
+        </p>
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     DASHBOARD GRID
+====================================================== -->
+
+<section class="dashboard-grid">
+
+
+
+    <!-- =================================================
+         TODAY
+    ================================================== -->
+
+    <article class="dashboard-card">
+
+
+        <div class="card-header">
+
+
+            <div>
+
+
+                <span class="card-icon">
+
+                    📅
+
+                </span>
+
+
+                <span class="card-title">
+
+                    TODAY
+
+                </span>
+
+
+            </div>
+
+
+            <span class="card-arrow">
+
+                →
+
+            </span>
+
 
         </div>
 
-    </section>
+
+
+        <div
+            class="card-main-value"
+            id="today-value"
+        >
+
+            —
+
+        </div>
 
 
 
-    <!-- =========================
-         DASHBOARD GRID
-    ========================= -->
+        <div class="card-description">
 
-    <section class="dashboard-grid">
+            今日の予定
+
+        </div>
 
 
-        <!-- =========================
-             TODAY
-        ========================= -->
+
+        <div
+            class="card-detail"
+            id="today-detail"
+        >
+
+            予定を読み込んでいます...
+
+        </div>
+
+
+    </article>
+
+
+
+    <!-- =================================================
+         AWS SAA
+    ================================================== -->
+
+    <a
+        href="./aws.html"
+        class="dashboard-card-link"
+    >
+
 
         <article class="dashboard-card">
 
-            <div class="card-header">
-
-                <div>
-
-                    <span class="card-icon">
-                        📅
-                    </span>
-
-                    <span class="card-title">
-                        TODAY
-                    </span>
-
-                </div>
-
-                <span class="card-arrow">
-                    →
-                </span>
-
-            </div>
-
-
-            <div
-                class="card-main-value"
-                id="today-value"
-            >
-                —
-            </div>
-
-
-            <div class="card-description">
-                今日の予定
-            </div>
-
-
-            <div
-                class="card-detail"
-                id="today-detail"
-            >
-                予定を読み込んでいます...
-            </div>
-
-        </article>
-
-
-
-        <!-- =========================
-             AWS SAA
-        ========================= -->
-
-        <article class="dashboard-card">
 
             <div class="card-header">
 
+
                 <div>
 
+
                     <span class="card-icon">
+
                         ☁️
+
                     </span>
 
+
                     <span class="card-title">
+
                         AWS SAA
+
                     </span>
+
 
                 </div>
 
+
                 <span class="card-arrow">
+
                     →
+
                 </span>
 
+
             </div>
+
 
 
             <div class="card-main-value">
 
+
                 <span id="aws-value">
+
                     —
+
                 </span>
 
+
             </div>
+
 
 
             <div class="card-description">
+
                 学習進捗
+
             </div>
 
 
+
             <div class="progress">
+
 
                 <div
                     class="progress-bar"
@@ -269,330 +361,461 @@
                     style="width: 0%;"
                 ></div>
 
+
             </div>
+
 
 
             <div
                 class="card-detail"
                 id="aws-detail"
             >
+
                 学習データを読み込んでいます...
+
             </div>
+
 
         </article>
 
 
+    </a>
 
-        <!-- =========================
-             GOALS
-        ========================= -->
 
-        <a
-            href="./goals.html"
-            class="dashboard-card-link"
-        >
 
-            <article class="dashboard-card">
+    <!-- =================================================
+         GOALS
+    ================================================== -->
 
-                <div class="card-header">
+    <a
+        href="./goals.html"
+        class="dashboard-card-link"
+    >
 
-                    <div>
 
-                        <span class="card-icon">
-                            🎯
-                        </span>
+        <article class="dashboard-card">
 
-                        <span class="card-title">
-                            GOALS
-                        </span>
 
-                    </div>
+            <div class="card-header">
 
-                    <span class="card-arrow">
-                        →
+
+                <div>
+
+
+                    <span class="card-icon">
+
+                        🎯
+
                     </span>
 
-                </div>
 
+                    <span class="card-title">
 
-                <div class="card-main-value">
+                        GOALS
 
-                    <span id="goals-value">
-                        —
                     </span>
 
-                </div>
-
-
-                <div class="card-description">
-                    現在の目標
-                </div>
-
-
-                <div class="progress">
-
-                    <div
-                        class="progress-bar"
-                        id="goals-progress-bar"
-                        style="width: 0%;"
-                    ></div>
 
                 </div>
+
+
+                <span class="card-arrow">
+
+                    →
+
+                </span>
+
+
+            </div>
+
+
+
+            <div class="card-main-value">
+
+
+                <span id="goals-value">
+
+                    —
+
+                </span>
+
+
+            </div>
+
+
+
+            <div class="card-description">
+
+                現在の目標
+
+            </div>
+
+
+
+            <div class="progress">
 
 
                 <div
-                    class="card-detail"
-                    id="goals-detail"
-                >
-                    目標データを読み込んでいます...
-                </div>
+                    class="progress-bar"
+                    id="goals-progress-bar"
+                    style="width: 0%;"
+                ></div>
 
-            </article>
+
+            </div>
+
+
+
+            <div
+                class="card-detail"
+                id="goals-detail"
+            >
+
+                目標データを読み込んでいます...
+
+            </div>
+
+
+        </article>
+
+
+    </a>
+
+
+
+    <!-- =================================================
+         LIFE SCORE
+    ================================================== -->
+
+    <article class="dashboard-card life-score-card">
+
+
+        <div class="card-header">
+
+
+            <div>
+
+
+                <span class="card-icon">
+
+                    📊
+
+                </span>
+
+
+                <span class="card-title">
+
+                    LIFE SCORE
+
+                </span>
+
+
+            </div>
+
+
+            <span class="card-arrow">
+
+                →
+
+            </span>
+
+
+        </div>
+
+
+
+        <div class="score">
+
+
+            <span
+                class="score-number"
+                id="life-score-value"
+            >
+
+                —
+
+            </span>
+
+
+            <span class="score-unit">
+
+                / 100
+
+            </span>
+
+
+        </div>
+
+
+
+        <div class="card-description">
+
+            YOUR LIFE SCORE
+
+        </div>
+
+
+
+        <div
+            class="score-message"
+            id="life-score-detail"
+        >
+
+            データを読み込んでいます...
+
+        </div>
+
+
+    </article>
+
+
+
+</section>
+
+
+
+<!-- =====================================================
+     QUICK ACCESS
+====================================================== -->
+
+<section class="quick-section">
+
+
+    <div class="section-title">
+
+        QUICK ACCESS
+
+    </div>
+
+
+
+    <div class="quick-grid">
+
+
+
+        <!-- =================================================
+             Schedule
+        ================================================== -->
+
+        <a
+            href="./schedule.html"
+            class="quick-card-link"
+        >
+
+
+            <div class="quick-card">
+
+
+                <span class="quick-icon">
+
+                    📅
+
+                </span>
+
+
+                <span>
+
+                    Schedule
+
+                </span>
+
+
+            </div>
+
 
         </a>
 
 
 
-        <!-- =========================
-             LIFE SCORE
-        ========================= -->
+        <!-- =================================================
+             AWS SAA
+        ================================================== -->
 
-        <article class="dashboard-card life-score-card">
-
-            <div class="card-header">
-
-                <div>
-
-                    <span class="card-icon">
-                        📊
-                    </span>
-
-                    <span class="card-title">
-                        LIFE SCORE
-                    </span>
-
-                </div>
-
-                <span class="card-arrow">
-                    →
-                </span>
-
-            </div>
+        <a
+            href="./aws.html"
+            class="quick-card-link"
+        >
 
 
-            <div class="score">
+            <div class="quick-card">
 
-                <span
-                    class="score-number"
-                    id="life-score-value"
-                >
-                    —
-                </span>
-
-                <span class="score-unit">
-                    / 100
-                </span>
-
-            </div>
-
-
-            <div class="card-description">
-                YOUR LIFE SCORE
-            </div>
-
-
-            <div
-                class="score-message"
-                id="life-score-detail"
-            >
-                データを読み込んでいます...
-            </div>
-
-        </article>
-
-
-    </section>
-
-
-
-    <!-- =========================
-         QUICK ACCESS
-    ========================= -->
-
-    <section class="quick-section">
-
-        <div class="section-title">
-            QUICK ACCESS
-        </div>
-
-
-        <div class="quick-grid">
-
-
-            <!-- Schedule -->
-
-            <a
-                href="./schedule.html"
-                class="quick-card-link"
-            >
-
-                <button
-                    class="quick-card"
-                    type="button"
-                >
-
-                    <span class="quick-icon">
-                        📅
-                    </span>
-
-                    <span>
-                        Schedule
-                    </span>
-
-                </button>
-
-            </a>
-
-
-
-            <!-- AWS -->
-
-            <button
-                class="quick-card"
-                type="button"
-            >
 
                 <span class="quick-icon">
+
                     ☁️
+
                 </span>
+
 
                 <span>
+
                     AWS SAA
+
                 </span>
 
-            </button>
+
+            </div>
+
+
+        </a>
 
 
 
-            <!-- Goals -->
+        <!-- =================================================
+             Goals
+        ================================================== -->
 
-            <a
-                href="./goals.html"
-                class="quick-card-link"
-            >
-
-                <button
-                    class="quick-card"
-                    type="button"
-                >
-
-                    <span class="quick-icon">
-                        🎯
-                    </span>
-
-                    <span>
-                        Goals
-                    </span>
-
-                </button>
-
-            </a>
+        <a
+            href="./goals.html"
+            class="quick-card-link"
+        >
 
 
+            <div class="quick-card">
 
-            <!-- Settings -->
-
-            <button
-                class="quick-card"
-                type="button"
-            >
 
                 <span class="quick-icon">
-                    ⚙️
+
+                    🎯
+
                 </span>
+
 
                 <span>
-                    Settings
+
+                    Goals
+
                 </span>
 
-            </button>
-
-
-        </div>
-
-    </section>
-
-
-
-    <!-- =========================
-         ACCOUNT
-    ========================= -->
-
-    <section class="account-section">
-
-        <div class="section-title">
-            ACCOUNT
-        </div>
-
-
-        <div class="account-card">
-
-
-            <div>
-
-                <div class="account-label">
-                    USER ID
-                </div>
-
-
-                <code id="user-uid">
-                    CONNECTING...
-                </code>
 
             </div>
 
 
-            <div class="account-type">
-                ANONYMOUS
+        </a>
+
+
+
+        <!-- =================================================
+             Settings
+        ================================================== -->
+
+        <button
+            class="quick-card"
+            type="button"
+        >
+
+
+            <span class="quick-icon">
+
+                ⚙️
+
+            </span>
+
+
+            <span>
+
+                Settings
+
+            </span>
+
+
+        </button>
+
+
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================================
+     ACCOUNT
+====================================================== -->
+
+<section class="account-section">
+
+
+    <div class="section-title">
+
+        ACCOUNT
+
+    </div>
+
+
+
+    <div class="account-card">
+
+
+
+        <div>
+
+
+            <div class="account-label">
+
+                USER ID
+
             </div>
+
+
+
+            <code id="user-uid">
+
+                CONNECTING...
+
+            </code>
 
 
         </div>
 
-    </section>
 
+
+        <div class="account-type">
+
+            ANONYMOUS
+
+        </div>
+
+
+    </div>
+
+
+</section>
+```
 
 </main>
 
-
-
-<!-- =========================
+<!-- =========================================================
      FOOTER
-========================= -->
+========================================================= -->
 
 <footer class="footer">
 
-    LIFE DASHBOARD
+```
+LIFE DASHBOARD
 
-    <span>
-        •
-    </span>
 
-    YOUR LIFE. YOUR DATA.
+<span>
+
+    •
+
+</span>
+
+
+YOUR LIFE. YOUR DATA.
+```
 
 </footer>
 
-
-
-<!-- =========================
+<!-- =========================================================
      JAVASCRIPT
-========================= -->
+========================================================= -->
 
 <script
     type="module"
     src="./js/dashboard.js"
 ></script>
-
 
 </body>
 
