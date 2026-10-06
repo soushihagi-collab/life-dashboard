@@ -3,129 +3,108 @@
    AWS SAA
    aws.js
 
-   AWS Certified Solutions Architect - Associate
+   FULL VERSION
 
-   機能
-   ・30問のAWS SAA問題データベース
-   ・分野別問題
-   ・ランダム出題
-   ・同じ問題の連続出題防止
-   ・正誤判定
-   ・正解 / 不正解表示
-   ・詳しい解説
-   ・各選択肢の解説
-   ・問題数カウント
-   ・正解数カウント
-   ・不正解数カウント
-   ・正答率計算
-   ・学習進捗保存
-   ・目標日保存
-   ・学習メモ保存
-   ・Firebase / Firestore 保存
-========================================================= */
+   Features
+   - Firebase Authentication
+   - Firestore persistence
+   - Study progress
+   - Question history
+   - Category analytics
+   - Weak area detection
+   - Wrong question review
+   - Favorites
+   - Difficulty filtering
+   - Daily / weekly statistics
+   - Study streak
+   - Study goals
+   - Mock exam
+   ========================================================= */
 
-
-/* =========================================================
-   FIREBASE
-========================================================= */
 
 import {
+
     doc,
     getDoc,
-    setDoc
+    setDoc,
+    addDoc,
+    collection,
+    getDocs,
+    deleteDoc,
+    query,
+    where,
+    Timestamp,
+    onAuthStateChanged
+
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
 import {
-    onAuthStateChanged
+
+    onAuthStateChanged as onAuthStateChangedAuth
+
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 
 import {
-    auth,
-    db
+
+    db,
+    auth
+
 } from "./firebase.js";
 
 
 
 /* =========================================================
-   DOM
+   GLOBAL STATE
 ========================================================= */
 
-const authStatusElement =
-    document.getElementById("auth-status");
+
+let currentUser = null;
+
+let currentQuestion = null;
+
+let previousQuestionId = null;
+
+let currentFilter = "all";
+
+let favoriteQuestionIds = new Set();
+
+let wrongQuestionIds = new Set();
+
+let questionHistory = [];
+
+let currentStudyQuestions = [];
+
+let currentStudyIndex = 0;
 
 
-const progressValueElement =
-    document.getElementById("aws-progress-value");
+/* =========================================================
+   STUDY MODE
+========================================================= */
+
+let studyMode = "normal";
 
 
-const progressBarElement =
-    document.getElementById("aws-progress-bar");
+/* =========================================================
+   MOCK EXAM STATE
+========================================================= */
 
+let mockQuestions = [];
 
-const progressTextElement =
-    document.getElementById("aws-progress-text");
+let mockAnswers = [];
 
+let mockMarked = [];
 
-const accuracyValueElement =
-    document.getElementById("aws-accuracy-value");
+let mockCurrentIndex = 0;
 
+let mockStartedAt = null;
 
-const questionCountElement =
-    document.getElementById("aws-question-count");
+let mockTimerInterval = null;
 
+const MOCK_TOTAL = 65;
 
-const correctCountElement =
-    document.getElementById("aws-correct-count");
-
-
-const incorrectCountElement =
-    document.getElementById("aws-incorrect-count");
-
-
-const targetDateDisplayElement =
-    document.getElementById("aws-target-date-display");
-
-
-const targetDateInputElement =
-    document.getElementById("aws-target-date");
-
-
-const progressInputElement =
-    document.getElementById("aws-progress-input");
-
-
-const noteElement =
-    document.getElementById("aws-note");
-
-
-const saveButtonElement =
-    document.getElementById("aws-save-button");
-
-
-const saveStatusElement =
-    document.getElementById("aws-save-status");
-
-
-const questionNumberElement =
-    document.getElementById("question-number");
-
-
-const questionTextElement =
-    document.getElementById("question-text");
-
-
-const answerListElement =
-    document.getElementById("answer-list");
-
-
-const questionResultElement =
-    document.getElementById("question-result");
-
-
-const nextQuestionButtonElement =
-    document.getElementById("next-question-button");
+const MOCK_TIME_SECONDS = 120 * 60;
 
 
 
@@ -147,6 +126,10 @@ let awsData = {
 
     targetDate: "",
 
+    targetQuestions: 1000,
+
+    dailyTarget: 10,
+
     note: ""
 
 };
@@ -154,10 +137,32 @@ let awsData = {
 
 
 /* =========================================================
-   CURRENT USER
+   CATEGORIES
 ========================================================= */
 
-let currentUser = null;
+const categories = [
+
+    "IAM / Security",
+
+    "VPC / Networking",
+
+    "EC2",
+
+    "S3 / Storage",
+
+    "RDS / Database",
+
+    "ELB / Auto Scaling",
+
+    "CloudFront / Route 53",
+
+    "Serverless",
+
+    "High Availability / DR",
+
+    "Cost Optimization"
+
+];
 
 
 
@@ -169,1044 +174,1219 @@ const questionDatabase = [
 
     /* =====================================================
        IAM / SECURITY
-    ====================================================== */
+    ===================================================== */
 
     {
+
+        id: "iam-001",
+
         category: "IAM / Security",
 
+        difficulty: "EASY",
+
         question:
-            "ある企業では、EC2インスタンス上で実行されるアプリケーションからAmazon S3へアクセスする必要がある。アクセスキーをEC2インスタンス内に保存することなく、AWSのベストプラクティスに従ってアクセスを許可したい。最も適切な方法はどれか。",
+            "EC2インスタンスからS3バケットへアクセスさせる場合、アクセスキーをEC2内に保存せずにAWSリソースへアクセスするための推奨方法はどれですか？",
 
         choices: [
 
-            "EC2インスタンス内にIAMユーザーのアクセスキーを保存する",
+            "IAMユーザーのアクセスキーを環境変数に保存する",
 
-            "EC2インスタンスにIAMロールを割り当てる",
+            "IAMロールをEC2インスタンスに関連付ける",
 
-            "S3バケットをパブリックアクセス可能にする",
+            "S3バケットをパブリック公開する",
 
-            "AWSアカウントのルートユーザーを使用する"
+            "ルートユーザーのアクセスキーを使用する"
 
         ],
 
         answer: 1,
 
         explanation:
-            "EC2からAWSサービスへアクセスする場合は、IAMロールをEC2インスタンスに関連付ける方法が推奨されます。これにより、一時的な認証情報が自動的に提供され、長期間有効なアクセスキーをサーバーへ保存する必要がありません。",
+            "EC2からAWSサービスへアクセスする場合は、IAMロールをEC2インスタンスプロファイルとして関連付けるのが推奨です。認証情報をアプリケーションへ直接保存する必要がありません。",
 
         choiceExplanations: [
 
-            "IAMユーザーのアクセスキーをサーバーへ保存すると、認証情報の漏洩リスクが高まります。",
+            "長期的なアクセスキーを保存するため、推奨されません。",
 
-            "正解です。EC2 IAMロールを使用すると、一時的な認証情報を安全に利用できます。",
+            "正解です。IAMロールによる一時的な認証情報を利用できます。",
 
-            "S3をパブリック公開する必要はありません。むしろ不要な公開はセキュリティリスクになります。",
+            "セキュリティ上、S3をパブリック公開する必要はありません。",
 
-            "ルートユーザーをアプリケーションから利用することは推奨されません。"
+            "ルートユーザーのアクセスキー利用は推奨されません。"
+
         ]
 
     },
 
 
     {
+
+        id: "iam-002",
+
         category: "IAM / Security",
 
+        difficulty: "MEDIUM",
+
         question:
-            "AWSアカウント内のユーザーに対して、必要な操作だけを許可し、それ以外の権限を与えないようにしたい。このセキュリティ原則はどれか。",
+            "AWSアカウント内のユーザーが特定のリージョンでEC2を起動できないようにしたいとします。複数のIAMポリシーより上位で組織全体の権限制御を行うサービスはどれですか？",
 
         choices: [
 
-            "Fault Tolerance",
+            "Security Group",
 
-            "Least Privilege",
+            "AWS Organizations SCP",
 
-            "Elasticity",
+            "NACL",
 
-            "Loose Coupling"
+            "Route 53"
 
         ],
 
         answer: 1,
 
         explanation:
-            "Least Privilege（最小権限の原則）は、ユーザーやサービスに必要最低限の権限だけを付与する考え方です。AWS IAMの設計において重要な原則です。",
+            "AWS OrganizationsのService Control Policies（SCP）は、組織内のアカウントで利用できる最大権限を制御します。",
 
         choiceExplanations: [
 
-            "Fault Toleranceは、障害が発生してもシステムが継続して動作できる能力です。",
+            "Security Groupはネットワーク通信を制御します。",
 
-            "正解です。必要最小限の権限だけを付与するのがLeast Privilegeです。",
+            "正解です。SCPはAWS Organizationsでアカウントの最大権限を制御します。",
 
-            "Elasticityは、需要に応じてリソースを増減させる能力です。",
+            "NACLはサブネットレベルのネットワークアクセス制御です。",
 
-            "Loose Couplingは、システムコンポーネント間の依存関係を弱くする設計です。"
+            "Route 53はDNSサービスです。"
+
         ]
 
     },
 
 
     {
+
+        id: "iam-003",
+
         category: "IAM / Security",
 
+        difficulty: "HARD",
+
         question:
-            "AWSアカウントのルートユーザーを保護するために、最も適切な対策はどれか。",
+            "ある企業がAWSアカウント間で安全にアクセス権を委任したいと考えています。長期的なアクセスキーを共有せず、一時的な認証情報を利用する方法はどれですか？",
 
         choices: [
 
-            "ルートユーザーを日常的なAWS操作に使用する",
+            "IAMユーザーのアクセスキーを共有する",
 
-            "ルートユーザーのアクセスキーを各EC2へ配布する",
+            "AWS STS AssumeRoleを利用する",
 
-            "ルートユーザーに多要素認証（MFA）を設定する",
+            "ルートユーザーでログインする",
 
-            "ルートユーザーのパスワードをチーム全員で共有する"
+            "S3 ACLを利用する"
+
+        ],
+
+        answer: 1,
+
+        explanation:
+            "STS AssumeRoleを利用すると、IAMロールを引き受け、一時的なセキュリティ認証情報を取得できます。",
+
+        choiceExplanations: [
+
+            "長期認証情報の共有となるため推奨されません。",
+
+            "正解です。STS AssumeRoleで一時認証情報を取得できます。",
+
+            "ルートユーザー利用は推奨されません。",
+
+            "S3 ACLはロール引き受けの仕組みではありません。"
+
+        ]
+
+    },
+
+
+
+    /* =====================================================
+       VPC / NETWORKING
+    ===================================================== */
+
+    {
+
+        id: "vpc-001",
+
+        category: "VPC / Networking",
+
+        difficulty: "EASY",
+
+        question:
+            "プライベートサブネットのEC2からS3へアクセスしたいが、インターネットを経由させたくありません。最も適切な方法はどれですか？",
+
+        choices: [
+
+            "Internet Gateway",
+
+            "S3 Gateway VPC Endpoint",
+
+            " NAT Gateway ",
+
+            "CloudFront"
+
+        ],
+
+        answer: 1,
+
+        explanation:
+            "S3にはGateway VPC Endpointを利用できます。VPC内部からS3へプライベートにアクセスできます。",
+
+        choiceExplanations: [
+
+            "Internet Gatewayはインターネット接続用です。",
+
+            "正解です。S3 Gateway Endpointを利用できます。",
+
+            "NAT Gateway経由でも可能ですが、S3への専用プライベート経路としてはGateway Endpointが適切です。",
+
+            "CloudFrontはCDNサービスです。"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "vpc-002",
+
+        category: "VPC / Networking",
+
+        difficulty: "MEDIUM",
+
+        question:
+            "プライベートサブネットのEC2からインターネット上のアップデートサーバーへアクセスする必要があります。外部からEC2へ直接接続されない構成はどれですか？",
+
+        choices: [
+
+            "Internet Gatewayのみ",
+
+            "NAT Gateway",
+
+            "パブリックIPをEC2に付与",
+
+            "Elastic IPをEC2に直接付与"
+
+        ],
+
+        answer: 1,
+
+        explanation:
+            "プライベートサブネットから外向きのインターネット通信を行う場合、NAT Gatewayが代表的な構成です。",
+
+        choiceExplanations: [
+
+            "プライベートサブネットから直接利用する構成ではありません。",
+
+            "正解です。NAT Gatewayによって外向き通信が可能になります。",
+
+            "EC2を直接インターネットへ公開することになります。",
+
+            "同様に直接公開する構成になります。"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "vpc-003",
+
+        category: "VPC / Networking",
+
+        difficulty: "HARD",
+
+        question:
+            "オンプレミス環境からVPC内のプライベートリソースへ専用線で接続し、安定したネットワーク品質を確保したいとします。最適な選択肢はどれですか？",
+
+        choices: [
+
+            "Site-to-Site VPN",
+
+            "AWS Direct Connect",
+
+            "Internet Gateway",
+
+            "NAT Gateway"
+
+        ],
+
+        answer: 1,
+
+        explanation:
+            "専用線接続による安定したネットワークを求める場合、AWS Direct Connectが適しています。",
+
+        choiceExplanations: [
+
+            "VPNはインターネット経由の暗号化接続です。",
+
+            "正解です。Direct Connectは専用線接続を提供します。",
+
+            "インターネット接続用です。",
+
+            "外向きインターネット通信に利用します。"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "vpc-004",
+
+        category: "VPC / Networking",
+
+        difficulty: "HARD",
+
+        question:
+            "複数VPC間でAWS PrivateLinkを使用してサービスを非公開で提供したいとします。サービス提供側で使用する主要なコンポーネントはどれですか？",
+
+        choices: [
+
+            "Network Load Balancer",
+
+            "Internet Gateway",
+
+            "NAT Gateway",
+
+            "Route 53 Resolver"
+
+        ],
+
+        answer: 0,
+
+        explanation:
+            "AWS PrivateLinkでは、サービス提供側にNetwork Load Balancerを配置する構成が一般的です。",
+
+        choiceExplanations: [
+
+            "正解です。PrivateLinkのエンドポイントサービスではNLBを利用します。",
+
+            "インターネット接続用です。",
+
+            "NAT Gatewayは外向き通信向けです。",
+
+            "DNS関連の機能です。"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "vpc-005",
+
+        category: "VPC / Networking",
+
+        difficulty: "MEDIUM",
+
+        question:
+            "セキュリティグループとネットワークACLの違いとして正しいものはどれですか？",
+
+        choices: [
+
+            "Security Groupはステートフル、NACLはステートレス",
+
+            "Security Groupはサブネット単位、NACLはインスタンス単位",
+
+            "両方とも完全に同じ",
+
+            "NACLはアウトバウンド通信を制御できない"
+
+        ],
+
+        answer: 0,
+
+        explanation:
+            "Security Groupはステートフル、Network ACLはステートレスです。またSecurity GroupはENI単位、NACLはサブネット単位で適用されます。",
+
+        choiceExplanations: [
+
+            "正解です。重要なSAA頻出ポイントです。",
+
+            "逆です。",
+
+            "適用単位やステート性が異なります。",
+
+            "NACLはインバウンド・アウトバウンドの両方を制御できます。"
+
+        ]
+
+    },
+
+
+
+    /* =====================================================
+       EC2
+    ===================================================== */
+
+    {
+
+        id: "ec2-001",
+
+        category: "EC2",
+
+        difficulty: "EASY",
+
+        question:
+            "EC2インスタンスのOSへSSH接続することなく、AWSコンソールから管理操作を行いたい場合に利用できるサービスはどれですか？",
+
+        choices: [
+
+            "AWS Systems Manager",
+
+            "CloudFront",
+
+            "Route 53",
+
+            "S3"
+
+        ],
+
+        answer: 0,
+
+        explanation:
+            "AWS Systems Manager Session Managerを使用すると、SSHポートを公開せずにEC2へ接続できます。",
+
+        choiceExplanations: [
+
+            "正解です。Session Managerによる管理が可能です。",
+
+            "CDNサービスです。",
+
+            "DNSサービスです。",
+
+            "オブジェクトストレージです。"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "ec2-002",
+
+        category: "EC2",
+
+        difficulty: "MEDIUM",
+
+        question:
+            "突然の負荷増加に対してEC2台数を自動的に増減させたい場合に利用するサービスはどれですか？",
+
+        choices: [
+
+            "Auto Scaling",
+
+            "AWS Backup",
+
+            "CloudTrail",
+
+            "IAM"
+
+        ],
+
+        answer: 0,
+
+        explanation:
+            "EC2 Auto Scalingを利用すると、負荷やスケジュールなどに応じてインスタンス数を自動調整できます。",
+
+        choiceExplanations: [
+
+            "正解です。EC2の台数を自動調整できます。",
+
+            "バックアップサービスです。",
+
+            "API操作の監査ログサービスです。",
+
+            "アクセス権管理サービスです。"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "ec2-003",
+
+        category: "EC2",
+
+        difficulty: "HARD",
+
+        question:
+            "アプリケーションを変更せずに、EC2インスタンスの障害時もサービスを継続したいとします。複数AZへEC2を分散し、ロードバランサーを利用する構成が適切な理由はどれですか？",
+
+        choices: [
+
+            "単一AZ障害の影響を低減できる",
+
+            "EC2のCPU性能が2倍になる",
+
+            "S3の容量が増える",
+
+            "IAM権限が自動付与される"
+
+        ],
+
+        answer: 0,
+
+        explanation:
+            "複数AZへリソースを分散することで、単一AZの障害によるサービス停止リスクを低減できます。",
+
+        choiceExplanations: [
+
+            "正解です。高可用性設計の基本です。",
+
+            "CPU性能そのものは変化しません。",
+
+            "S3容量とは関係ありません。",
+
+            "IAM権限が自動付与されるわけではありません。"
+
+        ]
+
+    },
+
+
+
+    /* =====================================================
+       S3
+    ===================================================== */
+
+    {
+
+        id: "s3-001",
+
+        category: "S3 / Storage",
+
+        difficulty: "EASY",
+
+        question:
+            "アクセス頻度が低いが、必要になったときすぐ取得できるS3オブジェクトの保存先として適切なのはどれですか？",
+
+        choices: [
+
+            "S3 Standard",
+
+            "S3 Glacier Deep Archive",
+
+            "S3 Standard-IA",
+
+            "Amazon EFS"
 
         ],
 
         answer: 2,
 
         explanation:
-            "ルートユーザーは非常に強力な権限を持つため、通常の操作では使用せず、MFAを設定して厳重に保護することが推奨されます。",
+            "S3 Standard-IAはアクセス頻度が低いデータ向けで、Standardより低いストレージ料金で利用できます。",
 
         choiceExplanations: [
 
-            "ルートユーザーは日常的な操作には使用しません。",
+            "頻繁にアクセスするデータ向けです。",
 
-            "アクセスキーを配布すると重大なセキュリティリスクになります。",
+            "長期アーカイブ向けで、取得に時間がかかる場合があります。",
 
-            "正解です。ルートユーザーにはMFAを設定し、利用を最小限にします。",
+            "正解です。低頻度アクセス向けです。",
 
-            "パスワードを共有することはセキュリティ上不適切です。"
-        ]
+            "ファイルシステムサービスです。"
 
-    },
-
-
-    /* =====================================================
-       VPC / NETWORKING
-    ====================================================== */
-
-    {
-        category: "VPC / Networking",
-
-        question:
-            "プライベートサブネットに配置されたEC2インスタンスから、インターネット上のソフトウェアリポジトリへアクセスしたい。ただし、インターネットからEC2への着信接続は許可したくない。最も適切な構成はどれか。",
-
-        choices: [
-
-            "Internet Gatewayのみを使用する",
-
-            "NAT Gatewayをパブリックサブネットに配置する",
-
-            "EC2をパブリックサブネットへ移動する",
-
-            "VPC Peeringを使用する"
-
-        ],
-
-        answer: 1,
-
-        explanation:
-            "プライベートサブネットのEC2からインターネットへアウトバウンド通信を行う場合、パブリックサブネットにNAT Gatewayを配置する構成が一般的です。外部からEC2への直接着信は許可する必要がありません。",
-
-        choiceExplanations: [
-
-            "Internet Gatewayだけでは、プライベートサブネットのEC2からインターネットへアクセスするための構成になりません。",
-
-            "正解です。NAT Gatewayをパブリックサブネットに配置し、プライベートサブネットから外向き通信を行います。",
-
-            "EC2をパブリックサブネットへ移動すると、設計上不要なインターネット到達性を持つ可能性があります。",
-
-            "VPC PeeringはVPC間接続用であり、インターネットアクセス用ではありません。"
         ]
 
     },
 
 
     {
-        category: "VPC / Networking",
+
+        id: "s3-002",
+
+        category: "S3 / Storage",
+
+        difficulty: "MEDIUM",
 
         question:
-            "VPC内のEC2インスタンスからAmazon S3へアクセスする際、インターネットゲートウェイやNAT Gatewayを経由せず、AWSネットワーク内で通信したい。最も適切な方法はどれか。",
+            "S3バケット内のオブジェクトを誤って削除した場合に復元できるようにしたい場合、基本的な機能はどれですか？",
 
         choices: [
 
-            "S3 Gateway Endpoint",
+            "Versioning",
 
-            "Internet Gateway",
+            "Security Group",
 
-            "NAT Gateway",
+            "Auto Scaling",
 
-            "Virtual Private Gateway"
+            "CloudFront"
 
         ],
 
         answer: 0,
 
         explanation:
-            "S3 Gateway Endpointを使用すると、VPC内のリソースからS3へAWSネットワークを経由してアクセスできます。NAT GatewayやInternet Gatewayを必要としません。",
+            "S3 Versioningを有効にすると、オブジェクトの複数バージョンを保持できます。",
 
         choiceExplanations: [
 
-            "正解です。S3 Gateway Endpointを利用できます。",
+            "正解です。誤削除からの復元に利用できます。",
 
-            "Internet Gatewayはインターネットとの接続に使用します。",
+            "ネットワークアクセス制御です。",
 
-            "NAT Gatewayはプライベートサブネットからインターネットへのアウトバウンド通信などに使用します。",
+            "EC2台数調整です。",
 
-            "Virtual Private Gatewayは主にVPN接続などで使用されます。"
+            "CDNです。"
+
         ]
 
     },
 
 
     {
-        category: "VPC / Networking",
+
+        id: "s3-003",
+
+        category: "S3 / Storage",
+
+        difficulty: "HARD",
 
         question:
-            "企業のオンプレミス環境とAWS VPCをインターネットを経由して安全に接続したい。比較的低コストで構築する場合、最も適切なサービスはどれか。",
+            "大量のS3オブジェクトを一定期間後に自動的に低コストストレージへ移行したい場合、最適な機能はどれですか？",
 
         choices: [
 
-            "AWS Direct Connect",
+            "S3 Lifecycle",
 
-            "AWS Site-to-Site VPN",
+            "CloudTrail",
 
-            "Amazon CloudFront",
+            "AWS Config",
 
-            "VPC Peering"
+            "IAM Policy"
+
+        ],
+
+        answer: 0,
+
+        explanation:
+            "S3 Lifecycleルールを利用すると、オブジェクトを一定期間後に別ストレージクラスへ移行したり削除したりできます。",
+
+        choiceExplanations: [
+
+            "正解です。ストレージクラス移行や削除を自動化できます。",
+
+            "監査ログサービスです。",
+
+            "AWSリソースの設定管理サービスです。",
+
+            "アクセス権を定義する仕組みです。"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "s3-004",
+
+        category: "S3 / Storage",
+
+        difficulty: "MEDIUM",
+
+        question:
+            "S3へ保存するデータを暗号化したい場合に利用できる代表的な暗号化方式はどれですか？",
+
+        choices: [
+
+            "SSE-S3",
+
+            "Security Group",
+
+            "NACL",
+
+            "Route Table"
+
+        ],
+
+        answer: 0,
+
+        explanation:
+            "S3ではSSE-S3、SSE-KMSなどのサーバーサイド暗号化を利用できます。",
+
+        choiceExplanations: [
+
+            "正解です。S3のサーバーサイド暗号化方式です。",
+
+            "ネットワークアクセス制御です。",
+
+            "サブネットレベルのアクセス制御です。",
+
+            "ルーティング制御です。"
+
+        ]
+
+    },
+
+
+
+    /* =====================================================
+       RDS
+    ===================================================== */
+
+    {
+
+        id: "rds-001",
+
+        category: "RDS / Database",
+
+        difficulty: "EASY",
+
+        question:
+            "Amazon RDSで高可用性を実現するため、別AZへ同期的にスタンバイDBを配置する機能はどれですか？",
+
+        choices: [
+
+            "Read Replica",
+
+            "Multi-AZ",
+
+            "DynamoDB",
+
+            "ElastiCache"
 
         ],
 
         answer: 1,
 
         explanation:
-            "AWS Site-to-Site VPNは、オンプレミス環境とAWS VPCを暗号化されたVPNトンネルで接続できます。専用線であるDirect Connectより一般的に低コストで導入できます。",
+            "RDS Multi-AZは高可用性を目的としてスタンバイDBを別AZに配置します。",
 
         choiceExplanations: [
 
-            "Direct Connectは専用ネットワーク接続であり、より安定した専用接続が必要な場合に適しています。",
+            "Read Replicaは主に読み取りスケールやレポート用途です。",
 
-            "正解です。Site-to-Site VPNはインターネット経由で暗号化された接続を構築できます。",
+            "正解です。Multi-AZは高可用性のための機能です。",
 
-            "CloudFrontはCDNサービスであり、オンプレミスとVPCを接続するサービスではありません。",
+            "NoSQLデータベースサービスです。",
 
-            "VPC PeeringはAWS VPC同士を接続するための機能です。"
+            "インメモリキャッシュサービスです。"
+
         ]
 
     },
 
 
     {
-        category: "VPC / Networking",
+
+        id: "rds-002",
+
+        category: "RDS / Database",
+
+        difficulty: "MEDIUM",
 
         question:
-            "複数のVPC間でプライベートIPアドレスを使用した通信を行いたい。各VPCが同じAWSリージョンに存在している。最もシンプルな接続方法はどれか。",
+            "読み取り処理が非常に多いRDSデータベースの負荷を軽減したい場合、適切な方法はどれですか？",
 
         choices: [
 
-            "VPC Peering",
+            "Read Replica",
 
-            "Internet Gateway",
+            "Multi-AZだけを追加",
+
+            "IAMユーザーを増やす",
+
+            "S3 Glacierを利用"
+
+        ],
+
+        answer: 0,
+
+        explanation:
+            "Read Replicaを利用すると読み取り処理をレプリカへ分散できます。",
+
+        choiceExplanations: [
+
+            "正解です。読み取り負荷のスケールアウトに利用できます。",
+
+            "Multi-AZは主に高可用性目的です。",
+
+            "IAMユーザー数とDB読み取り性能は直接関係しません。",
+
+            "アーカイブストレージです。"
+
+        ]
+
+    },
+
+
+    {
+
+        id: "rds-003",
+
+        category: "RDS / Database",
+
+        difficulty: "HARD",
+
+        question:
+            "データベースの自動バックアップを利用し、障害発生時に特定時点まで復元したい場合、利用できるRDSの機能はどれですか？",
+
+        choices: [
+
+            "Point-in-Time Recovery",
+
+            "Security Group",
 
             "CloudFront",
 
-            "NAT Gateway"
+            "Auto Scaling"
 
         ],
 
         answer: 0,
 
         explanation:
-            "VPC Peeringを使用すると、2つのVPC間でプライベートIPアドレスを使用した通信が可能になります。",
+            "RDSでは自動バックアップを利用してPoint-in-Time Recoveryを実行できます。",
 
         choiceExplanations: [
 
-            "正解です。VPC PeeringはVPC間のプライベート接続に使用できます。",
+            "正解です。特定時点までのDB復元に利用できます。",
 
-            "Internet Gatewayはインターネットとの通信に使用します。",
+            "ネットワークアクセス制御です。",
 
-            "CloudFrontはコンテンツ配信サービスです。",
+            "CDNです。",
 
-            "NAT Gatewayはプライベートサブネットから外部への通信に使用します。"
+            "EC2台数調整です。"
+
         ]
 
     },
 
-
-    {
-        category: "VPC / Networking",
-
-        question:
-            "AWS上の複数のVPCとオンプレミスネットワークを、大規模なネットワーク構成として一元的に接続したい。多数のネットワークを接続する際に適したサービスはどれか。",
-
-        choices: [
-
-            "AWS Transit Gateway",
-
-            "Internet Gateway",
-
-            "S3 Gateway Endpoint",
-
-            "NAT Gateway"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "AWS Transit Gatewayは、複数のVPCやオンプレミスネットワークをハブとして接続するためのサービスです。大規模なネットワーク構成で特に有効です。",
-
-        choiceExplanations: [
-
-            "正解です。Transit Gatewayは複数ネットワークを中央のハブとして接続できます。",
-
-            "Internet GatewayはVPCとインターネットを接続します。",
-
-            "S3 Gateway EndpointはVPCからS3へのプライベートアクセスに使用します。",
-
-            "NAT Gatewayは主にプライベートサブネットから外部への通信に使用します。"
-        ]
-
-    },
-
-
-    /* =====================================================
-       EC2
-    ====================================================== */
-
-    {
-        category: "EC2",
-
-        question:
-            "複数のEC2インスタンスへSSHポートを開放したりSSHキーを配布したりすることなく、安全に管理アクセスを行いたい。最も適切なサービスはどれか。",
-
-        choices: [
-
-            "AWS Systems Manager Session Manager",
-
-            "Amazon CloudFront",
-
-            "Amazon Route 53",
-
-            "AWS Direct Connect"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "Systems Manager Session Managerを使用すると、SSHポートをインターネットへ公開したりSSHキーを管理したりすることなく、EC2へ安全に接続できます。",
-
-        choiceExplanations: [
-
-            "正解です。Session Managerは管理用SSHポートを公開せずにEC2へアクセスできます。",
-
-            "CloudFrontはCDNサービスです。",
-
-            "Route 53はDNSサービスです。",
-
-            "Direct Connectは専用ネットワーク接続サービスです。"
-        ]
-
-    },
-
-
-    {
-        category: "EC2",
-
-        question:
-            "EC2インスタンスを停止している間のコンピューティング料金を削減したい。インスタンスストアではなくEBSをルートボリュームとして使用している。最も適切な方法はどれか。",
-
-        choices: [
-
-            "EC2インスタンスを停止する",
-
-            "EC2インスタンスを再起動する",
-
-            "インターネットゲートウェイを削除する",
-
-            "Security Groupを削除する"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "EBS-backed EC2インスタンスは停止することで、インスタンスのコンピューティング料金を削減できます。EBSのストレージ料金などは継続して発生します。",
-
-        choiceExplanations: [
-
-            "正解です。不要な時間帯にEC2を停止することでコンピューティングコストを削減できます。",
-
-            "再起動してもコンピューティング料金の削減にはなりません。",
-
-            "Internet Gatewayを削除することはEC2のコンピューティング料金削減とは関係ありません。",
-
-            "Security Groupを削除してもEC2のコンピューティング料金は削減されません。"
-        ]
-
-    },
-
-
-    {
-        category: "EC2",
-
-        question:
-            "Webアプリケーションのアクセス量が時間帯によって大きく変動する。アクセス量に応じてEC2インスタンス数を自動的に増減させたい。最も適切なサービスはどれか。",
-
-        choices: [
-
-            "Amazon EC2 Auto Scaling",
-
-            "Amazon S3",
-
-            "AWS CloudTrail",
-
-            "AWS Secrets Manager"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "EC2 Auto Scalingは、CPU使用率やロードバランサーのリクエスト数などの条件に応じてEC2インスタンス数を自動的に増減できます。",
-
-        choiceExplanations: [
-
-            "正解です。Auto Scalingを利用することで需要に応じてEC2台数を自動調整できます。",
-
-            "S3はオブジェクトストレージサービスです。",
-
-            "CloudTrailはAWS API操作などの監査ログサービスです。",
-
-            "Secrets Managerは認証情報などの機密情報を安全に管理するサービスです。"
-        ]
-
-    },
-
-
-    /* =====================================================
-       S3 / STORAGE
-    ====================================================== */
-
-    {
-        category: "S3 / Storage",
-
-        question:
-            "大量の静的コンテンツを保存し、高い耐久性を確保したい。さらに、Webサイトから直接アクセスできるオブジェクトストレージを使用したい。最も適切なサービスはどれか。",
-
-        choices: [
-
-            "Amazon S3",
-
-            "Amazon EBS",
-
-            "Amazon EC2 Instance Store",
-
-            "Amazon RDS"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "Amazon S3は高い耐久性を持つオブジェクトストレージで、静的コンテンツやバックアップなど幅広い用途に利用できます。",
-
-        choiceExplanations: [
-
-            "正解です。S3はオブジェクトストレージとして静的コンテンツなどを保存できます。",
-
-            "EBSは主にEC2インスタンス用のブロックストレージです。",
-
-            "Instance StoreはEC2に一時的に接続されるローカルストレージです。",
-
-            "RDSはリレーショナルデータベースサービスです。"
-        ]
-
-    },
-
-
-    {
-        category: "S3 / Storage",
-
-        question:
-            "アクセス頻度が低いバックアップデータをS3に長期間保存したい。保存コストをできるだけ削減したいが、必要になった場合にはデータを取り出したい。適切なS3ストレージクラスはどれか。",
-
-        choices: [
-
-            "S3 Standard",
-
-            "S3 Glacier Flexible Retrieval",
-
-            "S3 Express One Zone",
-
-            "S3 Standard-IA"
-
-        ],
-
-        answer: 1,
-
-        explanation:
-            "長期間アクセス頻度が低いアーカイブデータにはS3 Glacier Flexible RetrievalなどのGlacier系ストレージクラスが適しています。",
-
-        choiceExplanations: [
-
-            "S3 Standardは頻繁にアクセスするデータ向けで、アーカイブ用途ではコストが高くなる可能性があります。",
-
-            "正解です。長期保存・低頻度アクセスのアーカイブ用途に適しています。",
-
-            "S3 Express One Zoneは高性能アクセスが必要な用途向けです。",
-
-            "Standard-IAも低頻度アクセス向けですが、長期アーカイブではGlacier系が適するケースがあります。"
-        ]
-
-    },
-
-
-    {
-        category: "S3 / Storage",
-
-        question:
-            "S3バケット内のオブジェクトを誤って削除した場合に復元できるようにしたい。最も適切な機能はどれか。",
-
-        choices: [
-
-            "S3 Versioning",
-
-            "S3 Transfer Acceleration",
-
-            "S3 Access Points",
-
-            "S3 Static Website Hosting"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "S3 Versioningを有効にすると、オブジェクトの複数バージョンを保持できます。誤削除した場合にも以前のバージョンを復元できます。",
-
-        choiceExplanations: [
-
-            "正解です。Versioningによって以前のオブジェクトバージョンを保持できます。",
-
-            "Transfer AccelerationはS3へのデータ転送を高速化する機能です。",
-
-            "Access PointsはS3へのアクセス管理を簡素化するための機能です。",
-
-            "Static Website HostingはS3をWebサイトのホスティングに利用する機能です。"
-        ]
-
-    },
-
-
-    {
-        category: "S3 / Storage",
-
-        question:
-            "オンプレミス環境からS3へ大量のデータを一度移行したい。ネットワーク回線を大量に使用することなく、大量データをAWSへ物理的に転送したい。最も適切なサービスはどれか。",
-
-        choices: [
-
-            "AWS Snowball",
-
-            "Amazon CloudFront",
-
-            "AWS Lambda",
-
-            "Amazon Route 53"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "AWS Snowballは、大量のデータを物理デバイスに保存してAWSへ転送するために利用できます。ネットワーク帯域が制約となる大規模データ移行に適しています。",
-
-        choiceExplanations: [
-
-            "正解です。Snowballは物理デバイスを利用した大量データ移行に適しています。",
-
-            "CloudFrontはコンテンツ配信サービスです。",
-
-            "Lambdaはサーバーレスコンピューティングサービスです。",
-
-            "Route 53はDNSサービスです。"
-        ]
-
-    },
-
-
-    /* =====================================================
-       RDS / DATABASE
-    ====================================================== */
-
-    {
-        category: "RDS / Database",
-
-        question:
-            "リレーショナルデータベースをAWSで運用したい。OSのパッチ適用やデータベースのバックアップなどの管理負担を減らしたい。最も適切なサービスはどれか。",
-
-        choices: [
-
-            "Amazon EC2に自分でデータベースをインストールする",
-
-            "Amazon RDS",
-
-            "Amazon S3",
-
-            "Amazon DynamoDB"
-
-        ],
-
-        answer: 1,
-
-        explanation:
-            "Amazon RDSはマネージド型リレーショナルデータベースサービスであり、バックアップやパッチ適用などの運用負担を軽減できます。",
-
-        choiceExplanations: [
-
-            "EC2に自分でデータベースを構築すると、OSやDBの管理負担が増えます。",
-
-            "正解です。RDSはリレーショナルDBの運用をAWSに任せられます。",
-
-            "S3はオブジェクトストレージです。",
-
-            "DynamoDBはNoSQLデータベースです。"
-        ]
-
-    },
-
-
-    {
-        category: "RDS / Database",
-
-        question:
-            "Amazon RDSデータベースの可用性を高めたい。1つのAvailability Zoneで障害が発生した場合でも、データベースサービスを継続できる構成にしたい。最も適切な方法はどれか。",
-
-        choices: [
-
-            "RDS Multi-AZ",
-
-            "RDS Read Replicaのみを使用する",
-
-            "S3 Versioningを有効にする",
-
-            "CloudFrontを使用する"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "RDS Multi-AZは、複数のAvailability Zoneにデータベースを配置して高可用性を実現します。プライマリに障害が発生した場合、スタンバイへフェイルオーバーできます。",
-
-        choiceExplanations: [
-
-            "正解です。Multi-AZはRDSの高可用性・フェイルオーバーを実現します。",
-
-            "Read Replicaは主に読み取り負荷の分散やスケーリングに利用されます。",
-
-            "S3 Versioningはオブジェクトストレージの機能です。",
-
-            "CloudFrontはCDNであり、RDSの高可用性機能ではありません。"
-        ]
-
-    },
-
-
-    {
-        category: "RDS / Database",
-
-        question:
-            "読み取り処理が非常に多いRDSデータベースの負荷を軽減したい。データの読み取り専用コピーを作成し、読み取り処理を分散したい。最も適切な機能はどれか。",
-
-        choices: [
-
-            "RDS Read Replica",
-
-            "RDS Multi-AZ",
-
-            "NAT Gateway",
-
-            "S3 Lifecycle"
-
-        ],
-
-        answer: 0,
-
-        explanation:
-            "RDS Read Replicaは、プライマリDBの読み取り専用レプリカを作成し、読み取りワークロードを分散するために使用できます。",
-
-        choiceExplanations: [
-
-            "正解です。Read Replicaは読み取り負荷の分散に利用できます。",
-
-            "Multi-AZの主目的は高可用性・フェイルオーバーです。",
-
-            "NAT Gatewayはネットワーク通信のためのサービスです。",
-
-            "S3 LifecycleはS3オブジェクトのストレージクラス移行などに使用します。"
-        ]
-
-    },
 
 
     /* =====================================================
        ELB / AUTO SCALING
-    ====================================================== */
+    ===================================================== */
 
     {
+
+        id: "elb-001",
+
         category: "ELB / Auto Scaling",
 
+        difficulty: "EASY",
+
         question:
-            "HTTP/HTTPSを使用するWebアプリケーションを複数のEC2インスタンスへ負荷分散したい。パスベースのルーティングも使用したい。最も適切なロードバランサーはどれか。",
+            "HTTP/HTTPSアプリケーションのトラフィックを複数のEC2インスタンスへ分散したい場合、一般的に利用するロードバランサーはどれですか？",
 
         choices: [
 
             "Application Load Balancer",
 
-            "Network Load Balancer",
+            "NAT Gateway",
 
-            "Gateway Load Balancer",
+            "Internet Gateway",
 
-            "Route 53だけを使用する"
+            "Route Table"
 
         ],
 
         answer: 0,
 
         explanation:
-            "Application Load Balancer（ALB）はHTTP/HTTPS向けのロードバランサーで、ホストベース・パスベースのルーティングなどの高度なルーティング機能を提供します。",
+            "Application Load BalancerはHTTP/HTTPSなどのアプリケーションレイヤーのトラフィック分散に適しています。",
 
         choiceExplanations: [
 
-            "正解です。ALBはHTTP/HTTPSアプリケーションに適しています。",
+            "正解です。HTTP/HTTPSのロードバランシングに適しています。",
 
-            "NLBはTCP/UDPなどの高性能なレイヤー4ロードバランシングに適しています。",
+            "アウトバウンド通信向けです。",
 
-            "Gateway Load Balancerは仮想アプライアンスのデプロイなどに使用されます。",
+            "インターネット接続用です。",
 
-            "Route 53だけではALBのようなアプリケーションレベルの負荷分散はできません。"
+            "ルーティング設定です。"
+
         ]
 
     },
 
 
     {
+
+        id: "elb-002",
+
         category: "ELB / Auto Scaling",
 
+        difficulty: "MEDIUM",
+
         question:
-            "EC2 Auto Scalingで、CPU使用率が高くなった場合にインスタンスを自動的に追加したい。どの機能を使用するのが適切か。",
+            "Auto Scaling GroupのEC2インスタンスが異常になった場合、異常なインスタンスを終了し新しいインスタンスを起動するために利用される仕組みはどれですか？",
 
         choices: [
 
-            "Auto Scalingのスケーリングポリシー",
+            "Health Check",
 
-            "S3 Lifecycle",
+            "S3 Versioning",
 
             "IAM Policy",
 
-            "CloudFront Origin Access Control"
+            "CloudFront Cache"
 
         ],
 
         answer: 0,
 
         explanation:
-            "Auto Scalingのスケーリングポリシーを使用すると、CPU使用率などのCloudWatchメトリクスを基準としてEC2インスタンス数を自動調整できます。",
+            "Auto Scalingではヘルスチェックによって異常なインスタンスを検出し、必要に応じて置き換えます。",
 
         choiceExplanations: [
 
-            "正解です。スケーリングポリシーによって需要に応じた自動スケーリングが可能です。",
+            "正解です。インスタンスの正常性確認に利用されます。",
 
-            "S3 LifecycleはS3オブジェクト管理機能です。",
+            "S3オブジェクトのバージョン管理です。",
 
-            "IAM Policyは権限管理に使用します。",
+            "権限管理です。",
 
-            "Origin Access ControlはCloudFrontからS3などのオリジンへのアクセス制御に使用します。"
+            "CDNキャッシュです。"
+
         ]
 
     },
 
 
     {
+
+        id: "elb-003",
+
         category: "ELB / Auto Scaling",
 
+        difficulty: "HARD",
+
         question:
-            "Webアプリケーションを複数のAvailability Zoneに配置し、1つのAZで障害が発生してもサービスを継続したい。最も適切な構成はどれか。",
+            "アプリケーションへのアクセスが時間帯によって大きく変動します。負荷に応じてEC2台数を自動調整したい場合、適切な構成はどれですか？",
 
         choices: [
 
-            "EC2を1つのAZだけに配置する",
+            "Auto Scaling Group + CloudWatch",
 
-            "複数AZのEC2をALBとAuto Scalingで構成する",
+            "S3 + Glacier",
 
-            "EC2を1台だけ使用する",
+            "IAM + SCP",
 
-            "S3だけでWebアプリケーションを構築する"
+            "Route 53 + S3"
 
         ],
 
-        answer: 1,
+        answer: 0,
 
         explanation:
-            "複数AZにEC2を配置し、ALBとAuto Scalingを組み合わせることで、AZ障害時にもサービスを継続しやすい高可用性構成を作れます。",
+            "CloudWatchメトリクスを利用したAuto Scalingによって、負荷に応じたEC2台数の自動調整が可能です。",
 
         choiceExplanations: [
 
-            "1つのAZだけではAZ障害時にサービス全体が影響を受ける可能性があります。",
+            "正解です。代表的な動的スケーリング構成です。",
 
-            "正解です。複数AZ + ALB + Auto Scalingは代表的な高可用性構成です。",
+            "ストレージ用途です。",
 
-            "1台構成ではインスタンス障害に弱くなります。",
+            "権限管理用途です。",
 
-            "S3だけでは一般的な動的Webアプリケーションの実行環境にはなりません。"
+            "DNSとストレージの組み合わせです。"
+
         ]
 
     },
+
 
 
     /* =====================================================
-       CLOUDFRONT / ROUTE 53
-    ====================================================== */
+       CLOUDFRONT / ROUTE53
+    ===================================================== */
 
     {
+
+        id: "cdn-001",
+
         category: "CloudFront / Route 53",
 
+        difficulty: "EASY",
+
         question:
-            "世界中のユーザーへ静的コンテンツを低レイテンシーで配信したい。ユーザーに近い場所からコンテンツを配信したい。最も適切なサービスはどれか。",
+            "世界中のユーザーへWebコンテンツを低レイテンシーで配信したい場合に利用する代表的なAWSサービスはどれですか？",
 
         choices: [
 
-            "Amazon CloudFront",
+            "CloudFront",
 
-            "Amazon RDS",
+            "RDS",
 
-            "Amazon SQS",
+            "IAM",
 
-            "AWS IAM"
+            "SQS"
 
         ],
 
         answer: 0,
 
         explanation:
-            "CloudFrontはAWSのCDNサービスで、世界中のエッジロケーションを利用してユーザーに近い場所からコンテンツを配信できます。",
+            "Amazon CloudFrontはAWSのグローバルなCDNサービスです。",
 
         choiceExplanations: [
 
-            "正解です。CloudFrontはCDNとして低レイテンシーなコンテンツ配信を実現します。",
+            "正解です。エッジロケーションからコンテンツを配信します。",
 
-            "RDSはリレーショナルデータベースサービスです。",
+            "リレーショナルデータベースです。",
 
-            "SQSはメッセージキューサービスです。",
+            "アクセス管理サービスです。",
 
-            "IAMはアクセス権限管理サービスです。"
+            "メッセージキューサービスです。"
+
         ]
 
     },
 
 
     {
+
+        id: "cdn-002",
+
         category: "CloudFront / Route 53",
 
+        difficulty: "MEDIUM",
+
         question:
-            "アプリケーションへのトラフィックを複数のAWSリージョンへ振り分けたい。DNSベースのルーティングを使用したい。最も適切なサービスはどれか。",
+            "DNSの名前解決をAWS上で提供するサービスはどれですか？",
 
         choices: [
 
-            "Amazon Route 53",
+            "Route 53",
 
-            "Amazon S3",
+            "CloudFront",
 
-            "AWS Lambda",
+            "S3",
 
-            "Amazon EBS"
+            "EBS"
 
         ],
 
         answer: 0,
 
         explanation:
-            "Amazon Route 53はDNSサービスであり、レイテンシーベースルーティングやフェイルオーバールーティングなどを利用してトラフィックを複数リージョンへ振り分けられます。",
+            "Amazon Route 53はDNSサービスです。",
 
         choiceExplanations: [
 
-            "正解です。Route 53はDNSベースのルーティングに使用できます。",
+            "正解です。DNS、ドメイン登録、ヘルスチェックなどを提供します。",
 
-            "S3はオブジェクトストレージサービスです。",
+            "CDNサービスです。",
 
-            "Lambdaはサーバーレスコンピューティングサービスです。",
+            "オブジェクトストレージです。",
 
-            "EBSはEC2向けのブロックストレージです。"
+            "ブロックストレージです。"
+
         ]
 
     },
+
 
 
     /* =====================================================
        SERVERLESS
-    ====================================================== */
+    ===================================================== */
 
     {
+
+        id: "serverless-001",
+
         category: "Serverless",
 
+        difficulty: "EASY",
+
         question:
-            "画像がS3へアップロードされたときに、自動的に画像処理を実行したい。サーバーを常時稼働させたくない。最も適切なサービスはどれか。",
+            "サーバーを管理せず、イベント発生時にコードを実行したい場合に利用する代表的なサービスはどれですか？",
 
         choices: [
 
             "AWS Lambda",
 
-            "Amazon EC2を常時稼働させる",
+            "EC2",
 
-            "Amazon RDS",
+            "EBS",
 
-            "AWS Direct Connect"
+            "Direct Connect"
 
         ],
 
         answer: 0,
 
         explanation:
-            "S3イベントをトリガーとしてLambda関数を実行することで、画像アップロード時にサーバーレスで処理を実行できます。",
+            "AWS Lambdaはサーバーをプロビジョニング・管理せずにコードを実行できるサーバーレスサービスです。",
 
         choiceExplanations: [
 
-            "正解です。S3イベントをLambdaのトリガーとして利用できます。",
+            "正解です。イベント駆動でコードを実行できます。",
 
-            "EC2を常時稼働させるとサーバー管理やコストが発生します。",
+            "仮想サーバーサービスです。",
 
-            "RDSはデータベースサービスです。",
+            "ブロックストレージです。",
 
-            "Direct Connectはネットワーク接続サービスです。"
+            "専用ネットワーク接続サービスです。"
+
         ]
 
     },
 
 
     {
+
+        id: "serverless-002",
+
         category: "Serverless",
 
+        difficulty: "HARD",
+
         question:
-            "ユーザーからのHTTPリクエストを受け取り、バックエンド処理をサーバーレスで実行したい。APIの入口として使用できるAWSサービスはどれか。",
+            "大量のメッセージを一時的に保持し、処理するアプリケーション間を疎結合にしたい場合、適切なサービスはどれですか？",
 
         choices: [
 
-            "Amazon API Gateway",
+            "Amazon SQS",
+
+            "Amazon Route 53",
 
             "Amazon EBS",
 
-            "AWS Snowball",
-
-            "Amazon S3 Glacier"
+            "IAM"
 
         ],
 
         answer: 0,
 
         explanation:
-            "Amazon API GatewayはAPIの作成・公開・管理を行えるマネージドサービスで、Lambdaなどのバックエンドと組み合わせてサーバーレスAPIを構築できます。",
+            "Amazon SQSはメッセージキューサービスであり、アプリケーション間の疎結合化に利用できます。",
 
         choiceExplanations: [
 
-            "正解です。API GatewayはLambdaなどと組み合わせてサーバーレスAPIを構築できます。",
+            "正解です。非同期処理や疎結合化に利用できます。",
 
-            "EBSはブロックストレージです。",
+            "DNSサービスです。",
 
-            "Snowballは大規模データ移行などに使用します。",
+            "ブロックストレージです。",
 
-            "S3 Glacierはアーカイブ用ストレージです。"
+            "権限管理サービスです。"
+
         ]
 
     },
+
 
 
     /* =====================================================
-       HIGH AVAILABILITY / DR
-    ====================================================== */
+       HA / DR
+    ===================================================== */
 
     {
+
+        id: "dr-001",
+
         category: "High Availability / DR",
 
+        difficulty: "MEDIUM",
+
         question:
-            "Webアプリケーションを複数のAvailability Zoneに配置する主な目的はどれか。",
+            "リージョン全体の障害に備えて、別リージョンへデータを複製しておきたい場合に利用できる代表的な方法はどれですか？",
 
         choices: [
 
-            "単一AZ障害への耐性を高める",
+            "Cross-Region Replication",
 
-            "IAMユーザーを作成する",
+            "Security Group",
 
-            "S3の保存容量を増やす",
+            "NACL",
 
-            "DNSレコードを暗号化する"
+            "Elastic IP"
 
         ],
 
         answer: 0,
 
         explanation:
-            "複数のAvailability Zoneにリソースを分散配置することで、1つのAZに障害が発生してもサービスを継続できる可能性を高められます。",
+            "S3 Cross-Region Replicationなど、AWSにはリージョン間でデータを複製する仕組みがあります。",
 
         choiceExplanations: [
 
-            "正解です。Multi-AZ構成は可用性と障害耐性を高める基本的な設計です。",
+            "正解です。リージョン障害へのDR対策として利用できます。",
 
-            "IAMユーザー作成はAZ構成とは関係ありません。",
+            "ネットワークアクセス制御です。",
 
-            "S3の容量拡張が目的ではありません。",
+            "サブネットアクセス制御です。",
 
-            "DNSレコードの暗号化が目的ではありません。"
+            "固定IPアドレスです。"
+
         ]
 
     },
 
 
     {
+
+        id: "dr-002",
+
         category: "High Availability / DR",
 
+        difficulty: "HARD",
+
         question:
-            "AWS上のアプリケーションで障害が発生した場合に備えて、別リージョンへバックアップを保存したい。S3を使用している。最も適切な方法の1つはどれか。",
+            "災害対策において、通常時は最小限のリソースだけを稼働させ、障害時に迅速に本番環境を拡張する方式はどれですか？",
 
         choices: [
 
-            "S3 Cross-Region Replication",
+            "Pilot Light",
 
-            "EC2 Instance Store",
+            "Multi-AZ",
 
-            "EBSスナップショットを1つのAZだけに保存する",
+            "Single-AZ",
 
-            "Security Group"
+            "Caching"
 
         ],
 
         answer: 0,
 
         explanation:
-            "S3 Cross-Region Replication（CRR）を使用すると、S3オブジェクトを別のAWSリージョンへ自動的に複製できます。リージョン障害に備えたDR対策として利用できます。",
+            "Pilot Lightでは最低限必要なコアリソースを稼働させ、災害時に他のリソースを起動して環境を拡張します。",
 
         choiceExplanations: [
 
-            "正解です。CRRによって別リージョンへオブジェクトを複製できます。",
+            "正解です。DR戦略の一つです。",
 
-            "Instance StoreはEC2のローカルストレージであり、DR用の永続バックアップには適していません。",
+            "単一リージョン内のAZ冗長化です。",
 
-            "1つのAZだけに保存するとリージョン障害への対策にはなりません。",
+            "可用性が低くなります。",
 
-            "Security Groupはネットワークアクセス制御機能です。"
+            "キャッシュ戦略です。"
+
         ]
 
     },
 
 
     {
+
+        id: "dr-003",
+
         category: "High Availability / DR",
 
+        difficulty: "HARD",
+
         question:
-            "アプリケーションの障害時に、できるだけ短時間で別環境へ切り替えたい。通常時は最小限のリソースだけを稼働させ、障害時にスケールアップするDR戦略を採用したい。最も適切な戦略はどれか。",
+            "RTOを可能な限り短くしたい場合、一般的に最も高速な復旧が期待できるDR戦略はどれですか？",
 
         choices: [
 
@@ -1216,102 +1396,116 @@ const questionDatabase = [
 
             "Warm Standby",
 
-            "Multi-Site Active/Active"
+            "Multi-site / Hot Standby"
 
         ],
 
-        answer: 2,
+        answer: 3,
 
         explanation:
-            "Warm Standbyでは、縮小された本番相当環境を別環境で稼働させ、障害時にスケールアップして本番トラフィックを処理します。Pilot Lightよりも迅速に切り替えられる一方、常時Active/Activeよりコストを抑えられます。",
+            "Multi-site / Hot Standbyでは別環境がほぼ本番状態で稼働しているため、一般的に最も短いRTOを実現しやすい方式です。",
 
         choiceExplanations: [
 
-            "Backup and Restoreは最もシンプルですが、復旧までの時間が長くなりやすい戦略です。",
+            "復旧まで時間がかかります。",
 
-            "Pilot Lightは最小限のコアコンポーネントを稼働させる戦略で、Warm Standbyより復旧に時間がかかる場合があります。",
+            "必要なコンポーネントを起動する必要があります。",
 
-            "正解です。Warm Standbyは縮小された環境を稼働させ、障害時にスケールアップします。",
+            "一定規模の環境を常時稼働させます。",
 
-            "Multi-Site Active/Activeは高い可用性と短い復旧時間を実現できますが、通常時から複数環境を稼働させるためコストが高くなります。"
+            "正解です。ほぼ本番環境を常時稼働させます。"
+
         ]
 
     },
 
 
+
     /* =====================================================
-       COST OPTIMIZATION
-    ====================================================== */
+       COST
+    ===================================================== */
 
     {
+
+        id: "cost-001",
+
         category: "Cost Optimization",
 
+        difficulty: "MEDIUM",
+
         question:
-            "EC2インスタンスを24時間365日、長期間にわたって安定して使用する予定である。オンデマンド料金よりもコストを削減したい。最も適切な選択肢はどれか。",
+            "長期間安定して使用するEC2インスタンスのコストを削減したい場合、適切な選択肢はどれですか？",
 
         choices: [
 
             "Savings Plans",
 
-            "NAT Gateway",
+            "NAT Gatewayを増やす",
 
-            "CloudFront",
+            "CloudFrontを停止",
 
-            "S3 Transfer Acceleration"
+            "IAMユーザーを増やす"
 
         ],
 
         answer: 0,
 
         explanation:
-            "長期間安定してコンピューティングリソースを使用する場合、Savings Plansによってオンデマンド料金より低い料金を利用できる場合があります。",
+            "Savings Plansは一定の利用量をコミットすることで、オンデマンド料金より低い料金を利用できます。",
 
         choiceExplanations: [
 
-            "正解です。Savings Plansは一定の利用コミットメントと引き換えにコンピューティングコストを削減できます。",
+            "正解です。長期的なコンピューティング利用に適しています。",
 
-            "NAT Gatewayはネットワーク通信のためのサービスです。",
+            "コスト削減にはなりません。",
 
-            "CloudFrontはCDNサービスです。",
+            "CDN停止とは関係ありません。",
 
-            "S3 Transfer AccelerationはS3へのデータ転送を高速化する機能です。"
+            "IAMユーザー数とEC2料金は直接関係しません。"
+
         ]
 
     },
 
 
     {
+
+        id: "cost-002",
+
         category: "Cost Optimization",
 
+        difficulty: "HARD",
+
         question:
-            "毎月数日間だけ大量のEC2コンピューティングリソースが必要になる。必要な期間だけEC2を使用し、それ以外の期間はリソースを使用しない。コスト最適化の観点で基本的に適切な考え方はどれか。",
+            "アクセス頻度が非常に低く、数年間保存する必要があるデータのストレージコストを最小化したい場合、適切な選択肢はどれですか？",
 
         choices: [
 
-            "不要な期間もEC2を常時稼働させる",
+            "S3 Standard",
 
-            "需要がない期間はEC2を停止または削除する",
+            "S3 Glacier Deep Archive",
 
-            "すべてのEC2をDedicated Hostにする",
+            "EBS General Purpose",
 
-            "すべてのEC2を常時最大サイズにする"
+            "EFS"
 
         ],
 
         answer: 1,
 
         explanation:
-            "需要がない期間にコンピューティングリソースを停止・削除することで、不要なコンピューティングコストを削減できます。",
+            "S3 Glacier Deep Archiveは長期保存・低頻度アクセス向けの非常に低コストなストレージクラスです。",
 
         choiceExplanations: [
 
-            "不要な期間まで稼働させると、不要なコンピューティング料金が発生します。",
+            "頻繁なアクセス向けです。",
 
-            "正解です。需要に合わせてリソースを停止・削除することは基本的なコスト最適化です。",
+            "正解です。長期アーカイブ向けです。",
 
-            "Dedicated Hostは特殊なライセンス要件などがある場合に使用するもので、単純なコスト削減策ではありません。",
+            "EC2向けブロックストレージです。",
 
-            "常時最大サイズにすると、需要が少ない期間にも過剰なコストが発生します。"
+            "ファイルストレージです。"
+
         ]
 
     }
@@ -1321,29 +1515,133 @@ const questionDatabase = [
 
 
 /* =========================================================
-   QUESTION STATE
+   UTILITY
 ========================================================= */
 
-let currentQuestionIndex = 0;
 
-let currentQuestion = null;
+function $(id) {
 
-let questionAnswered = false;
+    return document.getElementById(id);
 
-let previousQuestionIndex = -1;
+}
 
+
+function calculateAccuracy(
+    correct,
+    total
+) {
+
+    if (!total) {
+
+        return 0;
+
+    }
+
+    return Math.round(
+        (correct / total) * 100
+    );
+
+}
+
+
+function getTodayStart() {
+
+    const date = new Date();
+
+    date.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    return date;
+
+}
+
+
+function getWeekStart() {
+
+    const date = new Date();
+
+    const day = date.getDay();
+
+    const diff =
+        day === 0
+            ? 6
+            : day - 1;
+
+    date.setDate(
+        date.getDate() - diff
+    );
+
+    date.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    return date;
+
+}
+
+
+function formatDate(dateString) {
+
+    if (!dateString) {
+
+        return "—";
+
+    }
+
+    const date =
+        new Date(dateString);
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "—";
+
+    }
+
+    return date
+        .toLocaleDateString(
+            "ja-JP",
+            {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }
+        );
+
+}
+
+
+function getQuestionById(id) {
+
+    return questionDatabase.find(
+        question =>
+            question.id === id
+    );
+
+}
 
 
 /* =========================================================
-   FIRESTORE REFERENCE
+   FIRESTORE REFERENCES
 ========================================================= */
 
-function getAwsProgressRef(user) {
+
+function getProgressRef() {
 
     return doc(
         db,
         "users",
-        user.uid,
+        currentUser.uid,
         "aws",
         "progress"
     );
@@ -1351,180 +1649,55 @@ function getAwsProgressRef(user) {
 }
 
 
-
-/* =========================================================
-   RENDER AWS DATA
-========================================================= */
-
-function renderAwsData() {
-
-
-    /* =====================================================
-       PROGRESS
-    ====================================================== */
-
-    const progress =
-        Number(awsData.progress) || 0;
-
-
-    if (progressValueElement) {
-
-        progressValueElement.textContent =
-            `${progress}%`;
-
-    }
-
-
-    if (progressBarElement) {
-
-        progressBarElement.style.width =
-            `${progress}%`;
-
-    }
-
-
-    if (progressTextElement) {
-
-        progressTextElement.textContent =
-            `${progress}%`;
-
-    }
-
-
-
-    /* =====================================================
-       ACCURACY
-    ====================================================== */
-
-    const accuracy =
-        Number(awsData.accuracy) || 0;
-
-
-    if (accuracyValueElement) {
-
-        accuracyValueElement.textContent =
-            `${accuracy}%`;
-
-    }
-
-
-
-    /* =====================================================
-       QUESTION COUNT
-    ====================================================== */
-
-    if (questionCountElement) {
-
-        questionCountElement.textContent =
-            Number(awsData.questionCount) || 0;
-
-    }
-
-
-
-    /* =====================================================
-       CORRECT
-    ====================================================== */
-
-    if (correctCountElement) {
-
-        correctCountElement.textContent =
-            Number(awsData.correctCount) || 0;
-
-    }
-
-
-
-    /* =====================================================
-       INCORRECT
-    ====================================================== */
-
-    if (incorrectCountElement) {
-
-        incorrectCountElement.textContent =
-            Number(awsData.incorrectCount) || 0;
-
-    }
-
-
-
-    /* =====================================================
-       TARGET DATE
-    ====================================================== */
-
-    if (targetDateDisplayElement) {
-
-        if (awsData.targetDate) {
-
-            targetDateDisplayElement.textContent =
-                awsData.targetDate;
-
-        } else {
-
-            targetDateDisplayElement.textContent =
-                "—";
-
-        }
-
-    }
-
-
-    if (targetDateInputElement) {
-
-        targetDateInputElement.value =
-            awsData.targetDate || "";
-
-    }
-
-
-
-    /* =====================================================
-       PROGRESS INPUT
-    ====================================================== */
-
-    if (progressInputElement) {
-
-        progressInputElement.value =
-            progress;
-
-    }
-
-
-
-    /* =====================================================
-       NOTE
-    ====================================================== */
-
-    if (noteElement) {
-
-        noteElement.value =
-            awsData.note || "";
-
-    }
+function getHistoryCollection() {
+
+    return collection(
+        db,
+        "users",
+        currentUser.uid,
+        "awsHistory"
+    );
 
 }
 
 
+function getFavoritesCollection() {
+
+    return collection(
+        db,
+        "users",
+        currentUser.uid,
+        "awsFavorites"
+    );
+
+}
+
 
 /* =========================================================
-   LOAD AWS DATA
+   LOAD PROGRESS
 ========================================================= */
 
-async function loadAwsData(user) {
+
+async function loadAwsData() {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
 
     try {
 
-        const awsProgressRef =
-            getAwsProgressRef(user);
-
-
         const snapshot =
             await getDoc(
-                awsProgressRef
+                getProgressRef()
             );
 
 
-        if (snapshot.exists()) {
+        if (
+            snapshot.exists()
+        ) {
 
             const data =
                 snapshot.data();
@@ -1532,44 +1705,22 @@ async function loadAwsData(user) {
 
             awsData = {
 
-                progress:
-                    Number(data.progress) || 0,
+                ...awsData,
 
-                accuracy:
-                    Number(data.accuracy) || 0,
-
-                questionCount:
-                    Number(data.questionCount) || 0,
-
-                correctCount:
-                    Number(data.correctCount) || 0,
-
-                incorrectCount:
-                    Number(data.incorrectCount) || 0,
-
-                targetDate:
-                    data.targetDate || "",
-
-                note:
-                    data.note || ""
+                ...data
 
             };
 
         }
 
 
-        renderAwsData();
+        applyAwsDataToUI();
 
-
-        console.log(
-            "AWSデータ読み込み完了",
-            awsData
-        );
 
     } catch (error) {
 
         console.error(
-            "AWSデータ読み込みエラー:",
+            "AWS data load error:",
             error
         );
 
@@ -1580,25 +1731,13 @@ async function loadAwsData(user) {
 
 
 /* =========================================================
-   SAVE AWS DATA
+   SAVE PROGRESS
 ========================================================= */
+
 
 async function saveAwsData() {
 
     if (!currentUser) {
-
-        console.warn(
-            "Firebase認証済みユーザーがいません"
-        );
-
-
-        if (saveStatusElement) {
-
-            saveStatusElement.textContent =
-                "Firebaseにログインしていないため保存できません。";
-
-        }
-
 
         return false;
 
@@ -1607,55 +1746,73 @@ async function saveAwsData() {
 
     try {
 
-        const awsProgressRef =
-            getAwsProgressRef(
-                currentUser
-            );
-
-
         await setDoc(
-            awsProgressRef,
+
+            getProgressRef(),
+
             {
 
                 progress:
-                    Number(awsData.progress) || 0,
+                    Number(
+                        awsData.progress
+                    ),
 
                 accuracy:
-                    Number(awsData.accuracy) || 0,
+                    Number(
+                        awsData.accuracy
+                    ),
 
                 questionCount:
-                    Number(awsData.questionCount) || 0,
+                    Number(
+                        awsData.questionCount
+                    ),
 
                 correctCount:
-                    Number(awsData.correctCount) || 0,
+                    Number(
+                        awsData.correctCount
+                    ),
 
                 incorrectCount:
-                    Number(awsData.incorrectCount) || 0,
+                    Number(
+                        awsData.incorrectCount
+                    ),
 
                 targetDate:
                     awsData.targetDate || "",
 
+                targetQuestions:
+                    Number(
+                        awsData.targetQuestions || 0
+                    ),
+
+                dailyTarget:
+                    Number(
+                        awsData.dailyTarget || 0
+                    ),
+
                 note:
                     awsData.note || ""
 
+            },
+
+            {
+
+                merge: true
+
             }
-        );
 
-
-        console.log(
-            "AWSデータ保存完了"
         );
 
 
         return true;
 
+
     } catch (error) {
 
         console.error(
-            "AWSデータ保存エラー:",
+            "AWS data save error:",
             error
         );
-
 
         return false;
 
@@ -1666,120 +1823,1288 @@ async function saveAwsData() {
 
 
 /* =========================================================
-   SAVE SETTINGS
+   APPLY DATA TO UI
 ========================================================= */
 
-async function saveSettings() {
+
+function applyAwsDataToUI() {
 
     const progress =
         Number(
-            progressInputElement
-                ? progressInputElement.value
-                : 0
+            awsData.progress || 0
         );
 
 
-    const targetDate =
-        targetDateInputElement
-            ? targetDateInputElement.value
-            : "";
-
-
-    const note =
-        noteElement
-            ? noteElement.value
-            : "";
-
-
-
-    /* =====================================================
-       PROGRESS VALIDATION
-    ====================================================== */
-
-    let validProgress =
-        Number.isFinite(progress)
-            ? progress
-            : 0;
-
-
-    validProgress =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                validProgress
-            )
+    const accuracy =
+        Number(
+            awsData.accuracy || 0
         );
 
 
-
-    /* =====================================================
-       UPDATE DATA
-    ====================================================== */
-
-    awsData.progress =
-        validProgress;
-
-    awsData.targetDate =
-        targetDate;
-
-    awsData.note =
-        note;
+    $("aws-progress-value").textContent =
+        `${progress}%`;
 
 
+    $("aws-progress-text").textContent =
+        `${progress}%`;
 
-    renderAwsData();
+
+    $("aws-progress-bar").style.width =
+        `${Math.min(progress, 100)}%`;
+
+
+    $("aws-accuracy-value").textContent =
+        `${accuracy}%`;
+
+
+    $("aws-question-count").textContent =
+        awsData.questionCount || 0;
+
+
+    $("aws-target-date").value =
+        awsData.targetDate || "";
+
+
+    $("aws-progress-input").value =
+        progress;
+
+
+    $("aws-target-questions-input").value =
+        awsData.targetQuestions || 1000;
+
+
+    $("aws-daily-target-input").value =
+        awsData.dailyTarget || 10;
+
+
+    $("aws-note").value =
+        awsData.note || "";
+
+
+    updateGoalUI();
+
+}
 
 
 
-    if (saveStatusElement) {
+/* =========================================================
+   SETTINGS
+========================================================= */
 
-        saveStatusElement.textContent =
-            "保存中...";
+
+async function saveSettings() {
+
+    if (!currentUser) {
+
+        alert(
+            "Firebase認証を確認しています。"
+        );
+
+        return;
 
     }
 
 
+    const progress =
+        Number(
+            $("aws-progress-input").value
+        );
 
-    const saved =
+
+    const targetQuestions =
+        Number(
+            $("aws-target-questions-input").value
+        );
+
+
+    const dailyTarget =
+        Number(
+            $("aws-daily-target-input").value
+        );
+
+
+    if (
+        progress < 0 ||
+        progress > 100
+    ) {
+
+        alert(
+            "進捗率は0〜100で入力してください。"
+        );
+
+        return;
+
+    }
+
+
+    awsData.progress =
+        progress;
+
+
+    awsData.targetDate =
+        $("aws-target-date").value;
+
+
+    awsData.targetQuestions =
+        targetQuestions;
+
+
+    awsData.dailyTarget =
+        dailyTarget;
+
+
+    awsData.note =
+        $("aws-note").value.trim();
+
+
+    const success =
         await saveAwsData();
 
 
-    if (saveStatusElement) {
+    if (success) {
 
-        if (saved) {
+        $("aws-save-status").textContent =
+            "保存しました。";
 
-            saveStatusElement.textContent =
-                "保存しました。";
+
+        applyAwsDataToUI();
+
+
+        setTimeout(
+            () => {
+
+                $("aws-save-status").textContent =
+                    "";
+
+            },
+            2500
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   LOAD HISTORY
+========================================================= */
+
+
+async function loadHistory() {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                getHistoryCollection()
+            );
+
+
+        questionHistory = [];
+
+
+        snapshot.forEach(
+            docSnapshot => {
+
+                const data =
+                    docSnapshot.data();
+
+
+                questionHistory.push({
+
+                    id:
+                        docSnapshot.id,
+
+                    ...data
+
+                });
+
+            }
+        );
+
+
+        questionHistory.sort(
+            (
+                a,
+                b
+            ) => {
+
+                const aTime =
+                    a.answeredAt?.toMillis
+                        ? a.answeredAt.toMillis()
+                        : 0;
+
+                const bTime =
+                    b.answeredAt?.toMillis
+                        ? b.answeredAt.toMillis()
+                        : 0;
+
+                return bTime - aTime;
+
+            }
+        );
+
+
+        updateAnalytics();
+
+
+    } catch (error) {
+
+        console.error(
+            "History load error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   LOAD FAVORITES
+========================================================= */
+
+
+async function loadFavorites() {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                getFavoritesCollection()
+            );
+
+
+        favoriteQuestionIds =
+            new Set();
+
+
+        snapshot.forEach(
+            item => {
+
+                favoriteQuestionIds.add(
+                    item.id
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Favorites load error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   SAVE HISTORY
+========================================================= */
+
+
+async function saveAnswerHistory(
+    question,
+    selectedIndex,
+    isCorrect
+) {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    try {
+
+        await addDoc(
+
+            getHistoryCollection(),
+
+            {
+
+                questionId:
+                    question.id,
+
+                category:
+                    question.category,
+
+                difficulty:
+                    question.difficulty,
+
+                selectedIndex:
+                    selectedIndex,
+
+                correctIndex:
+                    question.answer,
+
+                isCorrect:
+                    isCorrect,
+
+                answeredAt:
+                    Timestamp.now()
+
+            }
+
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "History save error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   FAVORITE
+========================================================= */
+
+
+async function toggleFavorite() {
+
+    if (
+        !currentUser ||
+        !currentQuestion
+    ) {
+
+        return;
+
+    }
+
+
+    const questionId =
+        currentQuestion.id;
+
+
+    const favoriteRef =
+        doc(
+            db,
+            "users",
+            currentUser.uid,
+            "awsFavorites",
+            questionId
+        );
+
+
+    try {
+
+        if (
+            favoriteQuestionIds.has(
+                questionId
+            )
+        ) {
+
+            await deleteDoc(
+                favoriteRef
+            );
+
+
+            favoriteQuestionIds.delete(
+                questionId
+            );
 
         } else {
 
-            saveStatusElement.textContent =
-                "保存に失敗しました。";
+            await setDoc(
+
+                favoriteRef,
+
+                {
+
+                    questionId:
+                        questionId,
+
+                    category:
+                        currentQuestion.category,
+
+                    createdAt:
+                        Timestamp.now()
+
+                }
+
+            );
+
+
+            favoriteQuestionIds.add(
+                questionId
+            );
+
+        }
+
+
+        updateFavoriteButton();
+
+
+    } catch (error) {
+
+        console.error(
+            "Favorite error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   FAVORITE BUTTON
+========================================================= */
+
+
+function updateFavoriteButton() {
+
+    if (
+        !currentQuestion
+    ) {
+
+        $("favorite-button").disabled =
+            true;
+
+        return;
+
+    }
+
+
+    $("favorite-button").disabled =
+        false;
+
+
+    const isFavorite =
+        favoriteQuestionIds.has(
+            currentQuestion.id
+        );
+
+
+    $("favorite-button").textContent =
+        isFavorite
+            ? "★ お気に入り済み"
+            : "☆ お気に入り";
+
+}
+
+
+
+/* =========================================================
+   UPDATE ANALYTICS
+========================================================= */
+
+
+function updateAnalytics() {
+
+    updateDailyWeekly();
+
+    updateCategoryPerformance();
+
+    updateWeakAreas();
+
+    updateStreak();
+
+    updateGoalUI();
+
+}
+
+
+
+/* =========================================================
+   DAILY / WEEKLY
+========================================================= */
+
+
+function updateDailyWeekly() {
+
+    const todayStart =
+        getTodayStart()
+            .getTime();
+
+
+    const weekStart =
+        getWeekStart()
+            .getTime();
+
+
+    const today =
+        questionHistory.filter(
+            item => {
+
+                const time =
+                    item.answeredAt?.toMillis
+                        ? item.answeredAt.toMillis()
+                        : 0;
+
+                return time >= todayStart;
+
+            }
+        );
+
+
+    const week =
+        questionHistory.filter(
+            item => {
+
+                const time =
+                    item.answeredAt?.toMillis
+                        ? item.answeredAt.toMillis()
+                        : 0;
+
+                return time >= weekStart;
+
+            }
+        );
+
+
+    const todayCorrect =
+        today.filter(
+            item =>
+                item.isCorrect
+        ).length;
+
+
+    const weekCorrect =
+        week.filter(
+            item =>
+                item.isCorrect
+        ).length;
+
+
+    $("today-question-count").textContent =
+        today.length;
+
+
+    $("today-accuracy").textContent =
+        `${calculateAccuracy(
+            todayCorrect,
+            today.length
+        )}%`;
+
+
+    $("week-question-count").textContent =
+        week.length;
+
+
+    $("week-accuracy").textContent =
+        `${calculateAccuracy(
+            weekCorrect,
+            week.length
+        )}%`;
+
+}
+
+
+
+/* =========================================================
+   CATEGORY PERFORMANCE
+========================================================= */
+
+
+function updateCategoryPerformance() {
+
+    const container =
+        $("category-performance");
+
+
+    container.innerHTML =
+        "";
+
+
+    categories.forEach(
+        category => {
+
+            const records =
+                questionHistory.filter(
+                    item =>
+                        item.category ===
+                        category
+                );
+
+
+            const correct =
+                records.filter(
+                    item =>
+                        item.isCorrect
+                ).length;
+
+
+            const accuracy =
+                calculateAccuracy(
+                    correct,
+                    records.length
+                );
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "category-row";
+
+
+            row.innerHTML = `
+
+                <div class="category-header">
+
+                    <span class="category-name">
+                        ${category}
+                    </span>
+
+                    <span class="category-score">
+                        ${records.length
+                            ? accuracy + "%"
+                            : "—"}
+                    </span>
+
+                </div>
+
+
+                <div class="category-background">
+
+                    <div
+                        class="category-bar"
+                        style="width:${accuracy}%"
+                    ></div>
+
+                </div>
+
+
+                <div class="category-meta">
+
+                    ${records.length}
+                    問 / ${correct}
+                    問正解
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   WEAK AREAS
+========================================================= */
+
+
+function updateWeakAreas() {
+
+    const container =
+        $("weak-areas");
+
+
+    container.innerHTML =
+        "";
+
+
+    const weakCategories =
+        [];
+
+
+    categories.forEach(
+        category => {
+
+            const records =
+                questionHistory.filter(
+                    item =>
+                        item.category ===
+                        category
+                );
+
+
+            if (
+                records.length < 3
+            ) {
+
+                return;
+
+            }
+
+
+            const correct =
+                records.filter(
+                    item =>
+                        item.isCorrect
+                ).length;
+
+
+            const accuracy =
+                calculateAccuracy(
+                    correct,
+                    records.length
+                );
+
+
+            if (
+                accuracy < 60
+            ) {
+
+                weakCategories.push({
+
+                    category:
+                        category,
+
+                    accuracy:
+                        accuracy
+
+                });
+
+            }
+
+        }
+    );
+
+
+    weakCategories.sort(
+        (
+            a,
+            b
+        ) =>
+            a.accuracy -
+            b.accuracy
+    );
+
+
+    if (
+        weakCategories.length === 0
+    ) {
+
+        container.innerHTML = `
+
+            <div class="good-message">
+
+                現在、明確な弱点分野はありません。<br>
+
+                この調子で学習を続けましょう。
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    weakCategories.forEach(
+        item => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "weak-item";
+
+
+            row.innerHTML = `
+
+                <span class="weak-name">
+                    ⚠ ${item.category}
+                </span>
+
+                <span class="weak-score">
+                    ${item.accuracy}%
+                </span>
+
+            `;
+
+
+            container.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   STREAK
+========================================================= */
+
+
+function updateStreak() {
+
+    const dateSet =
+        new Set();
+
+
+    questionHistory.forEach(
+        item => {
+
+            if (
+                !item.answeredAt?.toDate
+            ) {
+
+                return;
+
+            }
+
+
+            const date =
+                item.answeredAt.toDate();
+
+
+            const key =
+                date.toLocaleDateString(
+                    "ja-JP"
+                );
+
+
+            dateSet.add(
+                key
+            );
+
+        }
+    );
+
+
+    let currentStreak = 0;
+
+    const currentDate =
+        new Date();
+
+
+    currentDate.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    while (true) {
+
+        const key =
+            currentDate.toLocaleDateString(
+                "ja-JP"
+            );
+
+
+        if (
+            dateSet.has(key)
+        ) {
+
+            currentStreak++;
+
+            currentDate.setDate(
+                currentDate.getDate() - 1
+            );
+
+        } else {
+
+            break;
 
         }
 
     }
 
 
+    let longestStreak = 0;
 
-    /* =====================================================
-       STATUS RESET
-    ====================================================== */
+    let tempStreak = 0;
 
-    setTimeout(
-        () => {
+    const sortedDates =
+        Array.from(
+            dateSet
+        )
+        .map(
+            value =>
+                new Date(value)
+        )
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                a - b
+        );
 
-            if (saveStatusElement) {
 
-                saveStatusElement.textContent =
-                    "";
+    let previousDate =
+        null;
+
+
+    sortedDates.forEach(
+        date => {
+
+            if (!previousDate) {
+
+                tempStreak = 1;
+
+            } else {
+
+                const diff =
+                    (
+                        date -
+                        previousDate
+                    ) /
+                    (
+                        1000 *
+                        60 *
+                        60 *
+                        24
+                    );
+
+
+                if (
+                    diff === 1
+                ) {
+
+                    tempStreak++;
+
+                } else {
+
+                    tempStreak = 1;
+
+                }
 
             }
 
-        },
-        3000
+
+            longestStreak =
+                Math.max(
+                    longestStreak,
+                    tempStreak
+                );
+
+
+            previousDate =
+                date;
+
+        }
     );
+
+
+    $("streak-count").textContent =
+        currentStreak;
+
+
+    $("longest-streak").textContent =
+        `最長記録 ${longestStreak}日`;
+
+
+    renderStreakCalendar(
+        dateSet
+    );
+
+}
+
+
+
+/* =========================================================
+   STREAK CALENDAR
+========================================================= */
+
+
+function renderStreakCalendar(
+    dateSet
+) {
+
+    const container =
+        $("streak-calendar");
+
+
+    container.innerHTML =
+        "";
+
+
+    for (
+        let i = 27;
+        i >= 0;
+        i--
+    ) {
+
+        const date =
+            new Date();
+
+
+        date.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        date.setDate(
+            date.getDate() - i
+        );
+
+
+        const key =
+            date.toLocaleDateString(
+                "ja-JP"
+            );
+
+
+        const box =
+            document.createElement(
+                "div"
+            );
+
+
+        box.className =
+            "streak-day";
+
+
+        if (
+            dateSet.has(key)
+        ) {
+
+            box.classList.add(
+                "active"
+            );
+
+        }
+
+
+        box.title =
+            key;
+
+
+        container.appendChild(
+            box
+        );
+
+    }
+
+}
+
+
+
+/* =========================================================
+   GOAL
+========================================================= */
+
+
+function updateGoalUI() {
+
+    const targetDate =
+        awsData.targetDate;
+
+
+    $("goal-target-date").textContent =
+        formatDate(
+            targetDate
+        );
+
+
+    const targetQuestions =
+        Number(
+            awsData.targetQuestions || 0
+        );
+
+
+    $("goal-target-questions").textContent =
+        targetQuestions;
+
+
+    const dailyTarget =
+        Number(
+            awsData.dailyTarget || 0
+        );
+
+
+    $("goal-today-target").textContent =
+        dailyTarget;
+
+
+    if (!targetDate) {
+
+        $("goal-days-left").textContent =
+            "—";
+
+        return;
+
+    }
+
+
+    const today =
+        new Date();
+
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const target =
+        new Date(
+            targetDate
+        );
+
+
+    target.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const diff =
+        Math.ceil(
+            (
+                target -
+                today
+            ) /
+            (
+                1000 *
+                60 *
+                60 *
+                24
+            )
+        );
+
+
+    $("goal-days-left").textContent =
+        diff >= 0
+            ? `${diff}日`
+            : "期限超過";
+
+}
+
+
+
+/* =========================================================
+   QUESTION SELECTION
+========================================================= */
+
+
+function getFilteredQuestions() {
+
+    let list =
+        [...questionDatabase];
+
+
+    if (
+        currentFilter === "weak"
+    ) {
+
+        const weakCategories =
+            new Set();
+
+
+        categories.forEach(
+            category => {
+
+                const records =
+                    questionHistory.filter(
+                        item =>
+                            item.category ===
+                            category
+                    );
+
+
+                if (
+                    records.length >= 3
+                ) {
+
+                    const correct =
+                        records.filter(
+                            item =>
+                                item.isCorrect
+                        ).length;
+
+
+                    const accuracy =
+                        calculateAccuracy(
+                            correct,
+                            records.length
+                        );
+
+
+                    if (
+                        accuracy < 60
+                    ) {
+
+                        weakCategories.add(
+                            category
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        list =
+            list.filter(
+                question =>
+                    weakCategories.has(
+                        question.category
+                    )
+            );
+
+    }
+
+
+    if (
+        currentFilter === "wrong"
+    ) {
+
+        list =
+            list.filter(
+                question =>
+                    wrongQuestionIds.has(
+                        question.id
+                    )
+            );
+
+    }
+
+
+    return list;
 
 }
 
@@ -1789,10 +3114,13 @@ async function saveSettings() {
    GET RANDOM QUESTION
 ========================================================= */
 
-function getRandomQuestion() {
+
+function getRandomQuestion(
+    pool
+) {
 
     if (
-        questionDatabase.length === 0
+        !pool.length
     ) {
 
         return null;
@@ -1800,49 +3128,87 @@ function getRandomQuestion() {
     }
 
 
-    let randomIndex =
-        Math.floor(
-            Math.random() *
-            questionDatabase.length
-        );
-
-
-    /*
-       直前と同じ問題を防止
-    */
-
     if (
-        questionDatabase.length > 1
-        &&
-        randomIndex === previousQuestionIndex
+        pool.length === 1
     ) {
 
-        randomIndex += 1;
-
-
-        if (
-            randomIndex >=
-            questionDatabase.length
-        ) {
-
-            randomIndex = 0;
-
-        }
+        return pool[0];
 
     }
 
 
-    previousQuestionIndex =
-        randomIndex;
+    let question;
 
 
-    currentQuestionIndex =
-        randomIndex;
+    do {
+
+        const index =
+            Math.floor(
+                Math.random() *
+                pool.length
+            );
 
 
-    return questionDatabase[
-        randomIndex
-    ];
+        question =
+            pool[index];
+
+    } while (
+        question.id ===
+        previousQuestionId
+    );
+
+
+    previousQuestionId =
+        question.id;
+
+
+    return question;
+
+}
+
+
+
+/* =========================================================
+   START STUDY
+========================================================= */
+
+
+function startStudy() {
+
+    stopMockExam();
+
+
+    studyMode =
+        currentFilter;
+
+
+    currentStudyQuestions =
+        getFilteredQuestions();
+
+
+    if (
+        !currentStudyQuestions.length
+    ) {
+
+        alert(
+            "現在、この条件で利用できる問題がありません。"
+        );
+
+        return;
+
+    }
+
+
+    currentStudyIndex = 0;
+
+
+    renderQuestion();
+
+
+    $("study-section")
+        .scrollIntoView({
+            behavior: "smooth"
+        });
 
 }
 
@@ -1852,144 +3218,120 @@ function getRandomQuestion() {
    RENDER QUESTION
 ========================================================= */
 
+
 function renderQuestion() {
 
-    console.log(
-        "renderQuestion() 実行"
-    );
+    const pool =
+        currentStudyQuestions.length
+            ? currentStudyQuestions
+            : questionDatabase;
 
 
-    const question =
-        getRandomQuestion();
-
-
-    if (!question) {
-
-        console.error(
-            "問題データが存在しません"
+    currentQuestion =
+        getRandomQuestion(
+            pool
         );
+
+
+    if (
+        !currentQuestion
+    ) {
 
         return;
 
     }
 
 
-    currentQuestion =
-        question;
+    $("question-number").textContent =
+        `QUESTION ${
+            awsData.questionCount + 1
+        }`;
 
 
-    questionAnswered =
-        false;
+    $("question-text").textContent =
+        currentQuestion.question;
 
 
+    $("question-tags").innerHTML = `
 
-    /* =====================================================
-       QUESTION NUMBER
-    ====================================================== */
+        <span class="question-tag">
+            ${currentQuestion.category}
+        </span>
 
-    if (questionNumberElement) {
+        <span class="question-tag">
+            ${currentQuestion.difficulty}
+        </span>
 
-        questionNumberElement.textContent =
-            `QUESTION ${awsData.questionCount + 1}`;
-
-    }
-
-
-
-    /* =====================================================
-       QUESTION TEXT
-    ====================================================== */
-
-    if (questionTextElement) {
-
-        questionTextElement.textContent =
-            question.question;
-
-    }
+    `;
 
 
-
-    /* =====================================================
-       RESULT RESET
-    ====================================================== */
-
-    if (questionResultElement) {
-
-        questionResultElement.style.display =
-            "none";
+    const answerList =
+        $("answer-list");
 
 
-        questionResultElement.textContent =
-            "";
-
-    }
+    answerList.innerHTML =
+        "";
 
 
-
-    /* =====================================================
-       NEXT BUTTON RESET
-    ====================================================== */
-
-    if (nextQuestionButtonElement) {
-
-        nextQuestionButtonElement.style.display =
-            "none";
-
-    }
+    $("question-result").style.display =
+        "none";
 
 
-
-    /* =====================================================
-       ANSWERS
-    ====================================================== */
-
-    if (answerListElement) {
-
-        answerListElement.innerHTML =
-            "";
+    $("question-result").textContent =
+        "";
 
 
-        question.choices.forEach(
-            (choice, index) => {
+    $("next-question-button").style.display =
+        "none";
 
-                const button =
-                    document.createElement(
-                        "button"
+
+    updateFavoriteButton();
+
+
+    currentQuestion.choices.forEach(
+        (
+            choice,
+            index
+        ) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "answer-button";
+
+
+            button.textContent =
+                `${String.fromCharCode(
+                    65 + index
+                )}. ${choice}`;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    answerQuestion(
+                        index
                     );
 
-
-                button.type =
-                    "button";
-
-
-                button.className =
-                    "answer-button";
+                }
+            );
 
 
-                button.textContent =
-                    `${index + 1}. ${choice}`;
+            answerList.appendChild(
+                button
+            );
 
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        answerQuestion(
-                            index
-                        );
-
-                    }
-                );
-
-
-                answerListElement.appendChild(
-                    button
-                );
-
-            }
-        );
-
-    }
+        }
+    );
 
 }
 
@@ -1999,48 +3341,30 @@ function renderQuestion() {
    ANSWER QUESTION
 ========================================================= */
 
+
 async function answerQuestion(
     selectedIndex
 ) {
 
-    if (questionAnswered) {
+    if (
+        !currentQuestion
+    ) {
 
         return;
 
     }
 
 
-    if (!currentQuestion) {
-
-        return;
-
-    }
-
-
-    const question =
-        currentQuestion;
-
-
-    questionAnswered =
-        true;
-
-
-
-    /* =====================================================
-       ANSWER BUTTONS
-    ====================================================== */
-
-    const answerButtons =
-        answerListElement
-            ? answerListElement.querySelectorAll(
+    const buttons =
+        Array.from(
+            document.querySelectorAll(
                 ".answer-button"
             )
-            : [];
+        );
 
 
-
-    answerButtons.forEach(
-        (button) => {
+    buttons.forEach(
+        button => {
 
             button.disabled =
                 true;
@@ -2049,192 +3373,149 @@ async function answerQuestion(
     );
 
 
+    const correctIndex =
+        currentQuestion.answer;
 
-    /* =====================================================
-       CHECK ANSWER
-    ====================================================== */
 
     const isCorrect =
         selectedIndex ===
-        question.answer;
+        correctIndex;
 
-
-
-    /* =====================================================
-       BUTTON COLORS
-    ====================================================== */
-
-    answerButtons.forEach(
-        (button, index) => {
-
-            if (
-                index ===
-                question.answer
-            ) {
-
-                button.classList.add(
-                    "correct"
-                );
-
-            }
-
-
-            if (
-                index === selectedIndex
-                &&
-                !isCorrect
-            ) {
-
-                button.classList.add(
-                    "incorrect"
-                );
-
-            }
-
-        }
-    );
-
-
-
-    /* =====================================================
-       UPDATE STATISTICS
-    ====================================================== */
-
-    awsData.questionCount += 1;
-
-
-    if (isCorrect) {
-
-        awsData.correctCount += 1;
-
-    } else {
-
-        awsData.incorrectCount += 1;
-
-    }
-
-
-
-    /* =====================================================
-       CALCULATE ACCURACY
-    ====================================================== */
 
     if (
-        awsData.questionCount > 0
+        buttons[selectedIndex]
     ) {
 
-        awsData.accuracy =
-            Math.round(
-                (
-                    awsData.correctCount /
-                    awsData.questionCount
-                ) * 100
+        buttons[selectedIndex]
+            .classList.add(
+                isCorrect
+                    ? "correct"
+                    : "incorrect"
             );
-
-    } else {
-
-        awsData.accuracy =
-            0;
 
     }
 
 
+    if (
+        buttons[correctIndex]
+    ) {
 
-    /* =====================================================
-       RENDER STATISTICS
-    ====================================================== */
+        buttons[correctIndex]
+            .classList.add(
+                "correct"
+            );
 
-    renderAwsData();
+    }
 
 
-
-    /* =====================================================
-       BUILD EXPLANATION
-    ====================================================== */
-
-    let resultText = "";
+    awsData.questionCount++;
 
 
     if (isCorrect) {
 
-        resultText +=
-            "正解です。\n\n";
+        awsData.correctCount++;
 
     } else {
 
-        resultText +=
-            "不正解です。\n\n";
+        awsData.incorrectCount++;
 
-        resultText +=
-            `正解：${question.choices[question.answer]}\n\n`;
-
-    }
-
-
-    resultText +=
-        `【解説】\n${question.explanation}\n\n`;
-
-
-    resultText +=
-        "【各選択肢のポイント】\n";
-
-
-    question.choiceExplanations.forEach(
-        (explanation, index) => {
-
-            resultText +=
-                `\n${index + 1}. ${explanation}`;
-
-        }
-    );
-
-
-
-    /* =====================================================
-       SHOW RESULT
-    ====================================================== */
-
-    if (questionResultElement) {
-
-        questionResultElement.style.display =
-            "block";
-
-
-        questionResultElement.textContent =
-            resultText;
-
-    }
-
-
-
-    /* =====================================================
-       NEXT QUESTION BUTTON
-    ====================================================== */
-
-    if (nextQuestionButtonElement) {
-
-        nextQuestionButtonElement.style.display =
-            "block";
-
-    }
-
-
-
-    /* =====================================================
-       SAVE TO FIREBASE
-    ====================================================== */
-
-    const saved =
-        await saveAwsData();
-
-
-    if (!saved) {
-
-        console.warn(
-            "問題結果のFirebase保存に失敗しました"
+        wrongQuestionIds.add(
+            currentQuestion.id
         );
 
     }
+
+
+    awsData.accuracy =
+        calculateAccuracy(
+            awsData.correctCount,
+            awsData.questionCount
+        );
+
+
+    await saveAnswerHistory(
+
+        currentQuestion,
+
+        selectedIndex,
+
+        isCorrect
+
+    );
+
+
+    await saveAwsData();
+
+
+    const result =
+        $("question-result");
+
+
+    let resultText =
+        isCorrect
+            ? "正解です！"
+            : "不正解です。";
+
+
+    resultText +=
+        `\n\n正解：${
+            String.fromCharCode(
+                65 +
+                correctIndex
+            )
+        }. ${
+            currentQuestion.choices[
+                correctIndex
+            ]
+        }`;
+
+
+    resultText +=
+        `\n\n【解説】\n${
+            currentQuestion.explanation
+        }`;
+
+
+    resultText +=
+        "\n\n【各選択肢のポイント】";
+
+
+    currentQuestion.choiceExplanations
+        .forEach(
+            (
+                explanation,
+                index
+            ) => {
+
+                resultText +=
+                    `\n${
+                        String.fromCharCode(
+                            65 + index
+                        )
+                    }. ${
+                        explanation
+                    }`;
+
+            }
+        );
+
+
+    result.textContent =
+        resultText;
+
+
+    result.style.display =
+        "block";
+
+
+    $("next-question-button").style.display =
+        "inline-flex";
+
+
+    applyAwsDataToUI();
+
+
+    updateAnalytics();
 
 }
 
@@ -2244,7 +3525,18 @@ async function answerQuestion(
    NEXT QUESTION
 ========================================================= */
 
+
 function nextQuestion() {
+
+    if (
+        studyMode === "wrong"
+    ) {
+
+        currentStudyQuestions =
+            getFilteredQuestions();
+
+    }
+
 
     renderQuestion();
 
@@ -2253,142 +3545,1202 @@ function nextQuestion() {
 
 
 /* =========================================================
-   SAVE BUTTON
+   FILTER BUTTONS
 ========================================================= */
 
-if (saveButtonElement) {
 
-    saveButtonElement.addEventListener(
-        "click",
-        saveSettings
-    );
+function setupFilters() {
 
-}
-
-
-
-/* =========================================================
-   NEXT BUTTON
-========================================================= */
-
-if (nextQuestionButtonElement) {
-
-    nextQuestionButtonElement.addEventListener(
-        "click",
-        nextQuestion
-    );
-
-}
-
-
-
-/* =========================================================
-   INITIAL QUESTION
-========================================================= */
-
-/*
-   問題表示はFirebase認証とは独立させる。
-
-   Firebaseに問題があっても、
-   問題そのものは表示される。
-*/
-
-console.log(
-    "AWS SAA JavaScript 読み込み開始"
-);
-
-
-console.log(
-    "問題数:",
-    questionDatabase.length
-);
-
-
-renderQuestion();
-
-
-
-/* =========================================================
-   FIREBASE AUTH
-========================================================= */
-
-onAuthStateChanged(
-    auth,
-    async (user) => {
-
-        console.log(
-            "Firebase Auth状態:",
-            user
+    const buttons =
+        document.querySelectorAll(
+            ".filter-button"
         );
 
 
-        if (user) {
+    buttons.forEach(
+        button => {
 
-            /* =============================================
-               USER LOGIN
-            ============================================== */
+            button.addEventListener(
+                "click",
+                () => {
 
-            currentUser =
-                user;
+                    buttons.forEach(
+                        item =>
+                            item.classList.remove(
+                                "active"
+                            )
+                    );
 
 
-            if (authStatusElement) {
+                    button.classList.add(
+                        "active"
+                    );
 
-                authStatusElement.textContent =
-                    "CONNECTED";
+
+                    currentFilter =
+                        button.dataset.filter;
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   REBUILD WRONG QUESTION IDS
+========================================================= */
+
+
+function rebuildWrongQuestions() {
+
+    wrongQuestionIds =
+        new Set();
+
+
+    const latestByQuestion =
+        new Map();
+
+
+    questionHistory.forEach(
+        item => {
+
+            if (
+                !item.questionId
+            ) {
+
+                return;
 
             }
 
 
-            console.log(
-                "Firebase認証成功:",
-                user.uid
-            );
+            if (
+                !latestByQuestion.has(
+                    item.questionId
+                )
+            ) {
+
+                latestByQuestion.set(
+                    item.questionId,
+                    item
+                );
+
+            }
+
+        }
+    );
+
+
+    latestByQuestion.forEach(
+        (
+            item,
+            questionId
+        ) => {
+
+            if (
+                !item.isCorrect
+            ) {
+
+                wrongQuestionIds.add(
+                    questionId
+                );
+
+            }
+
+        }
+    );
+
+}
 
 
 
-            /* =============================================
-               LOAD AWS DATA
-            ============================================== */
-
-            await loadAwsData(
-                user
-            );
+/* =========================================================
+   MOCK EXAM
+========================================================= */
 
 
-        } else {
+function createMockQuestions() {
 
-            /* =============================================
-               USER LOGOUT
-            ============================================== */
+    const shuffled =
+        [...questionDatabase]
+        .sort(
+            () =>
+                Math.random() - 0.5
+        );
 
-            currentUser =
-                null;
+
+    const result = [];
 
 
-            if (authStatusElement) {
+    for (
+        let i = 0;
+        i < MOCK_TOTAL;
+        i++
+    ) {
 
-                authStatusElement.textContent =
-                    "NOT CONNECTED";
+        result.push(
+            shuffled[
+                i %
+                shuffled.length
+            ]
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+
+/* =========================================================
+   START MOCK
+========================================================= */
+
+
+function startMockExam() {
+
+    currentQuestion =
+        null;
+
+
+    mockQuestions =
+        createMockQuestions();
+
+
+    mockAnswers =
+        Array(
+            MOCK_TOTAL
+        ).fill(null);
+
+
+    mockMarked =
+        Array(
+            MOCK_TOTAL
+        ).fill(false);
+
+
+    mockCurrentIndex =
+        0;
+
+
+    mockStartedAt =
+        Date.now();
+
+
+    studyMode =
+        "mock";
+
+
+    $("study-section")
+        .scrollIntoView({
+            behavior: "smooth"
+        });
+
+
+    renderMockQuestion();
+
+    startMockTimer();
+
+}
+
+
+
+/* =========================================================
+   RENDER MOCK
+========================================================= */
+
+
+function renderMockQuestion() {
+
+    const question =
+        mockQuestions[
+            mockCurrentIndex
+        ];
+
+
+    currentQuestion =
+        question;
+
+
+    $("question-number").textContent =
+        `MOCK QUESTION ${
+            mockCurrentIndex + 1
+        } / ${
+            MOCK_TOTAL
+        }`;
+
+
+    $("question-text").textContent =
+        question.question;
+
+
+    $("question-tags").innerHTML = `
+
+        <span class="question-tag">
+            ${question.category}
+        </span>
+
+        <span class="question-tag">
+            ${question.difficulty}
+        </span>
+
+    `;
+
+
+    const answerList =
+        $("answer-list");
+
+
+    answerList.innerHTML =
+        "";
+
+
+    question.choices.forEach(
+        (
+            choice,
+            index
+        ) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "answer-button";
+
+
+            button.textContent =
+                `${String.fromCharCode(
+                    65 + index
+                )}. ${choice}`;
+
+
+            if (
+                mockAnswers[
+                    mockCurrentIndex
+                ] === index
+            ) {
+
+                button.classList.add(
+                    "correct"
+                );
 
             }
 
 
-            console.warn(
-                "Firebaseユーザー未認証"
+            button.addEventListener(
+                "click",
+                () => {
+
+                    selectMockAnswer(
+                        index
+                    );
+
+                }
+            );
+
+
+            answerList.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    $("question-result").style.display =
+        "none";
+
+
+    $("favorite-button").style.display =
+        "none";
+
+
+    $("next-question-button").style.display =
+        "none";
+
+
+    renderMockNavigation();
+
+}
+
+
+
+/* =========================================================
+   MOCK ANSWER
+========================================================= */
+
+
+function selectMockAnswer(
+    index
+) {
+
+    mockAnswers[
+        mockCurrentIndex
+    ] =
+        index;
+
+
+    renderMockQuestion();
+
+}
+
+
+
+/* =========================================================
+   MOCK NAVIGATION
+========================================================= */
+
+
+function renderMockNavigation() {
+
+    let existing =
+        document.getElementById(
+            "mock-navigation"
+        );
+
+
+    if (!existing) {
+
+        existing =
+            document.createElement(
+                "div"
+            );
+
+
+        existing.id =
+            "mock-navigation";
+
+
+        existing.className =
+            "mock-navigation";
+
+
+        $("question-container")
+            .appendChild(
+                existing
+            );
+
+    }
+
+
+    existing.innerHTML =
+        "";
+
+
+    mockQuestions.forEach(
+        (
+            question,
+            index
+        ) => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "mock-nav-button";
+
+
+            button.textContent =
+                index + 1;
+
+
+            if (
+                index ===
+                mockCurrentIndex
+            ) {
+
+                button.classList.add(
+                    "current"
+                );
+
+            }
+
+
+            if (
+                mockAnswers[index] !==
+                null
+            ) {
+
+                button.classList.add(
+                    "answered"
+                );
+
+            }
+
+
+            if (
+                mockMarked[index]
+            ) {
+
+                button.classList.add(
+                    "marked"
+                );
+
+            }
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    mockCurrentIndex =
+                        index;
+
+                    renderMockQuestion();
+
+                }
+            );
+
+
+            existing.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    const actions =
+        document.createElement(
+            "div"
+        );
+
+
+    actions.className =
+        "button-row";
+
+
+    actions.style.marginTop =
+        "15px";
+
+
+    const previous =
+        document.createElement(
+            "button"
+        );
+
+
+    previous.type =
+        "button";
+
+
+    previous.className =
+        "aws-button secondary";
+
+
+    previous.textContent =
+        "← 前へ";
+
+
+    previous.disabled =
+        mockCurrentIndex === 0;
+
+
+    previous.addEventListener(
+        "click",
+        () => {
+
+            mockCurrentIndex--;
+
+            renderMockQuestion();
+
+        }
+    );
+
+
+    const mark =
+        document.createElement(
+            "button"
+        );
+
+
+    mark.type =
+        "button";
+
+
+    mark.className =
+        "aws-button secondary";
+
+
+    mark.textContent =
+        mockMarked[
+            mockCurrentIndex
+        ]
+            ? "★ 見直し解除"
+            : "☆ 見直し";
+
+
+    mark.addEventListener(
+        "click",
+        () => {
+
+            mockMarked[
+                mockCurrentIndex
+            ] =
+                !mockMarked[
+                    mockCurrentIndex
+                ];
+
+            renderMockQuestion();
+
+        }
+    );
+
+
+    const next =
+        document.createElement(
+            "button"
+        );
+
+
+    next.type =
+        "button";
+
+
+    next.className =
+        "aws-button";
+
+
+    next.textContent =
+        mockCurrentIndex ===
+        MOCK_TOTAL - 1
+            ? "試験終了"
+            : "次へ →";
+
+
+    next.addEventListener(
+        "click",
+        () => {
+
+            if (
+                mockCurrentIndex ===
+                MOCK_TOTAL - 1
+            ) {
+
+                finishMockExam();
+
+            } else {
+
+                mockCurrentIndex++;
+
+                renderMockQuestion();
+
+            }
+
+        }
+    );
+
+
+    actions.appendChild(
+        previous
+    );
+
+
+    actions.appendChild(
+        mark
+    );
+
+
+    actions.appendChild(
+        next
+    );
+
+
+    existing.appendChild(
+        actions
+    );
+
+}
+
+
+
+/* =========================================================
+   MOCK TIMER
+========================================================= */
+
+
+function startMockTimer() {
+
+    clearInterval(
+        mockTimerInterval
+    );
+
+
+    const oldTimer =
+        document.getElementById(
+            "mock-timer"
+        );
+
+
+    if (oldTimer) {
+
+        oldTimer.remove();
+
+    }
+
+
+    const timer =
+        document.createElement(
+            "div"
+        );
+
+
+    timer.id =
+        "mock-timer";
+
+
+    timer.className =
+        "mock-timer";
+
+
+    $("question-container")
+        .prepend(
+            timer
+        );
+
+
+    updateMockTimer();
+
+
+    mockTimerInterval =
+        setInterval(
+            updateMockTimer,
+            1000
+        );
+
+}
+
+
+
+/* =========================================================
+   UPDATE TIMER
+========================================================= */
+
+
+function updateMockTimer() {
+
+    if (
+        !mockStartedAt
+    ) {
+
+        return;
+
+    }
+
+
+    const elapsed =
+        Math.floor(
+            (
+                Date.now() -
+                mockStartedAt
+            ) /
+            1000
+        );
+
+
+    const remaining =
+        Math.max(
+            0,
+            MOCK_TIME_SECONDS -
+            elapsed
+        );
+
+
+    const hours =
+        Math.floor(
+            remaining / 3600
+        );
+
+
+    const minutes =
+        Math.floor(
+            (
+                remaining % 3600
+            ) /
+            60
+        );
+
+
+    const seconds =
+        remaining % 60;
+
+
+    const timer =
+        $("mock-timer");
+
+
+    if (
+        timer
+    ) {
+
+        timer.textContent =
+            `TIME ${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+    }
+
+
+    if (
+        remaining === 0
+    ) {
+
+        finishMockExam();
+
+    }
+
+}
+
+
+
+/* =========================================================
+   FINISH MOCK
+========================================================= */
+
+
+async function finishMockExam() {
+
+    clearInterval(
+        mockTimerInterval
+    );
+
+
+    mockTimerInterval =
+        null;
+
+
+    let correct = 0;
+
+
+    mockQuestions.forEach(
+        (
+            question,
+            index
+        ) => {
+
+            if (
+                mockAnswers[index] ===
+                question.answer
+            ) {
+
+                correct++;
+
+            }
+
+        }
+    );
+
+
+    const score =
+        calculateAccuracy(
+            correct,
+            MOCK_TOTAL
+        );
+
+
+    const elapsed =
+        Math.floor(
+            (
+                Date.now() -
+                mockStartedAt
+            ) /
+            1000
+        );
+
+
+    const minutes =
+        Math.floor(
+            elapsed / 60
+        );
+
+
+    const seconds =
+        elapsed % 60;
+
+
+    const timeText =
+        `${minutes}分${seconds}秒`;
+
+
+    let estimate;
+
+
+    if (
+        score >= 75
+    ) {
+
+        estimate =
+            "PASS";
+
+    } else if (
+        score >= 65
+    ) {
+
+        estimate =
+            "BORDERLINE";
+
+    } else {
+
+        estimate =
+            "REVIEW";
+
+    }
+
+
+    if (
+        currentUser
+    ) {
+
+        try {
+
+            await addDoc(
+
+                collection(
+                    db,
+                    "users",
+                    currentUser.uid,
+                    "awsMockResults"
+                ),
+
+                {
+
+                    correct:
+                        correct,
+
+                    total:
+                        MOCK_TOTAL,
+
+                    score:
+                        score,
+
+                    elapsedSeconds:
+                        elapsed,
+
+                    estimate:
+                        estimate,
+
+                    answeredAt:
+                        Timestamp.now()
+
+                }
+
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Mock result save error:",
+                error
             );
 
         }
 
     }
-);
+
+
+    $("mock-result-score").textContent =
+        `${score}%`;
+
+
+    $("mock-result-correct").textContent =
+        correct;
+
+
+    $("mock-result-total").textContent =
+        MOCK_TOTAL;
+
+
+    $("mock-result-time").textContent =
+        timeText;
+
+
+    $("mock-result-estimate").textContent =
+        estimate;
+
+
+    $("mock-result-modal")
+        .classList.add(
+            "active"
+        );
+
+
+    studyMode =
+        "normal";
+
+
+    mockStartedAt =
+        null;
+
+
+    $("favorite-button").style.display =
+        "inline-flex";
+
+}
 
 
 
 /* =========================================================
-   COMPLETE
+   STOP MOCK
 ========================================================= */
 
-console.log(
-    "AWS SAA JavaScript 読み込み完了"
-);
+
+function stopMockExam() {
+
+    clearInterval(
+        mockTimerInterval
+    );
+
+
+    mockTimerInterval =
+        null;
+
+
+    mockStartedAt =
+        null;
+
+
+    const timer =
+        $("mock-timer");
+
+
+    if (
+        timer
+    ) {
+
+        timer.remove();
+
+    }
+
+
+    const navigation =
+        $("mock-navigation");
+
+
+    if (
+        navigation
+    ) {
+
+        navigation.remove();
+
+    }
+
+
+    $("favorite-button").style.display =
+        "inline-flex";
+
+}
+
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+
+function setupAuth() {
+
+    onAuthStateChangedAuth(
+
+        auth,
+
+        async user => {
+
+            currentUser =
+                user;
+
+
+            if (!user) {
+
+                $("auth-status").textContent =
+                    "OFFLINE";
+
+                return;
+
+            }
+
+
+            $("auth-status").textContent =
+                "CONNECTED";
+
+
+            await loadAwsData();
+
+            await loadHistory();
+
+            await loadFavorites();
+
+
+            rebuildWrongQuestions();
+
+            updateAnalytics();
+
+        }
+
+    );
+
+}
+
+
+
+/* =========================================================
+   EVENT LISTENERS
+========================================================= */
+
+
+function setupEventListeners() {
+
+
+    $("aws-save-button")
+        .addEventListener(
+            "click",
+            saveSettings
+        );
+
+
+    $("favorite-button")
+        .addEventListener(
+            "click",
+            toggleFavorite
+        );
+
+
+    $("next-question-button")
+        .addEventListener(
+            "click",
+            nextQuestion
+        );
+
+
+    $("start-study-button")
+        .addEventListener(
+            "click",
+            startStudy
+        );
+
+
+    $("start-mock-button")
+        .addEventListener(
+            "click",
+            startMockExam
+        );
+
+
+    $("start-review-button")
+        .addEventListener(
+            "click",
+            () => {
+
+                currentFilter =
+                    "wrong";
+
+
+                document
+                    .querySelectorAll(
+                        ".filter-button"
+                    )
+                    .forEach(
+                        button => {
+
+                            button.classList.toggle(
+
+                                "active",
+
+                                button.dataset.filter ===
+                                    "wrong"
+
+                            );
+
+                        }
+                    );
+
+
+                startStudy();
+
+            }
+        );
+
+
+    $("close-mock-result")
+        .addEventListener(
+            "click",
+            () => {
+
+                $("mock-result-modal")
+                    .classList.remove(
+                        "active"
+                    );
+
+            }
+        );
+
+
+    $("mock-result-modal")
+        .addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    $("mock-result-modal")
+                ) {
+
+                    $("mock-result-modal")
+                        .classList.remove(
+                            "active"
+                        );
+
+                }
+
+            }
+        );
+
+
+    setupFilters();
+
+}
+
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+
+function initialize() {
+
+    setupEventListeners();
+
+    setupAuth();
+
+
+    /* Initial dashboard values */
+
+    updateAnalytics();
+
+
+    /*
+       Question is intentionally not
+       loaded automatically.
+    */
+
+}
+
+
+initialize();
