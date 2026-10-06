@@ -59,6 +59,37 @@
 
 
         /* =====================================================
+           BACK BUTTON
+        ===================================================== */
+
+        .aws-header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+
+        .aws-back-button {
+            display: inline-block;
+            padding: 9px 14px;
+            border: 1px solid #d9e0e7;
+            border-radius: 10px;
+            background: #fff;
+            color: #253040;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+
+        .aws-back-button:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
            GRID
         ===================================================== */
 
@@ -811,6 +842,12 @@
             }
 
 
+            .aws-header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+
             .aws-grid,
             .activity-grid,
             .settings-grid {
@@ -877,8 +914,20 @@
         </div>
 
 
-        <div id="auth-status">
-            認証確認中...
+        <div class="aws-header-right">
+
+            <a
+                href="./index.html"
+                class="aws-back-button"
+            >
+                ← LIFE DASHBOARD
+            </a>
+
+
+            <div id="auth-status">
+                認証確認中...
+            </div>
+
         </div>
 
     </header>
