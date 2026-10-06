@@ -127,8 +127,11 @@
             </div>
 
 
-            <div class="card-main-value">
-                3
+            <div
+                class="card-main-value"
+                id="today-value"
+            >
+                —
             </div>
 
 
@@ -137,8 +140,11 @@
             </div>
 
 
-            <div class="card-detail">
-                次の予定：20:00
+            <div
+                class="card-detail"
+                id="today-detail"
+            >
+                予定を読み込んでいます...
             </div>
 
         </article>
@@ -174,10 +180,8 @@
 
             <div class="card-main-value">
 
-                42
-
-                <span class="unit">
-                    %
+                <span id="aws-value">
+                    —
                 </span>
 
             </div>
@@ -192,14 +196,18 @@
 
                 <div
                     class="progress-bar"
-                    style="width: 42%;"
+                    id="aws-progress-bar"
+                    style="width: 0%;"
                 ></div>
 
             </div>
 
 
-            <div class="card-detail">
-                正答率 78%
+            <div
+                class="card-detail"
+                id="aws-detail"
+            >
+                学習データを読み込んでいます...
             </div>
 
         </article>
@@ -235,7 +243,9 @@
 
             <div class="card-main-value">
 
-                3
+                <span id="goals-value">
+                    —
+                </span>
 
                 <span class="goal-total">
                     / 5
@@ -253,14 +263,18 @@
 
                 <div
                     class="progress-bar"
-                    style="width: 60%;"
+                    id="goals-progress-bar"
+                    style="width: 0%;"
                 ></div>
 
             </div>
 
 
-            <div class="card-detail">
-                達成率 60%
+            <div
+                class="card-detail"
+                id="goals-detail"
+            >
+                目標データを読み込んでいます...
             </div>
 
         </article>
@@ -296,8 +310,11 @@
 
             <div class="score">
 
-                <span class="score-number">
-                    82
+                <span
+                    class="score-number"
+                    id="life-score-value"
+                >
+                    —
                 </span>
 
                 <span class="score-unit">
@@ -312,8 +329,11 @@
             </div>
 
 
-            <div class="score-message">
-                GOOD CONDITION
+            <div
+                class="score-message"
+                id="life-score-detail"
+            >
+                データを読み込んでいます...
             </div>
 
         </article>
@@ -338,24 +358,22 @@
 
 
             <!-- Schedule -->
+
             <button
                 class="quick-card"
                 type="button"
                 onclick="location.href='./schedule.html'"
-                >
-                
+            >
+
                 <span class="quick-icon">
                     📅
                 </span>
-                
-                <span>
-                    
-                    Schedule
-                
-                </span>
-            
-            </button>
 
+                <span>
+                    Schedule
+                </span>
+
+            </button>
 
 
 
