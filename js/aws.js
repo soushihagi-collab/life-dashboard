@@ -155,9 +155,6 @@ const nextQuestionButtonElement =
 ========================================================= */
 
 
-/*
- * 現在のAWS学習データ
- */
 let awsData = {
 
     progress: 0,
@@ -393,10 +390,12 @@ function calculateAccuracy(
 
 
     return Math.round(
+
         (
             correctCount /
             questionCount
         ) * 100
+
     );
 
 }
@@ -561,7 +560,6 @@ function renderAwsData() {
     }
 
 
-
     if (
         progressInputElement
     ) {
@@ -721,6 +719,15 @@ async function saveAwsData() {
         !currentUser
     ) {
 
+        if (
+            saveStatusElement
+        ) {
+
+            saveStatusElement.textContent =
+                "認証が完了していません";
+
+        }
+
         return;
 
     }
@@ -752,9 +759,11 @@ async function saveAwsData() {
 
         const progress =
             normalizePercentage(
+
                 progressInputElement
                     ? progressInputElement.value
                     : awsData.progress
+
             );
 
 
@@ -964,6 +973,7 @@ function renderQuestion() {
 
 
     question.choices.forEach(
+
         (choice, index) => {
 
 
@@ -986,7 +996,9 @@ function renderQuestion() {
 
 
             button.addEventListener(
+
                 "click",
+
                 () => {
 
                     answerQuestion(
@@ -994,6 +1006,7 @@ function renderQuestion() {
                     );
 
                 }
+
             );
 
 
@@ -1008,6 +1021,7 @@ function renderQuestion() {
             }
 
         }
+
     );
 
 }
@@ -1054,12 +1068,14 @@ async function answerQuestion(
     ====================================================== */
 
     answerButtons.forEach(
+
         (button) => {
 
             button.disabled =
                 true;
 
         }
+
     );
 
 
@@ -1079,6 +1095,7 @@ async function answerQuestion(
     ====================================================== */
 
     answerButtons.forEach(
+
         (button, index) => {
 
             if (
@@ -1104,6 +1121,7 @@ async function answerQuestion(
             }
 
         }
+
     );
 
 
@@ -1189,7 +1207,6 @@ async function answerQuestion(
 
     }
 
-
 }
 
 
@@ -1270,6 +1287,9 @@ async function saveQuestionResult() {
 ========================================================= */
 
 
+/*
+ * 次の問題
+ */
 function nextQuestion() {
 
     currentQuestionIndex +=
@@ -1331,6 +1351,22 @@ if (
 
 
 /* =========================================================
+   INITIAL QUESTION
+========================================================= */
+
+
+/*
+ * 問題はFirebase認証に依存しない。
+ *
+ * ページを開いた時点で
+ * QUESTION 1を表示する。
+ */
+
+renderQuestion();
+
+
+
+/* =========================================================
    FIREBASE AUTH
 ========================================================= */
 
@@ -1341,6 +1377,10 @@ onAuthStateChanged(
 
     async (user) => {
 
+
+        /* =================================================
+           NOT AUTHENTICATED
+        ================================================== */
 
         if (
             !user
@@ -1360,15 +1400,10 @@ onAuthStateChanged(
             }
 
 
-            if (
-                questionTextElement
-            ) {
-
-                questionTextElement.textContent =
-                    "認証が必要です";
-
-            }
-
+            /*
+             * 問題はすでに表示済みなので、
+             * ここでは問題表示を変更しない。
+             */
 
             return;
 
@@ -1403,14 +1438,6 @@ onAuthStateChanged(
         await loadAwsData(
             user
         );
-
-
-
-        /* =================================================
-           QUESTION
-        ================================================== */
-
-        renderQuestion();
 
     }
 
