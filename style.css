@@ -1,9 +1,20 @@
+```css
+/* =========================
+   RESET
+========================= */
+
 * {
     box-sizing: border-box;
 }
 
 
+html {
+    scroll-behavior: smooth;
+}
+
+
 body {
+
     margin: 0;
 
     font-family:
@@ -15,11 +26,20 @@ body {
     background: #0b0f14;
 
     color: #f5f7fa;
+
+    min-height: 100vh;
+
 }
 
 
 
+/* =========================
+   HEADER
+========================= */
+
 .header {
+
+    height: 82px;
 
     display: flex;
 
@@ -27,39 +47,38 @@ body {
 
     align-items: center;
 
-    padding: 30px 40px;
+    padding: 0 40px;
 
     border-bottom:
         1px solid #252b33;
 
+    background: #0d1117;
+
 }
 
 
+.brand-title {
 
-.header h1 {
+    font-size: 22px;
 
-    margin: 0;
-
-    font-size: 28px;
+    font-weight: 700;
 
     letter-spacing: 2px;
 
 }
 
 
+.brand-subtitle {
 
-.header p {
+    margin-top: 5px;
 
-    margin: 6px 0 0;
-
-    color: #8993a1;
-
-    font-size: 12px;
+    font-size: 10px;
 
     letter-spacing: 2px;
 
-}
+    color: #6f7a88;
 
+}
 
 
 .status {
@@ -70,12 +89,13 @@ body {
 
     gap: 8px;
 
-    font-size: 12px;
+    font-size: 11px;
+
+    letter-spacing: 1px;
 
     color: #aab3bf;
 
 }
-
 
 
 .status-dot {
@@ -92,130 +112,478 @@ body {
 
 
 
+/* =========================
+   MAIN
+========================= */
+
 .dashboard {
 
     max-width: 1200px;
 
     margin: 0 auto;
 
-    padding: 50px 30px;
+    padding: 55px 30px 80px;
 
 }
 
 
 
-.welcome-card {
+/* =========================
+   GREETING
+========================= */
 
-    padding: 40px;
+.greeting {
 
-    margin-bottom: 25px;
-
-    border:
-        1px solid #252b33;
-
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #151b23,
-            #0f1319
-        );
+    margin-bottom: 40px;
 
 }
 
 
+.greeting-label {
 
-.label {
+    margin: 0 0 8px;
 
-    margin: 0 0 10px;
+    font-size: 11px;
 
-    color: #8993a1;
+    letter-spacing: 3px;
 
-    font-size: 12px;
-
-    letter-spacing: 2px;
-
-}
-
-
-
-.welcome-card h2 {
-
-    margin: 0 0 15px;
-
-    font-size: 36px;
+    color: #6f7a88;
 
 }
 
 
+.greeting h1 {
 
-.welcome-card p:last-child {
+    margin: 0;
 
-    color: #9ca6b3;
+    font-size: 38px;
 
-    line-height: 1.7;
+    font-weight: 600;
 
-}
-
-
-
-.info-card,
-.coming-card {
-
-    padding: 30px;
-
-    margin-bottom: 25px;
-
-    border:
-        1px solid #252b33;
-
-    border-radius: 20px;
-
-    background: #11161d;
+    letter-spacing: -1px;
 
 }
 
 
+.date {
 
-.info-card h3,
-.coming-card h3 {
-
-    margin-top: 0;
+    margin: 12px 0 0;
 
     font-size: 14px;
 
-    letter-spacing: 2px;
-
-    color: #9ca6b3;
+    color: #8993a1;
 
 }
 
 
 
-.uid-box {
+/* =========================
+   DASHBOARD GRID
+========================= */
+
+.dashboard-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 20px;
+
+}
+
+
+
+/* =========================
+   CARD
+========================= */
+
+.dashboard-card {
+
+    min-height: 230px;
+
+    padding: 28px;
+
+    border:
+        1px solid #252b33;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #131921,
+            #0f141a
+        );
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+
+}
+
+
+.dashboard-card:hover {
+
+    transform: translateY(-3px);
+
+    border-color: #3b4654;
+
+}
+
+
+.card-header {
 
     display: flex;
 
-    flex-direction: column;
+    justify-content: space-between;
 
-    gap: 8px;
+    align-items: center;
 
-    margin-top: 20px;
+}
 
-    padding: 15px;
 
-    border-radius: 10px;
+.card-header > div {
 
-    background: #0b0f14;
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+
+.card-icon {
+
+    font-size: 20px;
+
+}
+
+
+.card-title {
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    color: #aab3bf;
+
+}
+
+
+.card-arrow {
+
+    color: #5f6976;
+
+    font-size: 18px;
+
+}
+
+
+.card-main-value {
+
+    margin-top: 35px;
+
+    font-size: 52px;
+
+    font-weight: 600;
+
+    line-height: 1;
+
+}
+
+
+.unit {
+
+    margin-left: 4px;
+
+    font-size: 20px;
+
+    color: #8993a1;
+
+}
+
+
+.goal-total {
+
+    font-size: 22px;
+
+    color: #8993a1;
+
+}
+
+
+.card-description {
+
+    margin-top: 10px;
+
+    font-size: 13px;
+
+    color: #8993a1;
+
+}
+
+
+.card-detail {
+
+    margin-top: 25px;
+
+    font-size: 12px;
+
+    color: #697482;
 
 }
 
 
 
-.uid-box span {
+/* =========================
+   PROGRESS
+========================= */
+
+.progress {
+
+    width: 100%;
+
+    height: 5px;
+
+    margin-top: 20px;
+
+    overflow: hidden;
+
+    border-radius: 5px;
+
+    background: #252b33;
+
+}
+
+
+.progress-bar {
+
+    height: 100%;
+
+    border-radius: 5px;
+
+    background: #42d392;
+
+}
+
+
+
+/* =========================
+   LIFE SCORE
+========================= */
+
+.life-score-card {
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+.score {
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 5px;
+
+    margin-top: 32px;
+
+}
+
+
+.score-number {
+
+    font-size: 58px;
+
+    font-weight: 600;
+
+}
+
+
+.score-unit {
+
+    font-size: 14px;
+
+    color: #6f7a88;
+
+}
+
+
+.score-message {
+
+    margin-top: 18px;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
+
+    color: #42d392;
+
+}
+
+
+
+/* =========================
+   QUICK ACCESS
+========================= */
+
+.quick-section {
+
+    margin-top: 50px;
+
+}
+
+
+.section-title {
+
+    margin-bottom: 15px;
 
     font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    color: #6f7a88;
+
+}
+
+
+.quick-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 12px;
+
+}
+
+
+.quick-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 18px;
+
+    border:
+        1px solid #252b33;
+
+    border-radius: 12px;
+
+    background: #11161d;
+
+    color: #dce2e8;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    text-align: left;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+
+}
+
+
+.quick-card:hover {
+
+    background: #171d25;
+
+    border-color: #3b4654;
+
+}
+
+
+.quick-icon {
+
+    font-size: 18px;
+
+}
+
+
+
+/* =========================
+   ACCOUNT
+========================= */
+
+.account-section {
+
+    margin-top: 45px;
+
+}
+
+
+.account-card {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 20px 22px;
+
+    border:
+        1px solid #252b33;
+
+    border-radius: 12px;
+
+    background: #0f141a;
+
+}
+
+
+.account-label {
+
+    margin-bottom: 8px;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    color: #5f6976;
+
+}
+
+
+.account-card code {
+
+    font-size: 11px;
+
+    color: #8993a1;
+
+    word-break: break-all;
+
+}
+
+
+.account-type {
+
+    padding: 6px 10px;
+
+    border:
+        1px solid #303945;
+
+    border-radius: 6px;
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
 
     color: #6f7a88;
 
@@ -223,95 +591,51 @@ body {
 
 
 
-.uid-box code {
+/* =========================
+   FOOTER
+========================= */
 
-    word-break: break-all;
+.footer {
 
-    color: #dce2e8;
+    padding: 25px;
 
-}
-
-
-
-.feature-list {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    gap: 15px;
-
-}
-
-
-
-.feature-list div {
-
-    padding: 20px;
-
-    border:
+    border-top:
         1px solid #252b33;
 
-    border-radius: 12px;
+    text-align: center;
 
-    background: #0b0f14;
+    font-size: 9px;
 
-    font-size: 22px;
+    letter-spacing: 2px;
+
+    color: #4e5865;
+
+}
+
+
+.footer span {
+
+    margin: 0 8px;
 
 }
 
 
 
-.feature-list span {
-
-    display: block;
-
-    margin-top: 10px;
-
-    font-size: 13px;
-
-    color: #aab3bf;
-
-}
-
-
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 700px) {
 
+
     .header {
 
-        padding: 25px 20px;
+        height: 70px;
+
+        padding: 0 20px;
 
     }
 
 
-    .header h1 {
-
-        font-size: 20px;
-
-    }
-
-
-    .dashboard {
-
-        padding: 30px 20px;
-
-    }
-
-
-    .welcome-card h2 {
-
-        font-size: 28px;
-
-    }
-
-
-    .feature-list {
-
-        grid-template-columns:
-            1fr 1fr;
-
-    }
-
-}
+    .brand-title {
+```
