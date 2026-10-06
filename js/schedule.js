@@ -359,8 +359,6 @@ function renderCalendar() {
 
     /*
      * 次月
-     *
-     * 6週間 = 42マス
      */
 
     const totalCells =
@@ -493,7 +491,7 @@ function createCalendarDay(
 
 
     /*
-     * 予定がある場合
+     * 予定の有無
      */
 
     const hasSchedule =
@@ -526,7 +524,7 @@ function createCalendarDay(
 
 
     /*
-     * 日付クリック
+     * クリック
      */
 
     dayElement.addEventListener(
@@ -549,10 +547,6 @@ function createCalendarDay(
 
             renderSelectedDate();
 
-
-            /*
-             * 追加フォームの日付も変更
-             */
 
             dateInput.value =
                 selectedDate;
@@ -636,6 +630,21 @@ function renderSelectedDate() {
 
 
             /*
+             * 完了済み
+             */
+
+            if (
+                schedule.completed === true
+            ) {
+
+                item.classList.add(
+                    "completed"
+                );
+
+            }
+
+
+            /*
              * 左側
              */
 
@@ -714,6 +723,55 @@ function renderSelectedDate() {
 
 
             /*
+             * 完了ボタン
+             */
+
+            const completeButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            completeButton.type =
+                "button";
+
+
+            completeButton.className =
+                "complete-button";
+
+
+            if (
+                schedule.completed === true
+            ) {
+
+                completeButton.classList.add(
+                    "completed"
+                );
+
+                completeButton.textContent =
+                    "✓ 完了";
+
+            } else {
+
+                completeButton.textContent =
+                    "完了";
+
+            }
+
+
+            completeButton.addEventListener(
+                "click",
+                async () => {
+
+                    await toggleScheduleComplete(
+                        schedule
+                    );
+
+                }
+            );
+
+
+            /*
              * 編集ボタン
              */
 
@@ -782,6 +840,11 @@ function renderSelectedDate() {
 
 
             buttonArea.appendChild(
+                completeButton
+            );
+
+
+            buttonArea.appendChild(
                 editButton
             );
 
@@ -790,10 +853,6 @@ function renderSelectedDate() {
                 deleteButton
             );
 
-
-            /*
-             * 全体
-             */
 
             item.appendChild(
                 left
@@ -816,6 +875,69 @@ function renderSelectedDate() {
 
 
 /* =========================
+   TOGGLE COMPLETE
+========================= */
+
+async function toggleScheduleComplete(
+    schedule
+) {
+
+    const newCompleted =
+        schedule.completed !== true;
+
+
+    try {
+
+        await updateDoc(
+            doc(
+                db,
+                "users",
+                currentUser.uid,
+                "schedules",
+                schedule.id
+            ),
+            {
+                completed:
+                    newCompleted
+            }
+        );
+
+
+        /*
+         * ローカルデータも更新
+         */
+
+        schedule.completed =
+            newCompleted;
+
+
+        /*
+         * 再描画
+         */
+
+        renderCalendar();
+
+        renderSelectedDate();
+
+
+    } catch (error) {
+
+        console.error(
+            "予定完了状態変更失敗:",
+            error
+        );
+
+
+        alert(
+            "予定の完了状態を変更できませんでした。"
+        );
+
+    }
+
+}
+
+
+/* =========================
    EDIT SCHEDULE
 ========================= */
 
@@ -833,10 +955,6 @@ async function editSchedule(
             schedule.title || ""
         );
 
-
-    /*
-     * キャンセル
-     */
 
     if (
         newTitle === null
@@ -885,10 +1003,6 @@ async function editSchedule(
         newTime.trim();
 
 
-    /*
-     * 時刻チェック
-     */
-
     const timePattern =
         /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
@@ -930,10 +1044,6 @@ async function editSchedule(
         newDate.trim();
 
 
-    /*
-     * 日付チェック
-     */
-
     const datePattern =
         /^\d{4}-\d{2}-\d{2}$/;
 
@@ -951,10 +1061,6 @@ async function editSchedule(
         return;
     }
 
-
-    /*
-     * Firestore更新
-     */
 
     try {
 
@@ -980,7 +1086,7 @@ async function editSchedule(
 
 
         /*
-         * 編集した日付を選択
+         * 編集後の日付を選択
          */
 
         selectedDate =
@@ -1005,10 +1111,6 @@ async function editSchedule(
                 1
             );
 
-
-        /*
-         * 再読み込み
-         */
 
         await loadSchedules();
 
@@ -1099,14 +1201,17 @@ form.addEventListener(
                         time,
 
                     title:
-                        title
+                        title,
+
+                    completed:
+                        false
 
                 }
             );
 
 
             /*
-             * 入力欄をクリア
+             * 入力欄クリア
              */
 
             titleInput.value =
@@ -1139,10 +1244,6 @@ form.addEventListener(
                     1
                 );
 
-
-            /*
-             * 再読み込み
-             */
 
             await loadSchedules();
 
