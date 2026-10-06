@@ -12,7 +12,76 @@
 
     <title>LIFE DASHBOARD</title>
 
-    <link rel="stylesheet" href="./style.css">
+    <link
+        rel="stylesheet"
+        href="./style.css"
+    >
+
+    <style>
+
+        /* =========================================================
+           Dashboard Card Link
+        ========================================================= */
+
+        .dashboard-card-link {
+            display: block;
+
+            color: inherit;
+
+            text-decoration: none;
+        }
+
+
+        .dashboard-card-link .dashboard-card {
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+
+        .dashboard-card-link:hover .dashboard-card {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 6px 18px rgba(0, 0, 0, 0.10);
+
+        }
+
+
+        .dashboard-card-link:active .dashboard-card {
+
+            transform: translateY(0);
+
+        }
+
+
+        /* =========================================================
+           Quick Access Link
+        ========================================================= */
+
+        .quick-card-link {
+
+            display: block;
+
+            color: inherit;
+
+            text-decoration: none;
+
+        }
+
+
+        .quick-card-link .quick-card {
+
+            width: 100%;
+
+            cursor: pointer;
+
+        }
+
+    </style>
 
 </head>
 
@@ -218,66 +287,69 @@
              GOALS
         ========================= -->
 
-        <article class="dashboard-card">
+        <a
+            href="./goals.html"
+            class="dashboard-card-link"
+        >
 
-            <div class="card-header">
+            <article class="dashboard-card">
 
-                <div>
+                <div class="card-header">
 
-                    <span class="card-icon">
-                        🎯
-                    </span>
+                    <div>
 
-                    <span class="card-title">
-                        GOALS
+                        <span class="card-icon">
+                            🎯
+                        </span>
+
+                        <span class="card-title">
+                            GOALS
+                        </span>
+
+                    </div>
+
+                    <span class="card-arrow">
+                        →
                     </span>
 
                 </div>
 
-                <span class="card-arrow">
-                    →
-                </span>
 
-            </div>
+                <div class="card-main-value">
 
+                    <span id="goals-value">
+                        —
+                    </span>
 
-            <div class="card-main-value">
-
-                <span id="goals-value">
-                    —
-                </span>
-
-                <span class="goal-total">
-                    / 5
-                </span>
-
-            </div>
+                </div>
 
 
-            <div class="card-description">
-                今月の目標達成
-            </div>
+                <div class="card-description">
+                    現在の目標
+                </div>
 
 
-            <div class="progress">
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="goals-progress-bar"
+                        style="width: 0%;"
+                    ></div>
+
+                </div>
+
 
                 <div
-                    class="progress-bar"
-                    id="goals-progress-bar"
-                    style="width: 0%;"
-                ></div>
+                    class="card-detail"
+                    id="goals-detail"
+                >
+                    目標データを読み込んでいます...
+                </div>
 
-            </div>
+            </article>
 
-
-            <div
-                class="card-detail"
-                id="goals-detail"
-            >
-                目標データを読み込んでいます...
-            </div>
-
-        </article>
+        </a>
 
 
 
@@ -359,21 +431,27 @@
 
             <!-- Schedule -->
 
-            <button
-                class="quick-card"
-                type="button"
-                onclick="location.href='./schedule.html'"
+            <a
+                href="./schedule.html"
+                class="quick-card-link"
             >
 
-                <span class="quick-icon">
-                    📅
-                </span>
+                <button
+                    class="quick-card"
+                    type="button"
+                >
 
-                <span>
-                    Schedule
-                </span>
+                    <span class="quick-icon">
+                        📅
+                    </span>
 
-            </button>
+                    <span>
+                        Schedule
+                    </span>
+
+                </button>
+
+            </a>
 
 
 
@@ -398,20 +476,27 @@
 
             <!-- Goals -->
 
-            <button
-                class="quick-card"
-                type="button"
+            <a
+                href="./goals.html"
+                class="quick-card-link"
             >
 
-                <span class="quick-icon">
-                    🎯
-                </span>
+                <button
+                    class="quick-card"
+                    type="button"
+                >
 
-                <span>
-                    Goals
-                </span>
+                    <span class="quick-icon">
+                        🎯
+                    </span>
 
-            </button>
+                    <span>
+                        Goals
+                    </span>
+
+                </button>
+
+            </a>
 
 
 
