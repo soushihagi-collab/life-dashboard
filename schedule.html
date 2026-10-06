@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Schedule | LIFE DASHBOARD</title>
+
+    <link
+        rel="stylesheet"
+        href="./style.css"
+    >
+
+    <style>
+
+        /* =========================
+           SCHEDULE PAGE
+        ========================= */
+
+        .schedule-page {
+
+            max-width: 1000px;
+
+            margin: 0 auto;
+
+            padding: 45px 30px 80px;
+
+        }
+
+
+        .page-back {
+
+            display: inline-block;
+
+            margin-bottom: 25px;
+
+            color: #8993a1;
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+        }
+
+
+        .page-back:hover {
+
+            color: #f5f7fa;
+
+        }
+
+
+        .page-title {
+
+            margin: 0;
+
+            font-size: 36px;
+
+            font-weight: 600;
+
+        }
+
+
+        .page-description {
+
+            margin-top: 10px;
+
+            color: #8993a1;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .schedule-form-card {
+
+            margin-top: 35px;
+
+            padding: 25px;
+
+            border:
+                1px solid #252b33;
+
+            border-radius: 16px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #131921,
+                    #0f141a
+                );
+
+        }
+
+
+        .form-title {
+
+            margin-bottom: 20px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            letter-spacing: 2px;
+
+            color: #aab3bf;
+
+        }
+
+
+        .schedule-form {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr
+                1fr
+                2fr
+                auto;
+
+            gap: 12px;
+
+        }
+
+
+        .schedule-input {
+
+            width: 100%;
+
+            padding: 13px;
+
+            border:
+                1px solid #303945;
+
+            border-radius: 9px;
+
+            background: #0b0f14;
+
+            color: #f5f7fa;
+
+            font-size: 13px;
+
+            outline: none;
+
+        }
+
+
+        .schedule-input:focus {
+
+            border-color: #42d392;
+
+        }
+
+
+        .add-button {
+
+            padding: 13px 20px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #42d392;
+
+            color: #08100c;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+        }
+
+
+        .add-button:hover {
+
+            opacity: 0.85;
+
+        }
+
+
+        /* =========================
+           LIST
+        ========================= */
+
+        .schedule-list-section {
+
+            margin-top: 40px;
+
+        }
+
+
+        .schedule-list-title {
+
+            margin-bottom: 15px;
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            letter-spacing: 2px;
+
+            color: #6f7a88;
+
+        }
+
+
+        .schedule-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+        }
+
+
+        .schedule-item {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 18px 20px;
+
+            border:
+                1px solid #252b33;
+
+            border-radius: 12px;
+
+            background: #11161d;
+
+        }
+
+
+        .schedule-item-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 18px;
+
+        }
+
+
+        .schedule-time {
+
+            min-width: 55px;
+
+            font-size: 18px;
+
+            font-weight: 600;
+
+        }
+
+
+        .schedule-title {
+
+            font-size: 14px;
+
+            color: #dce2e8;
+
+        }
+
+
+        .delete-button {
+
+            padding: 7px 10px;
+
+            border:
+                1px solid #3b4654;
+
+            border-radius: 7px;
+
+            background: transparent;
+
+            color: #8993a1;
+
+            font-size: 11px;
+
+            cursor: pointer;
+
+        }
+
+
+        .delete-button:hover {
+
+            color: #f5f7fa;
+
+            border-color: #697482;
+
+        }
+
+
+        .empty-message {
+
+            padding: 35px;
+
+            border:
+                1px dashed #303945;
+
+            border-radius: 12px;
+
+            text-align: center;
+
+            color: #697482;
+
+            font-size: 13px;
+
+        }
+
+
+        .loading-message {
+
+            color: #697482;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            .schedule-page {
+
+                padding:
+                    35px 18px 60px;
+
+            }
+
+
+            .page-title {
+
+                font-size: 28px;
+
+            }
+
+
+            .schedule-form {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .schedule-item {
+
+                align-items: flex-start;
+
+                gap: 15px;
+
+            }
+
+
+            .schedule-item-left {
+
+                gap: 12px;
+
+            }
+
+
+            .schedule-time {
+
+                min-width: 45px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="header">
+
+    <div class="brand">
+
+        <div class="brand-title">
+            LIFE DASHBOARD
+        </div>
+
+        <div class="brand-subtitle">
+            YOUR LIFE. YOUR DATA. YOUR DASHBOARD.
+        </div>
+
+    </div>
+
+
+    <div class="header-right">
+
+        <div class="status">
+
+            <span class="status-dot"></span>
+
+            <span id="auth-status">
+                CONNECTING...
+            </span>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="schedule-page">
+
+
+    <a
+        href="./index.html"
+        class="page-back"
+    >
+        ← Dashboard
+    </a>
+
+
+
+    <h1 class="page-title">
+        Schedule
+    </h1>
+
+
+    <p class="page-description">
+        Manage your daily schedule.
+    </p>
+
+
+
+    <!-- =========================
+         ADD SCHEDULE
+    ========================= -->
+
+    <section class="schedule-form-card">
+
+        <div class="form-title">
+            ADD SCHEDULE
+        </div>
+
+
+        <form
+            id="schedule-form"
+            class="schedule-form"
+        >
+
+            <input
+                id="schedule-date"
+                class="schedule-input"
+                type="date"
+                required
+            >
+
+
+            <input
+                id="schedule-time"
+                class="schedule-input"
+                type="time"
+                required
+            >
+
+
+            <input
+                id="schedule-title"
+                class="schedule-input"
+                type="text"
+                placeholder="予定名"
+                maxlength="100"
+                required
+            >
+
+
+            <button
+                class="add-button"
+                type="submit"
+            >
+                ＋ 追加
+            </button>
+
+        </form>
+
+    </section>
+
+
+
+    <!-- =========================
+         SCHEDULE LIST
+    ========================= -->
+
+    <section class="schedule-list-section">
+
+        <div class="schedule-list-title">
+            SCHEDULES
+        </div>
+
+
+        <div
+            id="schedule-list"
+            class="schedule-list"
+        >
+
+            <div class="loading-message">
+                読み込み中...
+            </div>
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script
+    type="module"
+    src="./js/schedule.js"
+></script>
+
+
+</body>
+
+</html>
