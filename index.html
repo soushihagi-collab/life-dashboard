@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -64,7 +65,9 @@
 <main class="dashboard">
 
 
-    <!-- Greeting -->
+    <!-- =========================
+         GREETING
+    ========================= -->
 
     <section class="greeting">
 
@@ -78,7 +81,10 @@
                 Welcome to your LIFE.
             </h1>
 
-            <p class="date" id="today-date">
+            <p
+                class="date"
+                id="today-date"
+            >
                 ----年--月--日
             </p>
 
@@ -88,7 +94,9 @@
 
 
 
-    <!-- Dashboard Grid -->
+    <!-- =========================
+         DASHBOARD GRID
+    ========================= -->
 
     <section class="dashboard-grid">
 
@@ -122,3 +130,366 @@
 
             <div class="card-main-value">
                 3
+            </div>
+
+
+            <div class="card-description">
+                今日の予定
+            </div>
+
+
+            <div class="card-detail">
+                次の予定：20:00
+            </div>
+
+        </article>
+
+
+
+        <!-- =========================
+             AWS SAA
+        ========================= -->
+
+        <article class="dashboard-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <span class="card-icon">
+                        ☁️
+                    </span>
+
+                    <span class="card-title">
+                        AWS SAA
+                    </span>
+
+                </div>
+
+                <span class="card-arrow">
+                    →
+                </span>
+
+            </div>
+
+
+            <div class="card-main-value">
+
+                42
+
+                <span class="unit">
+                    %
+                </span>
+
+            </div>
+
+
+            <div class="card-description">
+                学習進捗
+            </div>
+
+
+            <div class="progress">
+
+                <div
+                    class="progress-bar"
+                    style="width: 42%;"
+                ></div>
+
+            </div>
+
+
+            <div class="card-detail">
+                正答率 78%
+            </div>
+
+        </article>
+
+
+
+        <!-- =========================
+             GOALS
+        ========================= -->
+
+        <article class="dashboard-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <span class="card-icon">
+                        🎯
+                    </span>
+
+                    <span class="card-title">
+                        GOALS
+                    </span>
+
+                </div>
+
+                <span class="card-arrow">
+                    →
+                </span>
+
+            </div>
+
+
+            <div class="card-main-value">
+
+                3
+
+                <span class="goal-total">
+                    / 5
+                </span>
+
+            </div>
+
+
+            <div class="card-description">
+                今月の目標達成
+            </div>
+
+
+            <div class="progress">
+
+                <div
+                    class="progress-bar"
+                    style="width: 60%;"
+                ></div>
+
+            </div>
+
+
+            <div class="card-detail">
+                達成率 60%
+            </div>
+
+        </article>
+
+
+
+        <!-- =========================
+             LIFE SCORE
+        ========================= -->
+
+        <article class="dashboard-card life-score-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <span class="card-icon">
+                        📊
+                    </span>
+
+                    <span class="card-title">
+                        LIFE SCORE
+                    </span>
+
+                </div>
+
+                <span class="card-arrow">
+                    →
+                </span>
+
+            </div>
+
+
+            <div class="score">
+
+                <span class="score-number">
+                    82
+                </span>
+
+                <span class="score-unit">
+                    / 100
+                </span>
+
+            </div>
+
+
+            <div class="card-description">
+                YOUR LIFE SCORE
+            </div>
+
+
+            <div class="score-message">
+                GOOD CONDITION
+            </div>
+
+        </article>
+
+
+    </section>
+
+
+
+    <!-- =========================
+         QUICK ACCESS
+    ========================= -->
+
+    <section class="quick-section">
+
+        <div class="section-title">
+            QUICK ACCESS
+        </div>
+
+
+        <div class="quick-grid">
+
+
+            <!-- Schedule -->
+
+            <button
+                class="quick-card"
+                type="button"
+            >
+
+                <span class="quick-icon">
+                    📅
+                </span>
+
+                <span>
+                    Schedule
+                </span>
+
+            </button>
+
+
+
+            <!-- AWS -->
+
+            <button
+                class="quick-card"
+                type="button"
+            >
+
+                <span class="quick-icon">
+                    ☁️
+                </span>
+
+                <span>
+                    AWS SAA
+                </span>
+
+            </button>
+
+
+
+            <!-- Goals -->
+
+            <button
+                class="quick-card"
+                type="button"
+            >
+
+                <span class="quick-icon">
+                    🎯
+                </span>
+
+                <span>
+                    Goals
+                </span>
+
+            </button>
+
+
+
+            <!-- Settings -->
+
+            <button
+                class="quick-card"
+                type="button"
+            >
+
+                <span class="quick-icon">
+                    ⚙️
+                </span>
+
+                <span>
+                    Settings
+                </span>
+
+            </button>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         ACCOUNT
+    ========================= -->
+
+    <section class="account-section">
+
+        <div class="section-title">
+            ACCOUNT
+        </div>
+
+
+        <div class="account-card">
+
+
+            <div>
+
+                <div class="account-label">
+                    USER ID
+                </div>
+
+
+                <code id="user-uid">
+                    CONNECTING...
+                </code>
+
+            </div>
+
+
+            <div class="account-type">
+                ANONYMOUS
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer class="footer">
+
+    LIFE DASHBOARD
+
+    <span>
+        •
+    </span>
+
+    YOUR LIFE. YOUR DATA.
+
+</footer>
+
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script
+    type="module"
+    src="./js/dashboard.js"
+></script>
+
+
+</body>
+
+</html>
+```
