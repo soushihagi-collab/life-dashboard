@@ -1,3 +1,4 @@
+```javascript
 import { startAnonymousAuth } from "./auth.js";
 
 import {
@@ -9,50 +10,138 @@ import {
 import { db } from "./firebase.js";
 
 
+
+/* =========================
+   ELEMENTS
+========================= */
+
 const uidElement =
     document.getElementById("user-uid");
 
 const statusElement =
     document.getElementById("auth-status");
 
+const dateElement =
+    document.getElementById("today-date");
+
+
+
+/* =========================
+   DATE
+========================= */
+
+function displayToday() {
+
+    const now = new Date();
+
+
+    const year =
+        now.getFullYear();
+
+
+    const month =
+        now.getMonth() + 1;
+
+
+    const date =
+        now.getDate();
+
+
+    const weekdayNames = [
+        "日",
+        "月",
+        "火",
+        "水",
+        "木",
+        "金",
+        "土"
+    ];
+
+
+    const weekday =
+        weekdayNames[
+            now.getDay()
+        ];
+
+
+    dateElement.textContent =
+        `${year}年${month}月${date}日（${weekday}）`;
+
+}
+
+
+displayToday();
+
+
+
+/* =========================
+   AUTH
+========================= */
 
 startAnonymousAuth(async (user) => {
 
-    console.log("LIFE DASHBOARD 起動");
 
-    console.log("User UID:", user.uid);
+    console.log(
+        "LIFE DASHBOARD 起動"
+    );
 
 
-    // UID表示
+    console.log(
+        "User UID:",
+        user.uid
+    );
+
+
+
+    /* =========================
+       UID DISPLAY
+    ========================= */
+
     uidElement.textContent =
         user.uid;
 
 
-    // ONLINE表示
+
+    /* =========================
+       ONLINE
+    ========================= */
+
     statusElement.textContent =
         "ONLINE";
 
 
+
+    /* =========================
+       FIRESTORE
+    ========================= */
+
     try {
 
-        // ユーザー情報をFirestoreに保存
 
         await setDoc(
+
             doc(
                 db,
                 "users",
                 user.uid
             ),
+
             {
-                createdAt: serverTimestamp(),
 
-                lastLoginAt: serverTimestamp(),
+                accountType:
+                    "anonymous",
 
-                accountType: "anonymous"
+                lastLoginAt:
+                    serverTimestamp()
+
             },
+
             {
+
                 merge: true
+
             }
+
         );
 
 
@@ -63,6 +152,7 @@ startAnonymousAuth(async (user) => {
 
     } catch (error) {
 
+
         console.error(
             "Firestore接続失敗:",
             error
@@ -71,3 +161,4 @@ startAnonymousAuth(async (user) => {
     }
 
 });
+```
