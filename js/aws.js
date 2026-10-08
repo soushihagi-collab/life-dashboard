@@ -13334,6 +13334,7 @@ async function toggleFavorite(){
         if(favoriteQuestionIds.has(currentQuestion.id)){await deleteDoc(ref);favoriteQuestionIds.delete(currentQuestion.id);}
         else{await setDoc(ref,{questionId:currentQuestion.id,createdAt:Timestamp.now()});favoriteQuestionIds.add(currentQuestion.id);}
         updateFavoriteButton();
+        renderFavoriteList();
     }catch(e){console.error("Favorite error:",e);}
 }
 function updateFavoriteButton(){
@@ -13384,17 +13385,20 @@ function startFavoriteStudy(){
     const favorites=getFavoriteQuestions();
 
     if(!favorites.length){
-        alert(
-            "お気に入り登録されている問題がありません。\n\n" +
-            "問題を解いたあと「☆ お気に入り」を押すと登録できます。"
-        );
+        alert("お気に入り登録されている問題がありません。\n\n問題を解いたあと「☆ お気に入り」を押すと登録できます。");
         return;
     }
 
     studyMode="favorite";
-    currentFilter="favorite";
     currentCategory="all";
     currentStudyQuestions=[...favorites];
+
+    // お気に入り問題を一度だけシャッフルし、全問を順番に解く
+    for(let i=currentStudyQuestions.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [currentStudyQuestions[i],currentStudyQuestions[j]]=[currentStudyQuestions[j],currentStudyQuestions[i]];
+    }
+
     currentStudyIndex=0;
     previousQuestionId=null;
 
@@ -13404,34 +13408,19 @@ function startFavoriteStudy(){
 }
 
 function renderFavoriteQuestion(){
-    if(!currentStudyQuestions.length){
-        finishFavoriteStudy();
-        return;
-    }
-
     if(currentStudyIndex>=currentStudyQuestions.length){
         finishFavoriteStudy();
         return;
     }
 
     currentQuestion=currentStudyQuestions[currentStudyIndex];
-    previousQuestionId=currentQuestion.id;
 
-    if($("question-number")){
-        $("question-number").textContent=
-            `FAVORITE ${currentStudyIndex+1} / ${currentStudyQuestions.length}`;
-    }
-
-    if($("question-tags")){
-        $("question-tags").innerHTML=
-            `<span>${currentQuestion.category}</span><span>${currentQuestion.difficulty}</span><span>⭐ お気に入り</span>`;
-    }
-
+    if($("question-number"))$("question-number").textContent=`お気に入り ${currentStudyIndex+1} / ${currentStudyQuestions.length}`;
+    if($("question-tags"))$("question-tags").innerHTML=`<span>${escapeHTML(currentQuestion.category)}</span><span>${escapeHTML(currentQuestion.difficulty)}</span><span>⭐ お気に入り</span>`;
     if($("question-text"))$("question-text").textContent=currentQuestion.question;
 
     const answerList=$("answer-list");
     if(!answerList)return;
-
     answerList.innerHTML="";
 
     currentQuestion.choices.forEach((choice,index)=>{
@@ -13448,28 +13437,24 @@ function renderFavoriteQuestion(){
     }
 
     if($("next-question-button"))$("next-question-button").style.display="none";
-
     updateFavoriteButton();
 }
 
 function finishFavoriteStudy(){
     const total=currentStudyQuestions.length;
 
-    if($("question-number"))
-        $("question-number").textContent="FAVORITE COMPLETE";
-
-    if($("question-text"))
-        $("question-text").textContent=
-            `⭐ お気に入り問題 ${total}問の演習が完了しました！`;
-
+    if($("question-number"))$("question-number").textContent="お気に入り演習 完了";
+    if($("question-text"))$("question-text").textContent=`⭐ お気に入り問題 ${total}問の演習が完了しました！`;
+    if($("question-tags"))$("question-tags").innerHTML=`<span>⭐ お気に入り</span><span>${total}問完了</span>`;
     if($("answer-list"))$("answer-list").innerHTML="";
+
     if($("question-result")){
-        $("question-result").innerHTML=
-            `<div class="result-title">🎉 お疲れさまでした！</div>` +
-            `<div class="result-explanation">お気に入り登録した ${total} 問をすべて演習しました。</div>`;
         $("question-result").style.display="block";
+        $("question-result").innerHTML=`<div class="result-title">🎉 お気に入り演習完了</div><div class="result-explanation">お気に入り登録した <strong>${total}問</strong> をすべて解き終わりました。<br><br>もう一度解く場合は「⭐ お気に入り問題」を押してください。</div>`;
     }
+
     if($("next-question-button"))$("next-question-button").style.display="none";
+    currentQuestion=null;
 }
 
 function getRandomQuestion(pool){
@@ -13519,21 +13504,7 @@ async function answerQuestion(selectedIndex){
     if($("next-question-button"))$("next-question-button").style.display="block";
     updateAnalytics();
 }
-function nextQuestion(){
-    if(studyMode==="favorite"){
-        currentStudyIndex++;
-        renderFavoriteQuestion();
-        return;
-    }
-
-    if(studyMode==="wrong")currentStudyQuestions=getPriorityWrongQuestions();
-    if(!currentStudyQuestions.length){
-        alert("現在、対象となる問題はありません。");
-        return;
-    }
-    currentStudyIndex++;
-    renderQuestion();
-}
+function nextQuestion(){if(studyMode==="favorite"){currentStudyIndex++;renderFavoriteQuestion();return;}if(studyMode==="wrong")currentStudyQuestions=getPriorityWrongQuestions();if(!currentStudyQuestions.length){alert("現在、対象となる問題はありません。");return;}currentStudyIndex++;renderQuestion();}
 
 // =========================================================
 // CATEGORY / FILTER UI
@@ -13605,9 +13576,130 @@ async function finishMockExam(){
 }
 
 // =========================================================
+// FAVORITE LIST
+// =========================================================
+function ensureFavoriteListStyles(){
+    if(document.getElementById("favorite-list-styles"))return;
+    const style=document.createElement("style");
+    style.id="favorite-list-styles";
+    style.textContent=`
+        .favorite-list-panel{margin:24px 0;padding:22px;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+        .favorite-list-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+        .favorite-list-title{margin:0;font-size:22px}
+        .favorite-list-count{font-weight:700;color:#8b5e3c}
+        .favorite-list-empty{padding:24px;text-align:center;color:#777;background:#faf7f2;border-radius:12px}
+        .favorite-list-item{padding:16px;margin-top:12px;border:1px solid #eee;border-radius:14px;background:#fff}
+        .favorite-list-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:9px}
+        .favorite-list-meta span{padding:4px 9px;border-radius:999px;background:#f4efe9;font-size:12px}
+        .favorite-list-question{font-weight:700;line-height:1.6;margin-bottom:12px}
+        .favorite-list-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .favorite-list-actions button{border:0;border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:700}
+        .favorite-list-solve{background:#8b5e3c;color:#fff}
+        .favorite-list-remove{background:#f1f1f1;color:#555}
+        @media(max-width:700px){.favorite-list-header{align-items:flex-start;flex-direction:column}.favorite-list-actions button{width:100%}}
+    `;
+    document.head.appendChild(style);
+}
+
+function ensureFavoriteListPanel(){
+    let panel=$("favorite-list-panel");
+    if(panel)return panel;
+
+    ensureFavoriteListStyles();
+    panel=document.createElement("section");
+    panel.id="favorite-list-panel";
+    panel.className="favorite-list-panel";
+    panel.innerHTML=`
+        <div class="favorite-list-header">
+            <h2 class="favorite-list-title">⭐ お気に入り問題一覧</h2>
+            <div id="favorite-list-count" class="favorite-list-count">0問</div>
+        </div>
+        <div id="favorite-list-content"></div>
+    `;
+
+    const studySection=$("study-section");
+    if(studySection&&studySection.parentNode)studySection.parentNode.insertBefore(panel,studySection);
+    else document.body.appendChild(panel);
+    return panel;
+}
+
+function renderFavoriteList(){
+    const panel=ensureFavoriteListPanel();
+    if(!panel)return;
+
+    const content=$("favorite-list-content");
+    const count=$("favorite-list-count");
+    const favorites=getFavoriteQuestions();
+
+    if(count)count.textContent=`${favorites.length}問`;
+    if(!content)return;
+
+    if(!favorites.length){
+        content.innerHTML=`<div class="favorite-list-empty">お気に入り登録されている問題はありません。<br>問題を解いたあと「☆ お気に入り」を押すと登録できます。</div>`;
+        return;
+    }
+
+    content.innerHTML="";
+
+    favorites.forEach((question,index)=>{
+        const item=document.createElement("div");
+        item.className="favorite-list-item";
+        item.innerHTML=`
+            <div class="favorite-list-meta">
+                <span>⭐ #${index+1}</span>
+                <span>${escapeHTML(question.category)}</span>
+                <span>${escapeHTML(question.difficulty)}</span>
+                <span>${escapeHTML(question.id)}</span>
+            </div>
+            <div class="favorite-list-question">${escapeHTML(question.question)}</div>
+            <div class="favorite-list-actions">
+                <button type="button" class="favorite-list-solve">この問題を解く</button>
+                <button type="button" class="favorite-list-remove">お気に入り解除</button>
+            </div>
+        `;
+
+        item.querySelector(".favorite-list-solve").addEventListener("click",()=>startFavoriteSingle(question.id));
+        item.querySelector(".favorite-list-remove").addEventListener("click",async()=>{
+            await removeFavoriteFromList(question.id);
+        });
+        content.appendChild(item);
+    });
+}
+
+async function removeFavoriteFromList(questionId){
+    if(!currentUser){alert("ログインしてください。");return;}
+    const ref=doc(getFavoritesCollection(),questionId);
+    try{
+        await deleteDoc(ref);
+        favoriteQuestionIds.delete(questionId);
+        if(currentQuestion&&currentQuestion.id===questionId)updateFavoriteButton();
+        renderFavoriteList();
+    }catch(e){
+        console.error("Favorite remove error:",e);
+        alert("お気に入りの解除に失敗しました。");
+    }
+}
+
+function startFavoriteSingle(questionId){
+    stopMockExam();
+    const question=questionDatabase.find(q=>q.id===questionId);
+    if(!question)return;
+
+    studyMode="favorite";
+    currentFilter="favorite";
+    currentCategory="all";
+    currentStudyQuestions=[question];
+    currentStudyIndex=0;
+    previousQuestionId=null;
+    renderFavoriteQuestion();
+
+    if($("study-section"))$("study-section").scrollIntoView({behavior:"smooth"});
+}
+
+// =========================================================
 // AUTH / EVENTS / INIT
 // =========================================================
-function setupAuth(){onAuthStateChangedAuth(auth,async user=>{currentUser=user;const status=$("auth-status");if(user){if(status)status.textContent=user.email||"ログイン中";await loadAwsData();await loadHistory();await loadFavorites();rebuildWrongQuestions();updateAnalytics();}else{if(status)status.textContent="未ログイン";}});}
+function setupAuth(){onAuthStateChangedAuth(auth,async user=>{currentUser=user;const status=$("auth-status");if(user){if(status)status.textContent=user.email||"ログイン中";await loadAwsData();await loadHistory();await loadFavorites();rebuildWrongQuestions();renderFavoriteList();updateAnalytics();}else{if(status)status.textContent="未ログイン";}});}
 function setupEventListeners(){
     if($("aws-save-button"))$("aws-save-button").addEventListener("click",saveSettings);
     if($("favorite-button"))$("favorite-button").addEventListener("click",toggleFavorite);
@@ -13621,7 +13713,7 @@ function setupEventListeners(){
 }
 
 function initialize(){
-    setupEventListeners();setupAuth();updateAnalytics();currentStudyQuestions=[...questionDatabase];renderQuestion();
+    setupEventListeners();setupAuth();ensureFavoriteListPanel();renderFavoriteList();updateAnalytics();currentStudyQuestions=[...questionDatabase];renderQuestion();
     // HTML buttons may call these from inline onclick handlers.
     window.awsMockNext=mockNext;
     window.awsMockPrevious=mockPrevious;
